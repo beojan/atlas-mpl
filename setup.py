@@ -29,7 +29,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/beojan/atlas-mpl,
+    url='https://github.com/beojan/atlas-mpl',
 
     # Author details
     author='Beojan Stanislaus',
