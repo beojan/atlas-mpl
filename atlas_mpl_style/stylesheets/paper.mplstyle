@@ -1,0 +1,51 @@
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+font.family: sans-serif
+font.sans-serif: Fira Sans, TeX Gyre Heros, Helvetica Neue, Helvetica, Arial
+font.serif: TeX Gyre Pagella, Palatino, Palatino Linotype
+font.monospace: Iosevka, Source Sans Pro, Inconsolata, Monaco, Consolas
+
+text.color: 444444
+mathtext.fontset: stixsans
+mathtext.default: regular
+
+axes.facecolor: E5E5E5
+axes.edgecolor: EEEEEE
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: 444444
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+axes.formatter.limits: -2, 4
+axes.formatter.use_mathtext: True
+
+# from http://www.huyng.com/posts/sane-color-scheme-for-matplotlib/
+axes.prop_cycle: cycler('color', ['E24A33', '348ABD', '988ED5', '777777', 'FBC15E', '8EBA42', 'FFB5B8'])
+                   # E24A33 : red
+                   # 348ABD : blue
+                   # 988ED5 : purple
+                   # 777777 : gray
+                   # FBC15E : yellow
+                   # 8EBA42 : green
+                   # FFB5B8 : pink
+
+xtick.color: 444444
+xtick.major.size: 0
+xtick.direction: in
+
+ytick.color: 444444
+ytick.major.size: 0
+ytick.direction: in
+
+grid.color: EEEEEE
+grid.linestyle: -    # solid line
+
+figure.figsize: 7.1, 4.8
+figure.facecolor: EEEEEE
+figure.edgecolor: 0.50
+
