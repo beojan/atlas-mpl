@@ -2,6 +2,8 @@
 
 Provides a Matplotlib style replicating that used by the [ATLAS](http://atlas.cern) collaboration.
 
+This is *not* an official ATLAS package, and there is no guarantee that the style will meet any requirements.
+
 In addition, this package also provides:
 
 - A matplotlib style based on the background / foreground from the VIM [Paper](https://github.com/NLKNguyen/papercolor-theme)
