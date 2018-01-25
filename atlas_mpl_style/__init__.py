@@ -144,6 +144,6 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
     label = (fr'\textbf{{\textit{{ATLAS}}}} {sim_str}{status_str}'
              fr'{nl if show_e_nl else ""}'
              fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
-             fr'{desc}')
+             fr'{desc if desc_line else ""}')
     ax.text(x, y, label, ha='left', va='top', multialignment='left',
             transform=ax.transAxes, size=14, *args, **kwargs)
