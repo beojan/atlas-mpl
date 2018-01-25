@@ -128,13 +128,13 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
     show_e_nl = False
     if energy is not None:
         show_e_nl = True
-        energy_str = rf'$\sqrt{{s}} = $ {energy} \quad'
+        energy_str = rf'$\sqrt{{s}} = $ {energy}'
     else:
         energy_str = ''
 
     if lumi is not None:
         show_e_nl = True
-        lumi_str = (fr'$\displaystyle\int \textsf{{Ld}}t = {lumi:4.1f}'
+        lumi_str = (fr', ${lumi:4.1f} '
                     fr'\textsf{{fb}}^{{-1}}$')
     else:
         lumi_str = ''
