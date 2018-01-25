@@ -63,7 +63,7 @@ def set_xlabel(label, ax=None, *args, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
-    ax.set_xlabel(label, x=1.0, ha='right')
+    ax.set_xlabel(label, x=1.0, ha='right', *args, **kwargs)
 
 
 def set_ylabel(label, ax=None, *args, **kwargs):
@@ -81,13 +81,15 @@ def set_ylabel(label, ax=None, *args, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
-    ax.set_ylabel(label, y=1.0, ha='right')
+    ax.set_ylabel(label, y=1.0, ha='right', *args, **kwargs)
 
 
 def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
-                     energy=None, lumi=None, desc=None):
+                     energy=None, lumi=None, desc=None, *args, **kwargs):
     """
     Draw ATLAS label.
+
+    Additional parameters are passed through to ``ax.text``.
 
     Parameters
     ----------
@@ -143,4 +145,5 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
              fr'{nl if show_e_nl else ""}'
              fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
              fr'{desc}')
-    ax.text(x, y, label, ha='left', va='top', multialignment='left')
+    ax.text(x, y, label, ha='left', va='top', multialignment='left',
+            transform=ax.transAxes, size=14, *args, **kwargs)
