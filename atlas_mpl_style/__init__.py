@@ -134,7 +134,7 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
 
     if lumi is not None:
         show_e_nl = True
-        lumi_str = (fr', ${lumi:4.1f} '
+        lumi_str = (fr', ${lumi:4f} '
                     fr'\textsf{{fb}}^{{-1}}$')
     else:
         lumi_str = ''
