@@ -1,4 +1,4 @@
 # Include the license file
 include LICENSE.md
-include README.md
+include README.rst
 
