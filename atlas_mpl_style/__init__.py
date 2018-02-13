@@ -147,3 +147,13 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
              fr'{desc if desc_line else ""}')
     ax.text(x, y, label, ha='left', va='top', multialignment='left',
             transform=ax.transAxes, size=14, *args, **kwargs)
+
+
+def ratio_axes():
+    fig = _mpl.pyplot.figure(figsize=(8, 8), dpi=600)
+    gs = _mpl.gridspec.GridSpec(4, 1, hspace=0., wspace=0.)
+    ax1 = fig.add_subplot(gs[0:3])
+    ax1.tick_params(labelbottom='off')
+    ax2 = fig.add_subplot(gs[3], sharex=ax1)
+    ax2.autoscale(axis='x', tight=True)
+    return fig, ax1, ax2
