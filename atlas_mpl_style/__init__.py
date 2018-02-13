@@ -84,7 +84,7 @@ def set_ylabel(label, ax=None, *args, **kwargs):
     ax.set_ylabel(label, y=1.0, ha='right', *args, **kwargs)
 
 
-def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
+def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
                      energy=None, lumi=None, desc=None, *args, **kwargs):
     """
     Draw ATLAS label.
@@ -99,7 +99,7 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
         y position
     ax : mpl.axes.Axes, optional
         Axes to draw label in
-    status : [ 'int' | 'wip' | 'prelim' | *'final'* ], optional
+    status : [ *'int'* | 'wip' | 'prelim' | 'final' ], optional
         Approval status
     simulation : bool (optional, default ``False``)
         Does the plot show only MC simulation results
@@ -134,7 +134,7 @@ def draw_atlas_label(x, y, ax=None, status='final', simulation=False,
 
     if lumi is not None:
         show_e_nl = True
-        lumi_str = (fr', ${lumi:4f} '
+        lumi_str = (fr', ${lumi:.4g} \ '
                     fr'\textsf{{fb}}^{{-1}}$')
     else:
         lumi_str = ''
@@ -153,7 +153,7 @@ def ratio_axes():
     fig = _mpl.pyplot.figure(figsize=(8, 8), dpi=600)
     gs = _mpl.gridspec.GridSpec(4, 1, hspace=0., wspace=0.)
     ax1 = fig.add_subplot(gs[0:3])
-    ax1.tick_params(labelbottom='off')
+    ax1.tick_params(labelbottom=False)
     ax2 = fig.add_subplot(gs[3], sharex=ax1)
     ax2.autoscale(axis='x', tight=True)
     return fig, ax1, ax2
