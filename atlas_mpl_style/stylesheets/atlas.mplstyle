@@ -23,6 +23,7 @@ axes.labelcolor: 000000
 axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
 axes.formatter.limits: -2, 4
 axes.formatter.use_mathtext: True
+axes.autolimit_mode: round_numbers
 
 # from http://www.huyng.com/posts/sane-color-scheme-for-matplotlib/
 axes.prop_cycle: cycler('color', ['E24A33', '348ABD', '988ED5', '777777', 'FBC15E', '8EBA42', 'FFB5B8'])

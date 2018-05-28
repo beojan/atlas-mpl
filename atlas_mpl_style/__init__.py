@@ -46,6 +46,7 @@ def use_atlas_style():
                                             r'\usepackage{sansmath}',
                                             r'\setlength{\parindent}{0pt}'
                                             r'\sansmath']
+    _mpl.pyplot.minorticks_on()
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
@@ -85,7 +86,8 @@ def set_ylabel(label, ax=None, *args, **kwargs):
 
 
 def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
-                     energy=None, lumi=None, desc=None, *args, **kwargs):
+                     energy=None, lumi=None, desc=None, lumi_lt=False, 
+                     *args, **kwargs):
     """
     Draw ATLAS label.
 
@@ -107,6 +109,8 @@ def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
         Centre of mass energy, including units
     lumi : float, optional
         Integrated luminosity in /fb
+    lumi_lt: bool, optional
+        True if only a subset of data was processed
     desc : str, optional
         Additional description
     """
@@ -134,7 +138,7 @@ def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
 
     if lumi is not None:
         show_e_nl = True
-        lumi_str = (fr', ${lumi:.4g} \ '
+        lumi_str = (fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ '
                     fr'\textsf{{fb}}^{{-1}}$')
     else:
         lumi_str = ''
@@ -155,5 +159,7 @@ def ratio_axes():
     ax1 = fig.add_subplot(gs[0:3])
     ax1.tick_params(labelbottom=False)
     ax2 = fig.add_subplot(gs[3], sharex=ax1)
+    ax2.yaxis.set_major_locator(_mpl.ticker.MaxNLocator(
+        symmetric=True, prune='both', min_n_ticks=5, nbins=4))
     ax2.autoscale(axis='x', tight=True)
     return fig, ax1, ax2
