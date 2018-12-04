@@ -15,6 +15,7 @@ _EXTRA_COLORS = {
         'paper:red': '#af0000',
         'paper:green': '#008700',
         'paper:blue': '#005f87',
+        'paper:yellow': '#afaf00',
         'paper:orange': '#d75f00',
         'paper:pink': '#d70087',
         'paper:purple': '#8700af',
@@ -34,13 +35,15 @@ _EXTRA_COLORS = {
         'on:brown': '#ab7967'
 }
 
+_atlas_label = "ATLAS"
 _mpl.colors.EXTRA_COLORS = _EXTRA_COLORS
 _mpl.colors.colorConverter.colors.update(_EXTRA_COLORS)
 
 
-def use_atlas_style():
+def use_atlas_style(atlasLabel='ATLAS'):
     "Setup ATLAS style."
     _style.use('atlas')
+    _atlas_label = atlasLabel
     _mpl.rcParams['font.size'] = 16
     _mpl.rcParams['text.latex.preamble'] = [r'\usepackage{helvet}',
                                             r'\usepackage{sansmath}',
@@ -127,7 +130,7 @@ def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
     elif status == 'prelim':
         status_str = 'Preliminary'
     else:
-        status_str = 'Internal (please set the status)'
+        status_str = status
 
     show_e_nl = False
     if energy is not None:
@@ -145,7 +148,7 @@ def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
 
     desc_line = desc is not None
     nl = r'\\'
-    label = (fr'\textbf{{\textit{{ATLAS}}}} {sim_str}{status_str}'
+    label = (fr'\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}'
              fr'{nl if show_e_nl else ""}'
              fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
              fr'{desc if desc_line else ""}')
