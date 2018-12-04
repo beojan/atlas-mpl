@@ -42,6 +42,7 @@ _mpl.colors.colorConverter.colors.update(_EXTRA_COLORS)
 
 def use_atlas_style(atlasLabel='ATLAS'):
     "Setup ATLAS style."
+    global _atlas_label
     _style.use('atlas')
     _atlas_label = atlasLabel
     _mpl.rcParams['font.size'] = 16
@@ -117,6 +118,7 @@ def draw_atlas_label(x, y, ax=None, status='int', simulation=False,
     desc : str, optional
         Additional description
     """
+    global _atlas_label
     if ax is None:
         ax = _mpl.pyplot.gca()
     sim_str = "Simulation " if simulation else ""
