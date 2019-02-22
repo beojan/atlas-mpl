@@ -13,8 +13,7 @@ In addition, this package also provides:
    `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ color
    scheme, along with a print version with a white background.
 
-   -  The default color cycle in all three styles is from the ggplot
-      theme included with Matplotlib
+   -  The default color cycle in all three styles is generated with HCL Wizard
 
 -  Additional Matplotlib color definitions based on the Paper theme, and
    the `Oceanic

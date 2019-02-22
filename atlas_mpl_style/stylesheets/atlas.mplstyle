@@ -25,15 +25,8 @@ axes.formatter.limits: -2, 4
 axes.formatter.use_mathtext: True
 axes.autolimit_mode: round_numbers
 
-# from http://www.huyng.com/posts/sane-color-scheme-for-matplotlib/
-axes.prop_cycle: cycler('color', ['E24A33', '348ABD', '988ED5', '777777', 'FBC15E', '8EBA42', 'FFB5B8'])
-                   # E24A33 : red
-                   # 348ABD : blue
-                   # 988ED5 : purple
-                   # 777777 : gray
-                   # FBC15E : yellow
-                   # 8EBA42 : green
-                   # FFB5B8 : pink
+# Generated with HCL Wizard
+axes.prop_cycle: cycler('color', ['54C9D1','ECA89A','95BCED','CEB776','D3A9EA','9BC57F','F0A1CA','5FCBAA'])
 
 xtick.color: 000000
 xtick.major.size: 5
