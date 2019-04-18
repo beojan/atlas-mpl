@@ -41,6 +41,8 @@ grid.color: FFFFFF
 grid.linestyle: -    # solid line
 
 figure.figsize: 8, 6
+figure.dpi: 150
 figure.facecolor: FFFFFF
 figure.edgecolor: 0.50
 
+savefig.facecolor: FFFFFF00

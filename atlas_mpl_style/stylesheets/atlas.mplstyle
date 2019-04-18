@@ -47,3 +47,5 @@ figure.figsize: 8, 6
 figure.facecolor: FFFFFF
 figure.edgecolor: 0.50
 
+savefig.facecolor: FFFFFF00
+
