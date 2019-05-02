@@ -4,8 +4,7 @@ ATLAS Matplotlib Style
 Provides a Matplotlib style replicating that used by the
 `ATLAS <http://atlas.cern>`__ collaboration.
 
-This is *not* an official ATLAS package, and there is no guarantee that
-the style will meet any requirements.
+Documentationhttps://atlas-mpl.readthedocs.io/en/latest/index.html: https://atlas-mpl.readthedocs.io/en/latest/index.html
 
 In addition, this package also provides:
 
