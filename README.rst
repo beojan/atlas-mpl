@@ -4,7 +4,7 @@ ATLAS Matplotlib Style
 Provides a Matplotlib style replicating that used by the
 `ATLAS <http://atlas.cern>`__ collaboration.
 
-Please open an issue if you find this style deviates from the guidelines
+**Please open an issue if you find this style deviates from the guidelines.**
 
 Documentation: https://atlas-mpl.readthedocs.io/en/latest/index.html
 
