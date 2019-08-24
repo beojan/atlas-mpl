@@ -73,7 +73,7 @@ def set_color_cycle(pal=None, n=4):
     """
     if n < 2:
         n = 2
-    if pal == "ATLAS":
+    if pal.upper() == "ATLAS":
         if n > 5:
             n = 5
         colors = reversed(
@@ -82,7 +82,7 @@ def set_color_cycle(pal=None, n=4):
             ]
             + ["series2:red"]
         )
-    elif pal == "Paper":
+    elif pal.lower() == "paper":
         if n > 8:
             n = 8
         colors = [
@@ -95,7 +95,7 @@ def set_color_cycle(pal=None, n=4):
             "paper:lightblue",
             "paper:olive",
         ][0:n]
-    elif pal == "Oceanic":
+    elif pal.lower() == "oceanic":
         colors = [
             "on:green",
             "on:red",
@@ -105,11 +105,23 @@ def set_color_cycle(pal=None, n=4):
             "on:pink",
             "on:yellow",
         ]
+     elif pal.lower() == "tab" or pal.lower() == "tableau":
+        colors = [
+            'tab:blue',
+            'tab:orange',
+            'tab:green', 
+            'tab:red',
+            'tab:purple',
+            'tab:brown',
+            'tab:pink',
+            'tab:gray',
+            'tab:olive',
+            'tab:cyan'
+        ]
     else:
         colors = [
             "series:cyan",
             "series:orange",
-            "series:blue",
             "series:blue",
             "series:olive",
             "series:purple",
