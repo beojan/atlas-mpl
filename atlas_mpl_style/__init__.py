@@ -65,9 +65,10 @@ def set_color_cycle(pal=None, n=4):
 
      Parameters
      ----------
-     pal : {'ATLAS', 'Paper', 'Oceanic', None}
+     pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', None}
        The palette to use. None resets to default palette.
-       The ATLAS palette is suitable for histograms, not lines
+       The ATLAS palette is suitable for histograms, not lines.
+        'MPL' (alias 'Tab') provides the default matplotlib palette.
      n : int, optional
        Number of lines or histograms.
     """
@@ -105,7 +106,7 @@ def set_color_cycle(pal=None, n=4):
             "on:pink",
             "on:yellow",
         ]
-     elif pal.lower() == "tab" or pal.lower() == "tableau":
+    elif pal.lower() == "tab" or pal.lower() == "tableau" or pal.lower() == "mpl":
         colors = [
             'tab:blue',
             'tab:orange',
