@@ -150,6 +150,7 @@ def use_atlas_style(atlasLabel="ATLAS"):
         r"\usepackage{helvet}",
         r"\usepackage{sansmath}",
         r"\setlength{\parindent}{0pt}" r"\sansmath",
+        r"\def\mathdefault{}"
     ]
     _mpl.pyplot.minorticks_on()
 
