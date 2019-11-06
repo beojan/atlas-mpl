@@ -16,7 +16,7 @@ mathtext.default: regular
 axes.facecolor: FFFFFF
 axes.edgecolor: 444444
 axes.linewidth: 1
-axes.grid: True
+axes.grid: False
 axes.titlesize: x-large
 axes.labelsize: large
 axes.labelcolor: 444444
