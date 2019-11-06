@@ -28,6 +28,11 @@ axes.autolimit_mode: round_numbers
 # Generated with HCL Wizard
 axes.prop_cycle: cycler('color', ['54C9D1','ECA89A','95BCED','CEB776','D3A9EA','9BC57F','F0A1CA','5FCBAA'])
 
+# Legend
+legend.frameon: False
+legend.framealpha: 0.0
+legend.fancybox: False
+
 xtick.color: 000000
 xtick.major.size: 5
 xtick.minor.size: 3
@@ -41,7 +46,6 @@ ytick.minor.size: 3
 ytick.left: True
 ytick.right: True
 ytick.direction: in
-
 
 figure.figsize: 8, 6
 figure.facecolor: FFFFFF
