@@ -149,7 +149,6 @@ def use_atlas_style(atlasLabel="ATLAS"):
     _mpl.rcParams["text.latex.preamble"] = [
         r"\usepackage[LGR,T1]{fontenc}",
         r"\usepackage{tgheros}",
-        r"\usepackage[frenchmath]{newtxsf}",
         r"\renewcommand{\familydefault}{\sfdefault}",
         r"\usepackage{amsmath}",
         r"\usepackage[symbolgreek,symbolmax]{mathastext}",

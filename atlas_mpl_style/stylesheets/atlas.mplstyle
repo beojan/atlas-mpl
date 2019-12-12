@@ -6,10 +6,9 @@ patch.antialiased: True
 text.usetex: True
 font.size: 14.0
 font.family: sans-serif
-font.sans-serif: Helvetica, Tex Gyre Heros, Arial
-font.serif: Times, Tex Gyre Termes, Times New Roman
+font.sans-serif: Tex Gyre Heros, Helvetica, Arial
+font.serif: Tex Gyre Termes, Times, Times New Roman
 font.monospace: Courier
-#text.latex.preamble: ['\usepackage{sansmathfonts}']
 
 text.color: 000000
 
@@ -17,8 +16,8 @@ axes.facecolor: FFFFFF
 axes.edgecolor: 000000
 axes.linewidth: 1
 axes.grid: False
-axes.titlesize: x-large
-axes.labelsize: large
+axes.titlesize: 16
+axes.labelsize: 14
 axes.labelcolor: 000000
 axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
 axes.formatter.limits: -2, 4
