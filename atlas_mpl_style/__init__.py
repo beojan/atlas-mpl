@@ -147,9 +147,15 @@ def use_atlas_style(atlasLabel="ATLAS"):
     _atlas_label = atlasLabel
     _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["text.latex.preamble"] = [
-        r"\usepackage{helvet}",
-        r"\usepackage{sansmath}",
-        r"\setlength{\parindent}{0pt}" r"\sansmath",
+        r"\usepackage[LGR,T1]{fontenc}",
+        r"\usepackage{tgheros}",
+        r"\usepackage[frenchmath]{newtxsf}",
+        r"\renewcommand{\familydefault}{\sfdefault}",
+        r"\usepackage{amsmath}",
+        r"\usepackage[symbolgreek,symbolmax]{mathastext}",
+        r"\usepackage{physics}",
+        r"\usepackage{siunitx}",
+        r"\setlength{\parindent}{0pt}",
         r"\def\mathdefault{}"
     ]
     _mpl.pyplot.minorticks_on()
