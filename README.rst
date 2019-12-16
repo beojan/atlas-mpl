@@ -1,7 +1,6 @@
 ATLAS Matplotlib Style
 ======================
-.. image:: https://img.shields.io/pypi/v/atlas-mpl-style?label=PyPI&style=for-the-badge   :alt: PyPI
-.. image:: https://img.shields.io/pypi/l/atlas-mpl-style?style=for-the-badge   :alt: PyPI - License
+.. image:: https://img.shields.io/pypi/v/atlas-mpl-style?label=PyPI&style=for-the-badge   :alt: PyPI 
 
 Provides a Matplotlib style replicating that used by the
 `ATLAS <http://atlas.cern>`__ collaboration.
