@@ -7,10 +7,7 @@ Provides a Matplotlib style replicating that used by the
 
 **Please open an issue if you find this style deviates from the guidelines.**
 
-Install from PyPI using pip:
-
-.. code-block:: bash
-    pip install atlas-mpl-style
+Install from PyPI using pip: pip install atlas-mpl-style
 
 Documentation: https://atlas-mpl.readthedocs.io/en/latest/index.html
 
