@@ -267,6 +267,7 @@ def draw_atlas_label(
     nl = r"\\"
     label = (
         fr'\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}'
+        fr'{nl + "for education only" if status=="opendata" else ""}'
         fr'{nl if show_e_nl else ""}'
         fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
         fr'{desc if desc_line else ""}'
