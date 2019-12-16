@@ -222,7 +222,7 @@ def draw_atlas_label(
         y position
     ax : mpl.axes.Axes, optional
         Axes to draw label in
-    status : [ *'int'* | 'wip' | 'prelim' | 'final' ], optional
+    status : [ *'int'* | 'wip' | 'prelim' | 'final' | 'opendata' ], optional
         Approval status
     simulation : bool (optional, default ``False``)
         Does the plot show only MC simulation results
@@ -248,6 +248,8 @@ def draw_atlas_label(
         status_str = "Work in Progress"
     elif status == "prelim":
         status_str = "Preliminary"
+    elif status == "opendata":
+        status_str = "Open Data"
     else:
         status_str = status
 
@@ -270,6 +272,7 @@ def draw_atlas_label(
     nl = r"\\"
     label = (
         fr'\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}'
+        fr'{nl + "for education only" if status=="opendata" else ""}'
         fr'{nl if show_e_nl else ""}'
         fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
         fr'{desc if desc_line else ""}'
