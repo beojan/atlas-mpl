@@ -146,6 +146,8 @@ def use_atlas_style(atlasLabel="ATLAS"):
     _style.use("atlas")
     _atlas_label = atlasLabel
     _mpl.rcParams["font.size"] = 16
+    _mpl.rcParams["xtick.minor.visible"] = True
+    _mpl.rcParams["ytick.minor.visible"] = True
     _mpl.rcParams["text.latex.preamble"] = [
         r"\usepackage[LGR,T1]{fontenc}",
         r"\usepackage{tgheros}",
@@ -157,7 +159,6 @@ def use_atlas_style(atlasLabel="ATLAS"):
         r"\setlength{\parindent}{0pt}",
         r"\def\mathdefault{}"
     ]
-    _mpl.pyplot.minorticks_on()
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
