@@ -148,7 +148,7 @@ def use_atlas_style(atlasLabel="ATLAS"):
     _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
-    _mpl.rcParams["text.latex.preamble"] = [
+    _mpl.rcParams["text.latex.preamble"] = "\n".join([
         r"\usepackage[LGR,T1]{fontenc}",
         r"\usepackage{tgheros}",
         r"\renewcommand{\familydefault}{\sfdefault}",
@@ -158,7 +158,7 @@ def use_atlas_style(atlasLabel="ATLAS"):
         r"\usepackage{siunitx}",
         r"\setlength{\parindent}{0pt}",
         r"\def\mathdefault{}"
-    ]
+    ])
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
