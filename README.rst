@@ -49,8 +49,8 @@ On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages sh
 - dvipng
 - ghostscript
 
-On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be installed from [upstream](https://www.tug.org/texlive/quickinstall.html).
+On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
 **TeXLive is not required for the `paper` or `print` style.**
-For these styles, [Fira Sans](https://bboxtype.com/typefaces/FiraSans/) and [Iosevka](https://github.com/be5invis/Iosevka/releases/tag/v2.3.3) should be installed.
+For these styles, `Fira Sans <https://bboxtype.com/typefaces/FiraSans/>`__ and `Iosevka <https://github.com/be5invis/Iosevka/releases/tag/v2.3.3>`__ should be installed.
 
