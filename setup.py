@@ -23,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.9.2',
+    version='0.10.0',
 
     description='ATLAS style for Matplotlib 2.0+',
     long_description=long_description,
@@ -76,7 +76,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['matplotlib>=2'],
+    install_requires=['matplotlib>=3'],
     python_requires='>=3.6',
     include_package_data=True,
 )

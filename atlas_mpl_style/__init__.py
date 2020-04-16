@@ -3,6 +3,8 @@ import matplotlib.style as _style
 import pkg_resources as _pkg
 import atexit as _atexit
 import cycler as _cycler
+import atlas_mpl_style.plot as plot
+import atlas_mpl_style.utils as utils
 
 _stylesheets = _pkg.resource_filename(__name__, "stylesheets")
 _atexit.register(_pkg.cleanup_resources)
@@ -144,6 +146,7 @@ def use_atlas_style(atlasLabel="ATLAS"):
     """
     global _atlas_label
     _style.use("atlas")
+    set_color_cycle("ATLAS")
     _atlas_label = atlasLabel
     _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["xtick.minor.visible"] = True

@@ -24,13 +24,10 @@ axes.formatter.limits: -2, 4
 axes.formatter.use_mathtext: True
 axes.autolimit_mode: round_numbers
 
-# Generated with HCL Wizard
-axes.prop_cycle: cycler('color', ['54C9D1','ECA89A','95BCED','CEB776','D3A9EA','9BC57F','F0A1CA','5FCBAA'])
-
 # Legend
-legend.frameon: False
-legend.framealpha: 0.0
-legend.fancybox: False
+legend.frameon: True
+legend.framealpha: 0.25
+legend.fancybox: True
 
 xtick.color: 000000
 xtick.major.size: 5
