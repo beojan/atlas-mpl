@@ -95,9 +95,9 @@ def plot_backgrounds(bins, backgrounds, ax=None):
     Returns
     --------
     total_hist : array_like
-        Sum of all bin contents
+        Total background histogram
     total_err : array_like
-        The total sum in quadrature of all uncertainties
+        Total error on background histogram
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -229,6 +229,13 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
         Line color
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
+
+    Returns
+    --------
+    hist : array_like
+        Data histogram
+    stat_errs : array_like
+        Statistical errors
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -349,6 +356,16 @@ def plot_ratio(
 
 
 def draw_tag(text, ax=None):
+    """
+    Draw tag just outside plot region
+
+    Parameters
+    -------------
+    text : str
+    ax : mpl.axes.Axes, optional
+        Axes to draw on (defaults to current axes)
+    """
+
     if ax is None:
         ax = _mpl.pyplot.gca()
     ax.text(
