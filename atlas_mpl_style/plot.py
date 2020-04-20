@@ -374,7 +374,7 @@ def draw_tag(text, ax=None):
 
 def plot_2d(xbins, ybins, hist, ax=None, **kwargs):
     """
-    Plot data
+    Plot 2D histogram
 
     Parameters
     ----------
