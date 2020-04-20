@@ -280,8 +280,7 @@ def plot_ratio(
     ratio_ax : mpl.axes.Axes
         Ratio axes (produced using `ampl.ratio_axes()`)
     max_ratio : float, optional
-        Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw",
-                       3 for "significances")
+        Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw", 3 for "significances")
     plottype : {"diff", "raw", "significances"}
         Type of ratio to plot.
         "diff" : (data - bkg) / bkg
