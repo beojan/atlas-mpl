@@ -365,9 +365,40 @@ def draw_tag(text, ax=None):
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     """
-
     if ax is None:
         ax = _mpl.pyplot.gca()
     ax.text(
         1, 1.0005, text, ha="right", va="bottom", fontsize=8, transform=ax.transAxes
     )
+
+
+def plot_2d(xbins, ybins, hist, ax=None, **kwargs):
+    """
+    Plot data
+
+    Parameters
+    ----------
+    xbins : array_like
+        x bin edges
+    bins : array_like
+        y bin edges
+    hist : array_like
+        Bin contents
+    ax : mpl.axes.Axes, optional
+        Axes to draw on (defaults to current axes)
+
+    Additional parameters are passed to `pcolormesh`
+
+    Returns
+    -------
+    mesh : QuadMesh
+    """
+    if len(xbins) != hist.shape[0] + 1:
+        raise BinningMismatchError("xbins does not match 1st axis of hist")
+    if len(ybins) != hist.shape[1] + 1:
+        raise BinningMismatchError("ybins does not match 2nd axis of hist")
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    X, Y = _np.meshgrid(xbins, ybins)
+    mesh = ax.pcolormesh(X, Y, hist.transpose(), rasterized=True, **kwargs)
+    return mesh
