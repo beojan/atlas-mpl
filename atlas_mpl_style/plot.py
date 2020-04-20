@@ -386,8 +386,8 @@ def plot_2d(xbins, ybins, hist, ax=None, **kwargs):
         Bin contents
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
-
-    Additional parameters are passed to `pcolormesh`
+    **kwargs
+        Extra parameters passed to `pcolormesh`
 
     Returns
     -------
