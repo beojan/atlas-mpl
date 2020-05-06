@@ -184,7 +184,7 @@ def set_xlabel(label, ax=None, *args, **kwargs):
 
 def set_ylabel(label, ax=None, *args, **kwargs):
     """
-    Set y label in ATLAS style (right aligned).
+    Set y label in ATLAS style (top aligned).
 
     Additional parameters are passed through to ``ax.set_ylabel``.
 
@@ -199,6 +199,21 @@ def set_ylabel(label, ax=None, *args, **kwargs):
         ax = _mpl.pyplot.gca()
     ax.set_ylabel(label, y=1.0, ha="right", *args, **kwargs)
 
+
+def set_zlabel(label, cbar, *args, **kwargs):
+    """
+    Set z label in ATLAS style (top aligned)
+
+    The colorbar to add the label to is *required*
+
+    Parameters
+    ----------
+    label : str
+        Label (LaTeX permitted)
+    cbar : mpl.colorbar.Colorbar
+        Colorbar to set label on
+    """
+    cbar.set_label(label, y=1.0, ha="right", *args, **kwargs)
 
 def draw_atlas_label(
     x,

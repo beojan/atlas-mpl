@@ -217,16 +217,16 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
 
     Parameters
     ----------
-    label : str
-        Label for legend
+    label : str, optional
+        Label for legend (default: "Data")
     bins : array_like
         Bin edges
     hist : array_like
         Bin contents
-    stat_errs : array_like
+    stat_errs : array_like, optional
         Statistical errors
-    color : color
-        Line color
+    color : color, optional
+        Point color, defaults to black
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
 
@@ -371,7 +371,47 @@ def draw_tag(text, ax=None):
     )
 
 
-def plot_2d(xbins, ybins, hist, ax=None, **kwargs):
+def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
+    """
+    Plot single 1D histogram
+
+    Parameters
+    ----------
+    label : str
+        Label for legend
+    bins : array_like
+        Bin edges
+    hist : array_like
+        Bin contents
+    stat_errs : array_like, optional
+        Statistical errors
+    color : color, optional
+        Line color
+    ax : mpl.axes.Axes, optional
+        Axes to draw on (defaults to current axes)
+    **kwargs
+        Extra parameters passed to `plt.hist`
+    """
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    if len(bins) - 1 != len(hist):
+        raise BinningMismatchError("Invalid binning")
+    if stat_errs is None:
+        stat_errs = _np.sqrt(hist)
+    if len(bins) - 1 != len(stat_errs):
+        raise BinningMismatchError("Incorrect binning for stat errors")
+    bin_centers = (bins[1:] + bins[:-1]) / 2
+    _, _, p = ax.hist(
+        bin_centers, bins=bins, weights=hist, histtype="step", color=color, label=label,
+    )
+    if color is None:
+        color = p[0].get_ec()
+    plot_band(
+        bins, hist - stat_errs, hist + stat_errs, color=color, alpha=0.3, zorder=5
+    )
+
+
+def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
     """
     Plot 2D histogram
 
@@ -385,12 +425,15 @@ def plot_2d(xbins, ybins, hist, ax=None, **kwargs):
         Bin contents
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
+    pad : float (0. - 1.), optional
+        Padding for colorbar (defaults to 0.005)
     **kwargs
         Extra parameters passed to `pcolormesh`
 
     Returns
     -------
     mesh : QuadMesh
+    cbar : mpl.colorbar.Colorbar
     """
     if len(xbins) != hist.shape[0] + 1:
         raise BinningMismatchError("xbins does not match 1st axis of hist")
@@ -400,4 +443,94 @@ def plot_2d(xbins, ybins, hist, ax=None, **kwargs):
         ax = _mpl.pyplot.gca()
     X, Y = _np.meshgrid(xbins, ybins)
     mesh = ax.pcolormesh(X, Y, hist.transpose(), rasterized=True, **kwargs)
-    return mesh
+    ax.axis("scaled")
+    ax.set_xlim(xbins[0], xbins[-1])
+    ax.set_ylim(ybins[0], ybins[-1])
+    cbar = ax.figure.colorbar(mesh, ax=ax, pad=pad)
+    return mesh, cbar
+
+
+def plot_limit(
+    expected_label,
+    x,
+    expected,
+    minus_one_sigma=None,
+    plus_one_sigma=None,
+    minus_two_sigma=None,
+    plus_two_sigma=None,
+    observed_label=None,
+    observed=None,
+    ax=None,
+):
+    """
+    Plot a limit
+
+    Parameters
+    ----------
+    expected_label : str
+        Label for expected limit (for legend)
+    x : array_like
+        x values
+    expected : array_like
+        Expected limit
+    minus_one_sigma : array_like, optional
+        Lower edge of one sigma band
+    plus_one_sigma : array_like, optional
+        Upper edge of one sigma band
+    minus_two_sigma : array_like, optional
+        Lower edge of two sigma band
+    plus_two_sigma : array_like, optional
+        Upper edge of two sigma band
+    observed_label : str, optional
+        Label for observed limit
+    observed : array_like, optional
+        Observed limit
+    ax : mpl.axes.Axes, optional
+        Axes to draw on (defaults to current axes)
+    """
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    if len(x) != len(expected):
+        raise BinningMismatchError("expected does not match x")
+    if minus_one_sigma is not None and len(x) != len(minus_one_sigma):
+        raise BinningMismatchError("minus_one_sigma does not match x")
+    if plus_one_sigma is not None and len(x) != len(plus_one_sigma):
+        raise BinningMismatchError("plus_one_sigma does not match x")
+    if minus_two_sigma is not None and len(x) != len(minus_two_sigma):
+        raise BinningMismatchError("minus_two_sigma does not match x")
+    if plus_two_sigma is not None and len(x) != len(plus_two_sigma):
+        raise BinningMismatchError("plus_two_sigma does not match x")
+    if observed is not None and len(x) != len(observed):
+        raise BinningMismatchError("observed does not match x")
+    if (minus_one_sigma is None) != (plus_one_sigma is None):
+        raise ValueError(
+            "Either both minus_one_sigma and plus_one_sigma must be provided or neither"
+        )
+    if (minus_two_sigma is None) != (plus_two_sigma is None):
+        raise ValueError(
+            "Either both minus_two_sigma and plus_two_sigma must be provided or neither"
+        )
+    if (observed is None) != (observed_label is None):
+        raise ValueError(
+            "Either both observed and observed_label must be provided or neither"
+        )
+
+    if minus_two_sigma is not None:
+        ax.fill_between(
+            x,
+            minus_two_sigma,
+            plus_two_sigma,
+            color="atlas:twosigma",
+            label=r"$2\sigma$ Band",
+        )
+    if minus_one_sigma is not None:
+        ax.fill_between(
+            x,
+            minus_one_sigma,
+            plus_one_sigma,
+            color="atlas:onesigma",
+            label=r"$1\sigma$ Band",
+        )
+    ax.plot(x, expected, "k--", label=expected_label)
+    if observed is not None:
+        ax.plot(x, observed, "k-", label=observed_label)
