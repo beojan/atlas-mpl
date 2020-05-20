@@ -2,6 +2,9 @@ import matplotlib as _mpl
 import numpy as _np
 from atlas_mpl_style.utils import significance as _significance
 
+# For histograms with no color set
+_hist_colors = _mpl.pyplot.rcParams["axes.prop_cycle"]()
+
 
 class BinningMismatchError(Exception):
     "Error due to histogram binning mismatch"
@@ -41,10 +44,13 @@ class Background:
 
         self.hist = hist
         self.stat_errs = stat_errs
-        self.color = color
+        if color is None:
+            self.color = next(_hist_colors)["color"]
+        else:
+            self.color = color
         self.label = label
         if syst_errs is None:
-            syst_errs = _np.zeros_like(stat_errs)
+            self.syst_errs = _np.zeros_like(stat_errs)
         else:
             self.syst_errs = syst_errs
 
@@ -133,15 +139,16 @@ def plot_backgrounds(bins, backgrounds, ax=None):
     )
     for p in ps:
         _mpl.pyplot.setp(p, edgecolor="k", lw=1)
-    plot_band(
-        bins,
-        total_hist - total_err,
-        total_hist + total_err,
-        color="grey",
-        alpha=0.5,
-        label="Stat. $\\bigoplus$ Syst. Unc.",
-        zorder=5,
-    )
+    if _np.sum(total_syst_err) != 0.0:
+        plot_band(
+            bins,
+            total_hist - total_err,
+            total_hist + total_err,
+            color="grey",
+            alpha=0.5,
+            label="Stat. $\\bigoplus$ Syst. Unc.",
+            zorder=5,
+        )
     plot_band(
         bins,
         total_hist - total_stat_err,

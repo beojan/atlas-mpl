@@ -110,16 +110,16 @@ def set_color_cycle(pal=None, n=4):
         ]
     elif pal.lower() == "tab" or pal.lower() == "tableau" or pal.lower() == "mpl":
         colors = [
-            'tab:blue',
-            'tab:orange',
-            'tab:green', 
-            'tab:red',
-            'tab:purple',
-            'tab:brown',
-            'tab:pink',
-            'tab:gray',
-            'tab:olive',
-            'tab:cyan'
+            "tab:blue",
+            "tab:orange",
+            "tab:green",
+            "tab:red",
+            "tab:purple",
+            "tab:brown",
+            "tab:pink",
+            "tab:gray",
+            "tab:olive",
+            "tab:cyan",
         ]
     else:
         colors = [
@@ -133,6 +133,7 @@ def set_color_cycle(pal=None, n=4):
         ]
 
     _mpl.rcParams["axes.prop_cycle"] = _cycler.cycler(color=colors)
+    plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
 def use_atlas_style(atlasLabel="ATLAS"):
@@ -151,17 +152,19 @@ def use_atlas_style(atlasLabel="ATLAS"):
     _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
-    _mpl.rcParams["text.latex.preamble"] = "\n".join([
-        r"\usepackage[LGR,T1]{fontenc}",
-        r"\usepackage{tgheros}",
-        r"\renewcommand{\familydefault}{\sfdefault}",
-        r"\usepackage{amsmath}",
-        r"\usepackage[symbolgreek,symbolmax]{mathastext}",
-        r"\usepackage{physics}",
-        r"\usepackage{siunitx}",
-        r"\setlength{\parindent}{0pt}",
-        r"\def\mathdefault{}"
-    ])
+    _mpl.rcParams["text.latex.preamble"] = "\n".join(
+        [
+            r"\usepackage[LGR,T1]{fontenc}",
+            r"\usepackage{tgheros}",
+            r"\renewcommand{\familydefault}{\sfdefault}",
+            r"\usepackage{amsmath}",
+            r"\usepackage[symbolgreek,symbolmax]{mathastext}",
+            r"\usepackage{physics}",
+            r"\usepackage{siunitx}",
+            r"\setlength{\parindent}{0pt}",
+            r"\def\mathdefault{}",
+        ]
+    )
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
@@ -214,6 +217,7 @@ def set_zlabel(label, cbar, *args, **kwargs):
         Colorbar to set label on
     """
     cbar.set_label(label, y=1.0, ha="right", *args, **kwargs)
+
 
 def draw_atlas_label(
     x,
@@ -290,7 +294,7 @@ def draw_atlas_label(
     desc_line = desc is not None
     nl = r"\\"
     label = (
-        fr'\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}'
+        fr"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
         fr'{nl + "for education only" if status=="opendata" else ""}'
         fr'{nl if show_e_nl else ""}'
         fr'{energy_str}{lumi_str}{nl if desc_line else ""}'

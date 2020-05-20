@@ -23,7 +23,7 @@ def significance(data, data_errs, bkg, bkg_errs):
     )
     local = {"n": data, "b": bkg, "s2": err2}
     return _ne.evaluate(
-        """(where(data >= bkg, 1, -1)
+        """(where(n >= b, 1, -1)
                         * sqrt(
                             2
                              * (
