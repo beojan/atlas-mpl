@@ -3,7 +3,7 @@ import numpy as _np
 from atlas_mpl_style.utils import significance as _significance
 
 # For histograms with no color set
-_hist_colors = _mpl.pyplot.rcParams["axes.prop_cycle"]()
+_hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
 class BinningMismatchError(Exception):
