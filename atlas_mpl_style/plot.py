@@ -403,19 +403,25 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
         ax = _mpl.pyplot.gca()
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
-    if stat_errs is None:
-        stat_errs = _np.sqrt(hist)
-    if len(bins) - 1 != len(stat_errs):
-        raise BinningMismatchError("Incorrect binning for stat errors")
+    if stat_errs is not None:
+        if len(bins) - 1 != len(stat_errs):
+            raise BinningMismatchError("Incorrect binning for stat errors")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     _, _, p = ax.hist(
-        bin_centers, bins=bins, weights=hist, histtype="step", color=color, label=label,
+        bin_centers,
+        bins=bins,
+        weights=hist,
+        histtype="step",
+        color=color,
+        label=label,
+        **kwargs,
     )
     if color is None:
         color = p[0].get_ec()
-    plot_band(
-        bins, hist - stat_errs, hist + stat_errs, color=color, alpha=0.3, zorder=5
-    )
+    if stat_errs is not None:
+        plot_band(
+            bins, hist - stat_errs, hist + stat_errs, color=color, alpha=0.3, zorder=5
+        )
 
 
 def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
