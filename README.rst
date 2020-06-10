@@ -39,7 +39,8 @@ When using the ATLAS style, text is typeset using LaTeX. A working TeXLive insta
 
 On Arch (and related distributions), the ``texlive-most`` group is sufficient.
 
-On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages should be sufficient:
+On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages should be sufficient. It is however highly recommended
+that you install `texlive-full` to obtain a complete installation of texlive.
 
 - texlive
 - texlive-latex-extra
@@ -49,8 +50,10 @@ On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages sh
 - dvipng
 - ghostscript
 
-On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
+On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be
+installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
-**TeXLive is not required for the "paper" or "print" style.**  
-`Fira Sans <https://bboxtype.com/typefaces/FiraSans/>`__ and `Iosevka <https://github.com/be5invis/Iosevka/releases/tag/v2.3.3>`__ should be installed for these styles to look as intended. However, neither is *necessary*.
-
+**TeXLive is not required for the "paper" or "print" style.** `Fira Sans
+<https://bboxtype.com/typefaces/FiraSans/>`__ and `Iosevka
+<https://github.com/be5invis/Iosevka/releases/tag/v2.3.3>`__ should be installed
+for these styles to appear as intended. However, neither is *necessary*.
