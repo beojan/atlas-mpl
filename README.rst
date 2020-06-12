@@ -37,6 +37,8 @@ When using the ATLAS style, text is typeset using LaTeX. A working TeXLive insta
 - physics (the package)
 - siunitx
 
+To check if all necessary packages are installed, try building ``atlas_mpl_style/testing/ampl-test.tex``.
+
 On Arch (and related distributions), the ``texlive-most`` group is sufficient.
 
 On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages should be sufficient. It is however highly recommended
