@@ -19,7 +19,7 @@ class Background:
 
     __slots__ = ["label", "hist", "stat_errs", "syst_errs", "color"]
 
-    def __init__(self, label, hist, stat_errs, syst_errs=None, color=None):
+    def __init__(self, label, hist, stat_errs=None, syst_errs=None, color=None):
         """
         Histogram and errors corresponding to a single background
 
@@ -36,8 +36,17 @@ class Background:
         color : color
             Background color for histogram
         """
-        if len(hist) != len(stat_errs):
-            raise BinningMismatchError("Stat errors may have incorrect binning")
+        if stat_errs is None:
+            stat_errs = _np.zeros_like(hist)
+        elif isinstance(stat_errs, str):
+            stat_errs = stat_errs.lower()
+            if "pois" in stat_errs or "sqrt" in stat_errs:
+                stat_errs = _np.sqrt(hist)
+            else:
+                raise TypeError("Invalid stat_errs")
+        else:
+            if len(hist) != len(stat_errs):
+                raise BinningMismatchError("Stat errors may have incorrect binning")
         if syst_errs is not None:
             if len(hist) != len(syst_errs):
                 raise BinningMismatchError("Syst errors have incorrect binning")
@@ -149,19 +158,20 @@ def plot_backgrounds(bins, backgrounds, ax=None):
             label="Stat. $\\bigoplus$ Syst. Unc.",
             zorder=5,
         )
-    plot_band(
-        bins,
-        total_hist - total_stat_err,
-        total_hist + total_stat_err,
-        fc="transparent",
-        hatch=r"////",
-        label="Stat. Unc.",
-        zorder=5,
-    )
+    if _np.sum(total_stat_err) != 0:
+        plot_band(
+            bins,
+            total_hist - total_stat_err,
+            total_hist + total_stat_err,
+            fc="transparent",
+            hatch=r"////",
+            label="Stat. Unc.",
+            zorder=5,
+        )
     return total_hist, total_err
 
 
-def plot_signal(label, bins, hist, stat_errs, syst_errs=None, color=None, ax=None):
+def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, ax=None):
     """
     Plot signal histogram
 
@@ -184,8 +194,19 @@ def plot_signal(label, bins, hist, stat_errs, syst_errs=None, color=None, ax=Non
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
-    if len(bins) - 1 != len(hist) != len(stat_errs):
+    if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
+    if stat_errs is None:
+        stat_errs = _np.zeros_like(hist)
+    elif isinstance(stat_errs, str):
+        stat_errs = stat_errs.lower()
+        if "pois" in stat_errs or "sqrt" in stat_errs:
+            stat_errs = _np.sqrt(hist)
+        else:
+            raise TypeError("Invalid stat_errs")
+    else:
+        if len(hist) != len(stat_errs):
+            raise BinningMismatchError("Stat errors may have incorrect binning")
     if syst_errs is None:
         syst_errs = _np.zeros_like(hist)
     else:
@@ -248,21 +269,34 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
         ax = _mpl.pyplot.gca()
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
+
     if stat_errs is None:
-        stat_errs = _np.sqrt(hist)
-    if len(bins) - 1 != len(stat_errs):
-        raise BinningMismatchError("Incorrect binning for stat errors")
+        stat_errs = _np.zeros_like(hist)
+    elif isinstance(stat_errs, str):
+        stat_errs = stat_errs.lower()
+        if "pois" in stat_errs or "sqrt" in stat_errs:
+            stat_errs = _np.sqrt(hist)
+        else:
+            raise TypeError("Invalid stat_errs")
+    else:
+        if len(hist) != len(stat_errs):
+            raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
-    ax.errorbar(
-        bin_centers,
-        hist,
-        yerr=stat_errs,
-        label=label,
-        color=color,
-        fmt="o",
-        zorder=7,
-        ms=5,
-    )
+    if _np.sum(stat_errs) == 0:
+        ax.plot(
+            bin_centers, hist, "o", label=label, color=color, zorder=7, ms=5,
+        )
+    else:
+        ax.errorbar(
+            bin_centers,
+            hist,
+            yerr=stat_errs,
+            label=label,
+            color=color,
+            fmt="o",
+            zorder=7,
+            ms=5,
+        )
     return hist, stat_errs
 
 
@@ -403,6 +437,10 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
         ax = _mpl.pyplot.gca()
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
+    if stat_errs is None:
+        stat_errs = _np.sqrt(hist)
+    if len(bins) - 1 != len(stat_errs):
+        raise BinningMismatchError("Incorrect binning for stat errors")
     if stat_errs is not None:
         if len(bins) - 1 != len(stat_errs):
             raise BinningMismatchError("Incorrect binning for stat errors")
@@ -547,3 +585,150 @@ def plot_limit(
     ax.plot(x, expected, "k--", label=expected_label)
     if observed is not None:
         ax.plot(x, observed, "k-", label=observed_label)
+
+
+def set_xlabel(label, ax=None, *args, **kwargs):
+    """
+    Set x label in ATLAS style (right aligned).
+
+    Additional parameters are passed through to `ax.set_xlabel`.
+
+    Parameters
+    ----------
+    label : str
+        Label (LaTeX permitted)
+    ax : mpl.axes.Axes, optional
+        Axes to set x label on
+    """
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    ax.set_xlabel(label, x=1.0, ha="right", *args, **kwargs)
+
+
+def set_ylabel(label, ax=None, *args, **kwargs):
+    """
+    Set y label in ATLAS style (top aligned).
+
+    Additional parameters are passed through to ``ax.set_ylabel``.
+
+    Parameters
+    ----------
+    label : str
+        Label (LaTeX permitted)
+    ax : mpl.axes.Axes, optional
+        Axes to set y label on
+    """
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    ax.set_ylabel(label, y=1.0, ha="right", *args, **kwargs)
+
+
+def set_zlabel(label, cbar, *args, **kwargs):
+    """
+    Set z label in ATLAS style (top aligned)
+
+    The colorbar to add the label to is *required*
+
+    Parameters
+    ----------
+    label : str
+        Label (LaTeX permitted)
+    cbar : mpl.colorbar.Colorbar
+        Colorbar to set label on
+    """
+    cbar.set_label(label, y=1.0, ha="right", *args, **kwargs)
+
+
+def draw_atlas_label(
+    x,
+    y,
+    ax=None,
+    status="int",
+    simulation=False,
+    energy=None,
+    lumi=None,
+    desc=None,
+    lumi_lt=False,
+    *args,
+    **kwargs,
+):
+    """
+    Draw ATLAS label.
+
+    Additional parameters are passed through to ``ax.text``.
+
+    Parameters
+    ----------
+    x : float
+        x position
+    y : float
+        y position
+    ax : mpl.axes.Axes, optional
+        Axes to draw label in
+    status : [ *'int'* | 'wip' | 'prelim' | 'final' | 'opendata' ], optional
+        Approval status
+    simulation : bool (optional, default ``False``)
+        Does the plot show only MC simulation results
+    energy : str, optional
+        Centre of mass energy, including units
+    lumi : float, optional
+        Integrated luminosity in /fb
+    lumi_lt: bool, optional
+        True if only a subset of data was processed
+    desc : str, optional
+        Additional description
+    """
+    global _atlas_label
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    sim_str = "Simulation " if simulation else ""
+
+    if status == "final":
+        status_str = ""
+    elif status == "int":
+        status_str = "Internal"
+    elif status == "wip":
+        status_str = "Work in Progress"
+    elif status == "prelim":
+        status_str = "Preliminary"
+    elif status == "opendata":
+        status_str = "Open Data"
+    else:
+        status_str = status
+
+    show_e_nl = False
+    if energy is not None:
+        show_e_nl = True
+        energy_str = rf"$\sqrt{{s}} = $ {energy}"
+    else:
+        energy_str = ""
+
+    if lumi is not None:
+        show_e_nl = True
+        lumi_str = (
+            fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"\textsf{{fb}}^{{-1}}$"
+        )
+    else:
+        lumi_str = ""
+
+    desc_line = desc is not None
+    nl = r"\\"
+    label = (
+        fr"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
+        fr'{nl + "for education only" if status=="opendata" else ""}'
+        fr'{nl if show_e_nl else ""}'
+        fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
+        fr'{desc if desc_line else ""}'
+    )
+    ax.text(
+        x,
+        y,
+        label,
+        ha="left",
+        va="top",
+        multialignment="left",
+        transform=ax.transAxes,
+        size=14,
+        *args,
+        **kwargs,
+    )
