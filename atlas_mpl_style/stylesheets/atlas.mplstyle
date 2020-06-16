@@ -6,9 +6,9 @@ patch.antialiased: True
 text.usetex: True
 font.size: 14.0
 font.family: sans-serif
-font.sans-serif: Tex Gyre Heros, Helvetica, Arial
-font.serif: Tex Gyre Termes, Times, Times New Roman
-font.monospace: Courier
+font.sans-serif: Tex Gyre Heros, Helvetica, Nimbus Sans, Arial
+font.serif: Tex Gyre Termes, Times, Times Roman, Times New Roman. Nimbus Roman
+font.monospace: Tex Gyre Cursor, Courier, Courier New, Nimbus Mono
 
 text.color: 000000
 
@@ -19,7 +19,7 @@ axes.grid: False
 axes.titlesize: 16
 axes.labelsize: 14
 axes.labelcolor: 000000
-axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+axes.axisbelow: False
 axes.formatter.limits: -2, 4
 axes.formatter.use_mathtext: True
 axes.autolimit_mode: round_numbers
