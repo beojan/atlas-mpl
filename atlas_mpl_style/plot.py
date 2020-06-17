@@ -2,6 +2,8 @@ import matplotlib as _mpl
 import numpy as _np
 from atlas_mpl_style.utils import significance as _significance
 
+_atlas_label = "ATLAS"
+
 # For histograms with no color set
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 

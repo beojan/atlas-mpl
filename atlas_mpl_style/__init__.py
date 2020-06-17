@@ -55,7 +55,6 @@ _EXTRA_COLORS = {
     "transparent": "#ffffff00",
 }
 
-_atlas_label = "ATLAS"
 _mpl.colors.EXTRA_COLORS = _EXTRA_COLORS
 _mpl.colors.colorConverter.colors.update(_EXTRA_COLORS)
 
@@ -146,10 +145,9 @@ def use_atlas_style(atlasLabel="ATLAS"):
     atlasLabel : str, option
        Replace ATLAS with a custom label
     """
-    global _atlas_label
     _style.use("atlas")
     set_color_cycle("ATLAS")
-    _atlas_label = atlasLabel
+    plot._atlas_label = atlasLabel
     _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
