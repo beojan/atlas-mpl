@@ -440,12 +440,16 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
     if stat_errs is None:
-        stat_errs = _np.sqrt(hist)
-    if len(bins) - 1 != len(stat_errs):
-        raise BinningMismatchError("Incorrect binning for stat errors")
-    if stat_errs is not None:
-        if len(bins) - 1 != len(stat_errs):
-            raise BinningMismatchError("Incorrect binning for stat errors")
+        stat_errs = _np.zeros_like(hist)
+    elif isinstance(stat_errs, str):
+        stat_errs = stat_errs.lower()
+        if "pois" in stat_errs or "sqrt" in stat_errs:
+            stat_errs = _np.sqrt(hist)
+        else:
+            raise TypeError("Invalid stat_errs")
+    else:
+        if len(hist) != len(stat_errs):
+            raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     _, _, p = ax.hist(
         bin_centers,
