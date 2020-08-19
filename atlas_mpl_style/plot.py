@@ -1,6 +1,8 @@
 import matplotlib as _mpl
+import matplotlib.colors as _colors
 import numpy as _np
 from atlas_mpl_style.utils import significance as _significance
+from math import floor, ceil
 
 _atlas_label = "ATLAS"
 
@@ -390,7 +392,12 @@ def plot_ratio(
     ratio[~_np.isnan(out_of_range_up)] = _np.NaN
     ratio[~_np.isnan(out_of_range_down)] = _np.NaN
     if plottype == "significances":
-        ratio_ax.plot(bin_centers, ratio, fmt="ko", ms=3)
+        ratio_ax.plot(bin_centers, ratio, "ko", ms=3)
+        ratio_ax.axhline(1, ls="--", color="paper:fg", alpha=0.5)
+        ratio_ax.axhline(-1, ls="--", color="paper:fg", alpha=0.5)
+        ratio_ax.axhline(2, ls="--", color="paper:fg", alpha=0.25)
+        ratio_ax.axhline(-2, ls="--", color="paper:fg", alpha=0.25)
+        ratio_ax.set_yticks(list(range(ceil(min_ratio), floor(max_ratio) + 1)))
     else:
         ratio_ax.errorbar(bin_centers, ratio, yerr=(data_errs / bkg), fmt="ko", ms=3)
     # re-enable errors
@@ -517,6 +524,7 @@ def plot_limit(
     plus_two_sigma=None,
     observed_label=None,
     observed=None,
+    color=None,
     ax=None,
 ):
     """
@@ -542,6 +550,8 @@ def plot_limit(
         Label for observed limit
     observed : array_like, optional
         Observed limit
+    color : color, optional
+        Line color (if multiple limits are being drawn)
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     """
@@ -577,7 +587,7 @@ def plot_limit(
             x,
             minus_two_sigma,
             plus_two_sigma,
-            color="atlas:twosigma",
+            color=("atlas:twosigma" if color is None else _colors.to_rgba(color, 0.25)),
             label=r"$2\sigma$ Band",
         )
     if minus_one_sigma is not None:
@@ -585,12 +595,24 @@ def plot_limit(
             x,
             minus_one_sigma,
             plus_one_sigma,
-            color="atlas:onesigma",
+            color=("atlas:onesigma" if color is None else _colors.to_rgba(color, 0.5)),
             label=r"$1\sigma$ Band",
         )
-    ax.plot(x, expected, "k--", label=expected_label)
+    ax.plot(
+        x,
+        expected,
+        "--",
+        label=expected_label,
+        color=("black" if color is None else color),
+    )
     if observed is not None:
-        ax.plot(x, observed, "k-", label=observed_label)
+        ax.plot(
+            x,
+            observed,
+            "-",
+            label=observed_label,
+            color=("black" if color is None else color),
+        )
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
