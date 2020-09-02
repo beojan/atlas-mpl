@@ -142,7 +142,7 @@ def use_atlas_style(atlasLabel="ATLAS"):
 
     Parameters
     ----------
-    atlasLabel : str, option
+    atlasLabel : str, optional
        Replace ATLAS with a custom label
     """
     _style.use("atlas")
@@ -166,15 +166,51 @@ def use_atlas_style(atlasLabel="ATLAS"):
     )
 
 
-def ratio_axes():
-    "Splits axes for ratio plots. Returns fig, main_axes, ratio_axes."
-    fig = _mpl.pyplot.figure(figsize=(8, 8), dpi=600)
-    gs = _mpl.gridspec.GridSpec(4, 1, hspace=0.0, wspace=0.0)
-    ax1 = fig.add_subplot(gs[0:3])
-    ax1.tick_params(labelbottom=False)
-    ax2 = fig.add_subplot(gs[3], sharex=ax1)
-    ax2.yaxis.set_major_locator(
-        _mpl.ticker.MaxNLocator(symmetric=True, prune="both", min_n_ticks=5, nbins=4)
+def ratio_axes(extra_axes=None):
+    """
+    Splits axes for ratio plots.
+
+    Parameters
+    -----------
+    extra_axes : int, optional
+       Number of additional axes. If not given, defaults to one.
+
+    Returns
+    -------
+    fig : figure
+    main_ax : axes
+    ratio_ax : axes or list of axes
+       Returns list if extra_axes is passed
+    """
+    fig = _mpl.pyplot.figure(
+        figsize=(8, 6 + 2 * (1 if extra_axes is None else extra_axes)), dpi=600
     )
-    ax2.autoscale(axis="x", tight=True)
-    return fig, ax1, ax2
+    if extra_axes is None:
+        gs = _mpl.gridspec.GridSpec(4, 1, hspace=0.0, wspace=0.0)
+        ax1 = fig.add_subplot(gs[0:3])
+        ax1.tick_params(labelbottom=False)
+        ax2 = fig.add_subplot(gs[3], sharex=ax1)
+        ax2.yaxis.set_major_locator(
+            _mpl.ticker.MaxNLocator(
+                symmetric=True, prune="both", min_n_ticks=5, nbins=4
+            )
+        )
+        ax2.autoscale(axis="x", tight=True)
+        return fig, ax1, ax2
+    else:
+        gs = _mpl.gridspec.GridSpec(3 + extra_axes, 1, hspace=0.0, wspace=0.0)
+        ax1 = fig.add_subplot(gs[0:3])
+        ax1.tick_params(labelbottom=False)
+        axs = []
+        for i in range(3, extra_axes + 3):
+            ax = fig.add_subplot(gs[i], sharex=ax1)
+            if i != extra_axes + 2:
+                ax.tick_params(labelbottom=False)
+            ax.yaxis.set_major_locator(
+                _mpl.ticker.MaxNLocator(
+                    symmetric=True, prune="both", min_n_ticks=5, nbins=4
+                )
+            )
+            ax.autoscale(axis="x", tight=True)
+            axs.append(ax)
+        return fig, ax1, axs
