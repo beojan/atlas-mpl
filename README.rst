@@ -33,8 +33,8 @@ UHI and the ``PlottableHistogram`` protocol
 With the development of the `UHI
 <https://github.com/henryiii/uhi>`__ interface, this package now has support for
 histogram objects that follow the ``PlottableHistogram`` protocol.
-``plot.Background`` objects can be constructed using ``PlottableHistogram``s and a
-list of such ``Background``s can be passed to ``plot.plot_backgrounds`` omitting
+``plot.Background`` objects can be constructed using ``PlottableHistograms`` and a
+list of such ``Backgrounds`` can be passed to ``plot.plot_backgrounds`` omitting
 the ``bins`` argument. The other histogram plotting functions could not be
 modified to accept ```PlottableHistogram``` in a backward compatible manner since
 they take ``bins`` before the histogram argument. Alternate versions of these
