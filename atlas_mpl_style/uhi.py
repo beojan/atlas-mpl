@@ -119,7 +119,7 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     data : PlottableHistogram
         Data histogram
     total_bkg : (array_like, array_like)
-        Tuple returned from `ampl.plot.plot_backgrounds`
+        Tuple returned from :func:`plot.plot_backgrounds`
     ratio_ax : mpl.axes.Axes
         Ratio axes (produced using `ampl.ratio_axes()`)
     max_ratio : float, optional

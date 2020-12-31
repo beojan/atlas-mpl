@@ -209,6 +209,7 @@ def plot_backgrounds(backgrounds, bins, ax=None):
 def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, ax=None):
     """
     Plot signal histogram
+    NB: :func:`uhi.plot_signal` provides a version of this function that accepts a `PlottableHistogram`.
 
     Parameters
     ----------
@@ -277,6 +278,7 @@ def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, a
 def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
     """
     Plot data
+    NB: :func:`uhi.plot_data` provides a version of this function that accepts a `PlottableHistogram`.
 
     Parameters
     ----------
@@ -340,6 +342,7 @@ def plot_ratio(
 ):
     """
     Plot ratio plot
+    NB: :func:`uhi.plot_ratio` provides a version of this function that accepts `PlottableHistogram`s.
 
     Parameters
     ----------
@@ -455,6 +458,7 @@ def draw_tag(text, ax=None):
 def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
     """
     Plot single 1D histogram
+    NB: :func:`uhi.plot_1d` provides a version of this function that accepts a `PlottableHistogram`.
 
     Parameters
     ----------
@@ -509,6 +513,7 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
 def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
     """
     Plot 2D histogram
+    NB: :func:`uhi.plot_2d` provides a version of this function that accepts a `PlottableHistogram`.
 
     Parameters
     ----------
