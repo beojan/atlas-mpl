@@ -40,6 +40,8 @@ modified to accept ``PlottableHistogram`` in a backward compatible manner since
 they take ``bins`` before the histogram argument. Alternate versions of these
 functions are therefore provided in the ``uhi`` module.
 
+As a result of this support, the histogram objects returned by `Uproot 4 <https://github.com/scikit-hep/uproot4>`__ can be plotted directly, as can `Boost-Histogram <https://github.com/scikit-hep/boost-histogram>`__  histograms and `Hist <https://github.com/scikit-hep/hist>`__ objects (once the relevent PRs are merged into those repositories).
+
 TeXLive and Fonts Needed
 ------------------------
 When using the ATLAS style, text is typeset using LaTeX. A working TeXLive installation providing the following is required:
