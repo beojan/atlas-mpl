@@ -28,7 +28,9 @@ In addition, this package also provides:
    theme
 
 UHI and the ``PlottableHistogram`` protocol
------------------------------------------ With the development of the `UHI
+----------------------------------------- 
+
+With the development of the `UHI
 <https://github.com/henryiii/uhi>`__ interface, this package now has support for
 histogram objects that follow the ``PlottableHistogram`` protocol.
 ``plot.Background`` objects can be constructed using ``PlottableHistogram``s and a
