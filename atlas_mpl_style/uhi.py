@@ -125,10 +125,10 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     max_ratio : float, optional
         Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw", 3 for "significances")
     plottype : {"diff", "raw", "significances"}
-        Type of ratio to plot.
-        "diff" : (data - bkg) / bkg
-        "raw" : data / bkg
-        "significances" : Significances (from `ampl.utils.significance()`)
+        | Type of ratio to plot.
+        | "diff" : (data - bkg) / bkg
+        | "raw" : data / bkg
+        | "significances" : Significances (from `ampl.utils.significance()`)
     """
     if (
         not hasattr(data, "axes")
