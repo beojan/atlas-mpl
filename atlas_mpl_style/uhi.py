@@ -1,7 +1,10 @@
-"""This module contains versions of the histogram plotting functions that take `PlottableHistogram`s
+"""This module contains versions of the histogram plotting functions that take PlottableHistograms
 
 These are in a separate module to preserve backward compatibility since the array versions of these
 functions take the array of bins before the histogram.
+
+:class:`atlas_mpl_style.plot.Background` can be constructed using a ``PlottableHistogram`` and therefore
+there is no ``atlas_mpl_style.uhi.plot_backgrounds`` function.
 """
 
 import numpy as _np
@@ -19,7 +22,7 @@ def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
     hist : PlottableHistogram
         Histogram
     ignore_variances : bool
-        Ignore variances and substitute `hist`. Defaults to False.
+        Ignore variances and substitute ``hist``. Defaults to False.
     color : color, optional
         Point color, defaults to black
     ax : mpl.axes.Axes, optional
@@ -58,7 +61,7 @@ def plot_signal(
     hist, label, ignore_variances=False, syst_errs=None, color=None, ax=None
 ):
     """
-    Plot signal histogram
+    Plot signal histogram from PlottableHistogram
 
     Parameters
     ----------
@@ -67,7 +70,7 @@ def plot_signal(
     label : str
         Label for legend
     ignore_variances : bool
-        Ignore variances and substitute `hist`. Defaults to False.
+        Ignore variances and substitute ``hist``. Defaults to False.
     syst_errs : array_like or PlottableHistogram, optional
         Systematic errors
     color : color
@@ -112,16 +115,16 @@ def plot_signal(
 
 def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     """
-    Plot ratio plot
+    Plot ratio plot from PlottableHistogram
 
     Parameters
     ----------
     data : PlottableHistogram
         Data histogram
     total_bkg : (array_like, array_like)
-        Tuple returned from :func:`plot.plot_backgrounds`
+        Tuple returned from :func:`atlas_mpl_style.plot.plot_backgrounds`
     ratio_ax : mpl.axes.Axes
-        Ratio axes (produced using `ampl.ratio_axes()`)
+        Ratio axes (produced using :func:`atlas_mpl_style.ratio_axes()`)
     max_ratio : float, optional
         Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw", 3 for "significances")
     plottype : {"diff", "raw", "significances"}
@@ -160,7 +163,7 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
 
 def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
     """
-    Plot single 1D histogram
+    Plot single 1D histogram from PlottableHistogram
 
     Parameters
     ----------
@@ -169,13 +172,13 @@ def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
     label : str
         Label for legend
     ignore_variances : bool
-        Ignore variances and substitute `hist`. Defaults to False.
+        Ignore variances and substitute ``hist``. Defaults to False.
     color : color, optional
         Line color
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     **kwargs
-        Extra parameters passed to `plt.hist`
+        Extra parameters passed to ``plt.hist``
     """
     if (
         not hasattr(hist, "axes")
@@ -201,7 +204,7 @@ def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
 
 def plot_2d(hist, ax=None, pad=0.005, **kwargs):
     """
-    Plot 2D histogram
+    Plot 2D histogram from PlottableHistogram
 
     Parameters
     ----------
@@ -212,7 +215,7 @@ def plot_2d(hist, ax=None, pad=0.005, **kwargs):
     pad : float (0. - 1.), optional
         Padding for colorbar (defaults to 0.005)
     **kwargs
-        Extra parameters passed to `pcolormesh`
+        Extra parameters passed to ``pcolormesh``
 
     Returns
     -------

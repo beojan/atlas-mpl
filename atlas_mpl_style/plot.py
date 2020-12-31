@@ -45,7 +45,7 @@ class Background:
         label : str
             Background label for legend
         hist : array_like or PlottableHistogram
-            Bin contents. If hist is a `PlottableHistogram` stat_errs is ignored unless it is `sqrt`.
+            Bin contents. If hist is a ``PlottableHistogram`` stat_errs is ignored unless it is `sqrt`.
         stat_errs : array_like
             Statistical errors on hist
         syst_errs : array_like or PlottableHist
@@ -132,7 +132,7 @@ def plot_backgrounds(backgrounds, bins, ax=None):
     backgrounds : [Background]
         List of backgrounds to be plotted, in order (bottom to top)
     bins : array_like, optional
-        Bin edges. To preserve backward compatibility, `backgrounds` and `bins` may be exchanged.
+        Bin edges. To preserve backward compatibility, ``backgrounds`` and ``bins`` may be exchanged.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
 
@@ -151,7 +151,7 @@ def plot_backgrounds(backgrounds, bins, ax=None):
         return
     if bins is None:
         if backgrounds[0].bins is None:
-            raise TypeError("`bins` is required if `backgrounds` were not constructed from `PlottableHists`s")
+            raise TypeError("bins is required if backgrounds were not constructed from PlottableHists")
         bins = backgrounds[0].bins
     if len(backgrounds[0].hist) != len(bins) - 1:
         raise BinningMismatchError("Invalid binning supplied")
@@ -209,7 +209,8 @@ def plot_backgrounds(backgrounds, bins, ax=None):
 def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, ax=None):
     """
     Plot signal histogram
-    NB: :func:`uhi.plot_signal` provides a version of this function that accepts a `PlottableHistogram`.
+
+    NB: :func:`atlas_mpl_style.uhi.plot_signal` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -278,7 +279,8 @@ def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, a
 def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
     """
     Plot data
-    NB: :func:`uhi.plot_data` provides a version of this function that accepts a `PlottableHistogram`.
+
+    NB: :func:`atlas_mpl_style.uhi.plot_data` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -342,7 +344,8 @@ def plot_ratio(
 ):
     """
     Plot ratio plot
-    NB: :func:`uhi.plot_ratio` provides a version of this function that accepts `PlottableHistogram`s.
+
+    NB: :func:`atlas_mpl_style.uhi.plot_ratio` provides a version of this function that accepts ``PlottableHistogram``s.
 
     Parameters
     ----------
@@ -357,14 +360,14 @@ def plot_ratio(
     bkg_errs : array_like
         Total errors on total background
     ratio_ax : mpl.axes.Axes
-        Ratio axes (produced using `ampl.ratio_axes()`)
+        Ratio axes (produced using :func:`atlas_mpl_style.ratio_axes()`)
     max_ratio : float, optional
         Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw", 3 for "significances")
     plottype : {"diff", "raw", "significances"}
         | Type of ratio to plot.
         | "diff" : (data - bkg) / bkg
         | "raw" : data / bkg
-        | "significances" : Significances (from `ampl.utils.significance()`)
+        | "significances" : Significances (using :func:`atlas_mpl_style.utils.significance()`)
     """
     # divide by zero is common -- ignore errors
     olderr = _np.seterr(all="ignore")
@@ -458,7 +461,8 @@ def draw_tag(text, ax=None):
 def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
     """
     Plot single 1D histogram
-    NB: :func:`uhi.plot_1d` provides a version of this function that accepts a `PlottableHistogram`.
+
+    NB: :func:`atlas_mpl_style.uhi.plot_1d` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -475,7 +479,7 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     **kwargs
-        Extra parameters passed to `plt.hist`
+        Extra parameters passed to ``plt.hist``
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -513,7 +517,8 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
 def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
     """
     Plot 2D histogram
-    NB: :func:`uhi.plot_2d` provides a version of this function that accepts a `PlottableHistogram`.
+
+    NB: :func:`atlas_mpl_style.uhi.plot_2d` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -528,7 +533,7 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
     pad : float (0. - 1.), optional
         Padding for colorbar (defaults to 0.005)
     **kwargs
-        Extra parameters passed to `pcolormesh`
+        Extra parameters passed to ``pcolormesh``
 
     Returns
     -------
