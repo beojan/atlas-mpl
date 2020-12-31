@@ -10,6 +10,19 @@ _atlas_label = "ATLAS"
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
+class DimensionError(Exception):
+    "Error due to incorrect / unsupported histogram dimension"
+    def __init__(self, msg):
+        "Histogram has incorrect / unsupported dimension"
+        super().__init__(self, msg)
+
+
+class ViolatesPlottableHistogramError(Exception):
+    "Error due to histogram object violating the PlottableHistogram protocol"
+    def __init__(self, msg):
+        "Histogram violates PlottableHistogram protocol"
+        super().__init__(self, msg)
+
 class BinningMismatchError(Exception):
     "Error due to histogram binning mismatch"
 
@@ -31,15 +44,27 @@ class Background:
         -----------
         label : str
             Background label for legend
-        hist : array_like
-            Bin contents
+        hist : array_like or PlottableHistogram
+            Bin contents. If hist is a `PlottableHistogram` stat_errs is ignored unless it is `sqrt`.
         stat_errs : array_like
             Statistical errors on hist
-        syst_errs : array_like
+        syst_errs : array_like or PlottableHist
             Systematic errors on hist
         color : color
             Background color for histogram
         """
+        if hasattr(hist, 'axes'): # Object should meet the PlottableHistogram protocol
+            if not hasattr(hist, 'values') or not hasattr(hist, 'variances'):
+                raise ViolatesPlottableHistogramError("hist violates PlottableHistogram protocol")
+            if len(hist.axes) != 1:
+                raise DimensionError("Only 1D histograms are supported here")
+            hist_obj = hist
+            bins = hist.axes[0].edges()
+            hist = hist_obj.values()
+            if not isinstance(stat_errs, str):
+                stat_errs = none if hist_obj.variances() is None else np.sqrt(hist_obj.variances())
+        else:
+            bins = None
         if stat_errs is None:
             stat_errs = _np.zeros_like(hist)
         elif isinstance(stat_errs, str):
@@ -55,6 +80,7 @@ class Background:
             if len(hist) != len(syst_errs):
                 raise BinningMismatchError("Syst errors have incorrect binning")
 
+        self.bins = bins
         self.hist = hist
         self.stat_errs = stat_errs
         if color is None:
@@ -97,17 +123,16 @@ def plot_band(bins, low, high, ax=None, **kwargs):
     ax.fill_between(x, new_low, new_high, **kwargs)
 
 
-def plot_backgrounds(bins, backgrounds, ax=None):
+def plot_backgrounds(backgrounds, bins, ax=None):
     """
     Plot stacked backgrounds
 
     Parameters
     ----------
-
-    bins : array_like
-        Bin edges
     backgrounds : [Background]
         List of backgrounds to be plotted, in order (bottom to top)
+    bins : array_like, optional
+        Bin edges. To preserve backward compatibility, `backgrounds` and `bins` may be exchanged.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
 
@@ -118,10 +143,16 @@ def plot_backgrounds(bins, backgrounds, ax=None):
     total_err : array_like
         Total error on background histogram
     """
+    if bins is not None and isinstance(bins[0], 'Background'):
+        bins, backgrounds = backgrounds, bins
     if ax is None:
         ax = _mpl.pyplot.gca()
     if len(backgrounds) < 1:
         return
+    if bins is None:
+        if backgrounds[0].bins is None:
+            raise TypeError("`bins` is required if `backgrounds` were not constructed from `PlottableHists`s")
+        bins = backgrounds[0].bins
     if len(backgrounds[0].hist) != len(bins) - 1:
         raise BinningMismatchError("Invalid binning supplied")
     n_bkgs = len(backgrounds)

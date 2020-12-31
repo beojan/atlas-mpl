@@ -5,6 +5,7 @@ import atexit as _atexit
 import cycler as _cycler
 import atlas_mpl_style.plot as plot
 import atlas_mpl_style.utils as utils
+import atlas_mpl_style.uhi as uhi
 from atlas_mpl_style.plot import set_xlabel, set_ylabel, set_zlabel, draw_atlas_label
 
 _stylesheets = _pkg.resource_filename(__name__, "stylesheets")
@@ -61,18 +62,18 @@ _mpl.colors.colorConverter.colors.update(_EXTRA_COLORS)
 
 def set_color_cycle(pal=None, n=4):
     """
-     Sets a different color cycle.
+    Sets a different color cycle.
 
-     The ATLAS palette includes the standard green and yellow.
+    The ATLAS palette includes the standard green and yellow.
 
-     Parameters
-     ----------
-     pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', None}
-       The palette to use. None resets to default palette.
-       The ATLAS palette is suitable for histograms, not lines.
-        'MPL' (alias 'Tab') provides the default matplotlib palette.
-     n : int, optional
-       Number of lines or histograms.
+    Parameters
+    ----------
+    pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', None}
+      The palette to use. None resets to default palette.
+      The ATLAS palette is suitable for histograms, not lines.
+       'MPL' (alias 'Tab') provides the default matplotlib palette.
+    n : int, optional
+      Number of lines or histograms.
     """
     if n < 2:
         n = 2
@@ -136,7 +137,7 @@ def set_color_cycle(pal=None, n=4):
     plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
-def use_atlas_style(atlasLabel="ATLAS"):
+def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True):
     """
     Setup ATLAS style.
 
@@ -144,6 +145,8 @@ def use_atlas_style(atlasLabel="ATLAS"):
     ----------
     atlasLabel : str, optional
        Replace ATLAS with a custom label
+    fancyLegend : bool, optional
+       Use matplotlib's fancy legend frame (defaults to True)
     """
     _style.use("atlas")
     set_color_cycle("ATLAS")
@@ -164,6 +167,10 @@ def use_atlas_style(atlasLabel="ATLAS"):
             r"\def\mathdefault{}",
         ]
     )
+    if not fancyLegend:
+        _mpl.rcParams["legend.frameon"] = False
+        _mpl.rcParams["legend.fancybox"] = False
+        _mpl.rcParams["legend.framealpha"] = 0.75
 
 
 def ratio_axes(extra_axes=None):
@@ -182,9 +189,8 @@ def ratio_axes(extra_axes=None):
     ratio_ax : axes or list of axes
        Returns list if extra_axes is passed
     """
-    fig = _mpl.pyplot.figure(
-        figsize=(8, 6 + 2 * (1 if extra_axes is None else extra_axes)), dpi=600
-    )
+    hgt = 6 + 2 * (1 if extra_axes is None else extra_axes)
+    fig = _mpl.pyplot.figure(figsize=(hgt, hgt), dpi=600)
     if extra_axes is None:
         gs = _mpl.gridspec.GridSpec(4, 1, hspace=0.0, wspace=0.0)
         ax1 = fig.add_subplot(gs[0:3])
