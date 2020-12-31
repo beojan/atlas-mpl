@@ -15,7 +15,7 @@ In addition, this package also provides:
 
 -  A function to draw the ATLAS label (requires ``usetex: true`` as set
    by the included ATLAS style)
--  A `plot` module containing functions to plot pre-binned histograms and limits. This includes functionality for plotting stacked backgrounds along with data and ratios in the usual ATLAS style.
+-  A ``plot`` module containing functions to plot pre-binned histograms and limits. This includes functionality for plotting stacked backgrounds along with data and ratios in the usual ATLAS style.
 -  A matplotlib style based on the background / foreground from the VIM
    `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ color
    scheme, along with a print version with a white background.
@@ -27,7 +27,7 @@ In addition, this package also provides:
    Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
    theme
 
-UHI and the ``PlottableHistogram`` protocol
+UHI and the PlottableHistogram protocol
 ----------------------------------------- 
 
 With the development of the `UHI
