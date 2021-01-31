@@ -2,6 +2,8 @@ import matplotlib as _mpl
 import matplotlib.style as _style
 import pkg_resources as _pkg
 import atexit as _atexit
+import shutil as _shutil
+import warnings as _warn
 import cycler as _cycler
 import atlas_mpl_style.plot as plot
 import atlas_mpl_style.utils as utils
@@ -137,7 +139,7 @@ def set_color_cycle(pal=None, n=4):
     plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
-def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True):
+def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True, usetex=True):
     """
     Setup ATLAS style.
 
@@ -147,26 +149,46 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True):
        Replace ATLAS with a custom label
     fancyLegend : bool, optional
        Use matplotlib's fancy legend frame (defaults to True)
+    usetex : bool, optional
+       Use LaTeX installation to set text (defaults to True)
+       If no LaTeX installation is found, this package will fallback to usetex=False.
+       This is on a best-effort basis, since the detected LaTeX installation may be incomplete.
     """
+    if usetex:
+        if (
+            _shutil.which("pdflatex") is None
+            or _shutil.which("dvipng") is None
+            or _shutil.which("gs") is None
+        ):
+            _warn.warn(
+                "No LaTeX installation found -- atlas-mpl-style is falling back to usetex=False"
+            )
+            usetex = False
+
     _style.use("atlas")
     set_color_cycle("ATLAS")
     plot._atlas_label = atlasLabel
     _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
-    _mpl.rcParams["text.latex.preamble"] = "\n".join(
-        [
-            r"\usepackage[LGR,T1]{fontenc}",
-            r"\usepackage{tgheros}",
-            r"\renewcommand{\familydefault}{\sfdefault}",
-            r"\usepackage{amsmath}",
-            r"\usepackage[symbolgreek,symbolmax]{mathastext}",
-            r"\usepackage{physics}",
-            r"\usepackage{siunitx}",
-            r"\setlength{\parindent}{0pt}",
-            r"\def\mathdefault{}",
-        ]
-    )
+    if not usetex:
+        _mpl.rcParams["text.usetex"] = False
+        _mpl.rcParams["mathtext.default"] = "regular"
+    else:
+        plot._usetex = True
+        _mpl.rcParams["text.latex.preamble"] = "\n".join(
+            [
+                r"\usepackage[LGR,T1]{fontenc}",
+                r"\usepackage{tgheros}",
+                r"\renewcommand{\familydefault}{\sfdefault}",
+                r"\usepackage{amsmath}",
+                r"\usepackage[symbolgreek,symbolmax]{mathastext}",
+                r"\usepackage{physics}",
+                r"\usepackage{siunitx}",
+                r"\setlength{\parindent}{0pt}",
+                r"\def\mathdefault{}",
+            ]
+        )
     if not fancyLegend:
         _mpl.rcParams["legend.frameon"] = False
         _mpl.rcParams["legend.fancybox"] = False

@@ -5,6 +5,7 @@ from atlas_mpl_style.utils import significance as _significance
 from math import floor, ceil
 
 _atlas_label = "ATLAS"
+_usetex = False
 
 # For histograms with no color set
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
@@ -12,6 +13,7 @@ _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 class DimensionError(Exception):
     "Error due to incorrect / unsupported histogram dimension"
+
     def __init__(self, msg):
         "Histogram has incorrect / unsupported dimension"
         super().__init__(self, msg)
@@ -19,9 +21,11 @@ class DimensionError(Exception):
 
 class ViolatesPlottableHistogramError(Exception):
     "Error due to histogram object violating the PlottableHistogram protocol"
+
     def __init__(self, msg):
         "Histogram violates PlottableHistogram protocol"
         super().__init__(self, msg)
+
 
 class BinningMismatchError(Exception):
     "Error due to histogram binning mismatch"
@@ -53,16 +57,22 @@ class Background:
         color : color
             Background color for histogram
         """
-        if hasattr(hist, 'axes'): # Object should meet the PlottableHistogram protocol
-            if not hasattr(hist, 'values') or not hasattr(hist, 'variances'):
-                raise ViolatesPlottableHistogramError("hist violates PlottableHistogram protocol")
+        if hasattr(hist, "axes"):  # Object should meet the PlottableHistogram protocol
+            if not hasattr(hist, "values") or not hasattr(hist, "variances"):
+                raise ViolatesPlottableHistogramError(
+                    "hist violates PlottableHistogram protocol"
+                )
             if len(hist.axes) != 1:
                 raise DimensionError("Only 1D histograms are supported here")
             hist_obj = hist
             bins = hist.axes[0].edges()
             hist = hist_obj.values()
             if not isinstance(stat_errs, str):
-                stat_errs = none if hist_obj.variances() is None else np.sqrt(hist_obj.variances())
+                stat_errs = (
+                    None
+                    if hist_obj.variances() is None
+                    else _np.sqrt(hist_obj.variances())
+                )
         else:
             bins = None
         if stat_errs is None:
@@ -143,7 +153,7 @@ def plot_backgrounds(backgrounds, bins, ax=None):
     total_err : array_like
         Total error on background histogram
     """
-    if bins is not None and isinstance(bins[0], 'Background'):
+    if bins is not None and isinstance(bins[0], "Background"):
         bins, backgrounds = backgrounds, bins
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -151,7 +161,9 @@ def plot_backgrounds(backgrounds, bins, ax=None):
         return
     if bins is None:
         if backgrounds[0].bins is None:
-            raise TypeError("bins is required if backgrounds were not constructed from PlottableHists")
+            raise TypeError(
+                "bins is required if backgrounds were not constructed from PlottableHists"
+            )
         bins = backgrounds[0].bins
     if len(backgrounds[0].hist) != len(bins) - 1:
         raise BinningMismatchError("Invalid binning supplied")
@@ -323,7 +335,13 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
     bin_centers = (bins[1:] + bins[:-1]) / 2
     if _np.sum(stat_errs) == 0:
         ax.plot(
-            bin_centers, hist, "o", label=label, color=color, zorder=7, ms=5,
+            bin_centers,
+            hist,
+            "o",
+            label=label,
+            color=color,
+            zorder=7,
+            ms=5,
         )
     else:
         ax.errorbar(
@@ -774,30 +792,86 @@ def draw_atlas_label(
 
     if lumi is not None:
         show_e_nl = True
-        lumi_str = (
-            fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"\textsf{{fb}}^{{-1}}$"
-        )
+        if _usetex:
+            lumi_str = (
+                fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"\textsf{{fb}}^{{-1}}$"
+            )
+        else:
+            lumi_str = fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"{{fb}}^{{-1}}$"
     else:
         lumi_str = ""
 
     desc_line = desc is not None
-    nl = r"\\"
-    label = (
-        fr"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
-        fr'{nl + "for education only" if status=="opendata" else ""}'
-        fr'{nl if show_e_nl else ""}'
-        fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
-        fr'{desc if desc_line else ""}'
-    )
-    ax.text(
-        x,
-        y,
-        label,
-        ha="left",
-        va="top",
-        multialignment="left",
-        transform=ax.transAxes,
-        size=14,
-        *args,
-        **kwargs,
-    )
+    if _usetex:
+        nl = r"\\"
+        label = (
+            fr"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
+            fr'{nl + "for education only" if status=="opendata" else ""}'
+            fr'{nl if show_e_nl else ""}'
+            fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
+            fr'{desc if desc_line else ""}'
+        )
+        ax.text(
+            x,
+            y,
+            label,
+            *args,
+            ha="left",
+            va="top",
+            multialignment="left",
+            transform=ax.transAxes,
+            size=14,
+            **kwargs,
+        )
+    else:
+        nl = "\n"
+        label = (
+            fr'{"for education only" if status=="opendata" else ""}'
+            fr'{nl if show_e_nl and status=="opendata" else ""}'
+            fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
+            fr'{desc if desc_line else ""}'
+        )
+        # Based on the rainbox_text example in MPL
+        prop = dict(
+            ha="left",
+            va="top",
+            multialignment="left",
+            size=14,
+        )
+        atl_txt = ax.text(
+            x,
+            y,
+            f"{_atlas_label} ",
+            *args,
+            style="italic",
+            weight="bold",
+            transform=ax.transAxes,
+            **prop,
+            **kwargs,
+        )
+        atl_txt.draw(ax.figure.canvas.get_renderer())
+        ex = atl_txt.get_window_extent()
+        side_t = _mpl.transforms.offset_copy(
+            atl_txt._transform, x=ex.width, units="dots"
+        )
+        under_t = _mpl.transforms.offset_copy(
+            atl_txt._transform, y=-ex.height, units="dots"
+        )
+        ax.text(
+            x,
+            y,
+            f"{sim_str}{status_str}",
+            *args,
+            transform=side_t,
+            **prop,
+            **kwargs,
+        )
+        ax.text(
+            x,
+            y,
+            label,
+            *args,
+            transform=under_t,
+            **prop,
+            **kwargs,
+        )

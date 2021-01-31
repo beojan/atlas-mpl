@@ -44,7 +44,9 @@ As a result of this support, the histogram objects returned by `Uproot 4 <https:
 
 TeXLive and Fonts Needed
 ------------------------
-When using the ATLAS style, text is typeset using LaTeX. A working TeXLive installation providing the following is required:
+When using the ATLAS style, text is (by default) typeset using LaTeX. From version 0.15, this can be avoided by passing ``usetex=False`` to ``use_atlas_style``.
+
+A working TeXLive installation providing the following is required:
 
 - pdflatex
 - amsmath
@@ -53,6 +55,7 @@ When using the ATLAS style, text is typeset using LaTeX. A working TeXLive insta
 - physics (the package)
 - siunitx
 
+If no LaTeX installation is available, the style will warn and fall back to the ``usetex=False`` behaviour.
 To check if all necessary packages are installed, try building ``atlas_mpl_style/testing/ampl-test.tex``.
 
 On Arch (and related distributions), the ``texlive-most`` group is sufficient.
@@ -73,5 +76,5 @@ installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
 **TeXLive is not required for the "paper" or "print" style.** `Fira Sans
 <https://bboxtype.com/typefaces/FiraSans/>`__ and `Iosevka
-<https://github.com/be5invis/Iosevka/releases/tag/v2.3.3>`__ should be installed
+<https://github.com/be5invis/Iosevka/releases/>`__ should be installed
 for these styles to appear as intended. However, neither is *necessary*.

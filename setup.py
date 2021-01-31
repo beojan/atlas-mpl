@@ -23,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="0.14.0",
+    version="0.15.0",
     description="ATLAS style for Matplotlib 3.0+",
     long_description=long_description,
     # The project's main homepage.
@@ -53,7 +53,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     # What does your project relate to?
-    keywords="plotting atlas matplotlib cern root",
+    keywords="plotting atlas matplotlib cern root hep high-energy-physics physics",
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
