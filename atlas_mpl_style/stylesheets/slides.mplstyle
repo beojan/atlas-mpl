@@ -1,0 +1,47 @@
+patch.linewidth: 0.5
+patch.facecolor: 348ABD  # blue
+patch.edgecolor: EEEEEE
+patch.antialiased: True
+
+font.size: 10.0
+font.family: sans-serif
+font.sans-serif: Fira Sans, TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, DejaVu Sans
+font.serif: TeX Gyre Pagella, Palatino, Palatino Linotype, URW Palladio L, DejaVu Sans
+font.monospace: Iosevka, Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono
+
+text.color: 444444
+mathtext.fontset: stixsans
+mathtext.default: regular
+
+axes.facecolor: E5E5E5
+axes.edgecolor: EEEEEE
+axes.linewidth: 1
+axes.grid: True
+axes.titlesize: x-large
+axes.labelsize: large
+axes.labelcolor: 444444
+axes.axisbelow: False       # grid/ticks are below elements (e.g., lines, text)
+axes.formatter.limits: -2, 4
+axes.formatter.use_mathtext: True
+
+# Generated with HCL Wizard
+axes.prop_cycle: cycler('color', ['54C9D1','ECA89A','95BCED','CEB776','D3A9EA','9BC57F','F0A1CA','5FCBAA'])
+
+xtick.color: 444444
+xtick.major.size: 0
+xtick.direction: in
+
+ytick.color: 444444
+ytick.major.size: 0
+ytick.direction: in
+
+grid.color: EEEEEE
+grid.linestyle: -    # solid line
+
+figure.figsize: 7.1, 4.8
+figure.dpi: 150
+figure.facecolor: EEEEEE
+figure.edgecolor: 0.50
+
+savefig.facecolor: EEEEEE00
+

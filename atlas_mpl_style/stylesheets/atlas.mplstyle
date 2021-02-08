@@ -7,7 +7,7 @@ text.usetex: True
 font.size: 14.0
 font.family: sans-serif
 font.sans-serif: Tex Gyre Heros, Helvetica, Nimbus Sans, Arial
-font.serif: Tex Gyre Termes, Times, Times Roman, Times New Roman. Nimbus Roman
+font.serif: Tex Gyre Termes, Times, Times Roman, Times New Roman, Nimbus Roman
 font.monospace: Tex Gyre Cursor, Courier, Courier New, Nimbus Mono
 
 text.color: 000000
@@ -43,9 +43,11 @@ ytick.left: True
 ytick.right: True
 ytick.direction: in
 
-figure.figsize: 8, 6
+figure.dpi: 72
+figure.figsize: 11.111, 8.333
 figure.facecolor: FFFFFF
 figure.edgecolor: 0.50
 
+savefig.dpi: figure
 savefig.facecolor: FFFFFF00
 

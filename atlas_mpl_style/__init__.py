@@ -203,6 +203,8 @@ def ratio_axes(extra_axes=None):
     -----------
     extra_axes : int, optional
        Number of additional axes. If not given, defaults to one.
+    square : bool, optional
+       Whether the plot should be square or tall. Defaults to True (square)
 
     Returns
     -------
@@ -211,8 +213,8 @@ def ratio_axes(extra_axes=None):
     ratio_ax : axes or list of axes
        Returns list if extra_axes is passed
     """
-    hgt = 6 + 2 * (1 if extra_axes is None else extra_axes)
-    fig = _mpl.pyplot.figure(figsize=(hgt, hgt), dpi=600)
+    hgt = (6 + 2 * (1 if extra_axes is None else extra_axes)) * (100/72)
+    fig = _mpl.pyplot.figure(figsize=(hgt, hgt))
     if extra_axes is None:
         gs = _mpl.gridspec.GridSpec(4, 1, hspace=0.0, wspace=0.0)
         ax1 = fig.add_subplot(gs[0:3])
