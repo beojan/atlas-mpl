@@ -38,7 +38,7 @@ class BinningMismatchError(Exception):
 class Background:
     """Histogram and errors corresponding to a single background"""
 
-    __slots__ = ["label", "hist", "stat_errs", "syst_errs", "color"]
+    __slots__ = ["bins", "label", "hist", "stat_errs", "syst_errs", "color"]
 
     def __init__(self, label, hist, stat_errs=None, syst_errs=None, color=None):
         """
@@ -49,7 +49,7 @@ class Background:
         label : str
             Background label for legend
         hist : array_like or PlottableHistogram
-            Bin contents. If hist is a ``PlottableHistogram`` stat_errs is ignored unless it is `sqrt`.
+            Bin contents. If hist is a ``PlottableHistogram`` stat_errs is ignored unless it is `sqrt` or `ignore`.
         stat_errs : array_like
             Statistical errors on hist
         syst_errs : array_like or PlottableHist
@@ -81,6 +81,8 @@ class Background:
             stat_errs = stat_errs.lower()
             if "pois" in stat_errs or "sqrt" in stat_errs:
                 stat_errs = _np.sqrt(hist)
+            elif "ignore" in stat_errs:
+                stat_errs = _np.zeros_like(hist)
             else:
                 raise TypeError("Invalid stat_errs")
         else:
@@ -133,7 +135,7 @@ def plot_band(bins, low, high, ax=None, **kwargs):
     ax.fill_between(x, new_low, new_high, **kwargs)
 
 
-def plot_backgrounds(backgrounds, bins, ax=None):
+def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
     """
     Plot stacked backgrounds
 
@@ -143,6 +145,8 @@ def plot_backgrounds(backgrounds, bins, ax=None):
         List of backgrounds to be plotted, in order (bottom to top)
     bins : array_like, optional
         Bin edges. To preserve backward compatibility, ``backgrounds`` and ``bins`` may be exchanged.
+    total_err: array_like, optional
+        Total uncertainty. If given, overrides per-background systematics. This is useful for showing post-fit uncertainties.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
 
@@ -153,7 +157,7 @@ def plot_backgrounds(backgrounds, bins, ax=None):
     total_err : array_like
         Total error on background histogram
     """
-    if bins is not None and isinstance(bins[0], "Background"):
+    if bins is not None and isinstance(bins[0], Background):
         bins, backgrounds = backgrounds, bins
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -167,22 +171,30 @@ def plot_backgrounds(backgrounds, bins, ax=None):
         bins = backgrounds[0].bins
     if len(backgrounds[0].hist) != len(bins) - 1:
         raise BinningMismatchError("Invalid binning supplied")
+    if total_err is not None:
+        if len(total_err) != len(bins) - 1:
+            raise BinningMismatchError("Total error may have incorrect binning")
     n_bkgs = len(backgrounds)
 
-    total_stat_err = _np.zeros_like(backgrounds[0].hist)
-    total_syst_err = _np.zeros_like(backgrounds[0].hist)
-    total_hist = _np.zeros_like(backgrounds[0].hist)
+    total_stat_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float_)
+    total_syst_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float_)
+    total_hist = _np.zeros_like(backgrounds[0].hist, dtype=_np.float_)
 
     for i, bkg in enumerate(backgrounds):
         if len(bkg.hist) != len(total_stat_err):
             raise BinningMismatchError(f"Invalid binning for background {i}")
         total_stat_err += _np.square(bkg.stat_errs)
-        total_syst_err += _np.square(bkg.syst_errs)
+        if total_err is not None:
+            total_syst_err += _np.square(bkg.syst_errs)
         total_hist += bkg.hist
     # components still variances at this point
-    total_err = _np.sqrt(total_stat_err + total_syst_err)
+    if total_err is None:
+        total_err = _np.sqrt(total_stat_err + total_syst_err)
+        total_syst_err = _np.sqrt(total_syst_err)
+    else:
+        total_syst_err = _np.sqrt(total_err - total_stat_err)
     total_stat_err = _np.sqrt(total_stat_err)
-    total_syst_err = _np.sqrt(total_syst_err)
+
     bin_centers = (bins[1:] + bins[:-1]) / 2
     _, _, ps = ax.hist(
         _np.vstack([bin_centers] * n_bkgs).transpose(),
@@ -202,7 +214,7 @@ def plot_backgrounds(backgrounds, bins, ax=None):
             total_hist + total_err,
             color="grey",
             alpha=0.5,
-            label="Stat. $\\bigoplus$ Syst. Unc.",
+            label="Stat. $\\oplus$ Syst. Unc.",
             zorder=5,
         )
     if _np.sum(total_stat_err) != 0:
@@ -747,9 +759,9 @@ def draw_atlas_label(
     Parameters
     ----------
     x : float
-        x position
+        x position (top left)
     y : float
-        y position
+        y position (top left)
     ax : mpl.axes.Axes, optional
         Axes to draw label in
     status : [ *'int'* | 'wip' | 'prelim' | 'final' | 'opendata' ], optional
