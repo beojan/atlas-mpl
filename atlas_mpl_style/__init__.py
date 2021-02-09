@@ -226,6 +226,7 @@ def ratio_axes(extra_axes=None):
             )
         )
         ax2.autoscale(axis="x", tight=True)
+        _mpl.pyplot.sca(ax1)
         return fig, ax1, ax2
     else:
         gs = _mpl.gridspec.GridSpec(3 + extra_axes, 1, hspace=0.0, wspace=0.0)
@@ -243,4 +244,5 @@ def ratio_axes(extra_axes=None):
             )
             ax.autoscale(axis="x", tight=True)
             axs.append(ax)
+        _mpl.pyplot.sca(ax1)
         return fig, ax1, axs

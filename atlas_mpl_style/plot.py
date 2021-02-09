@@ -222,6 +222,7 @@ def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
             bins,
             total_hist - total_stat_err,
             total_hist + total_stat_err,
+            ax=ax,
             fc="transparent",
             hatch=r"////",
             label="Stat. Unc.",
@@ -287,12 +288,19 @@ def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, a
     if color is None:
         color = p[0].get_ec()
     plot_band(
-        bins, hist - total_err, hist + total_err, color=color, alpha=0.25, zorder=5
+        bins,
+        hist - total_err,
+        hist + total_err,
+        color=color,
+        ax=ax,
+        alpha=0.25,
+        zorder=5,
     )
     plot_band(
         bins,
         hist - stat_errs,
         hist + stat_errs,
+        ax=ax,
         ec=color,
         fc="transparent",
         hatch=r"////",
