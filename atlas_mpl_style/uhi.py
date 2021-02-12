@@ -21,7 +21,7 @@ class LabeledBinsError(Exception):
 
 def _bins(axis):
     a = list(axis)
-    if not isinstance(a[0], str):
+    if isinstance(a[0], str):
         raise LabeledBinsError("Bins are labeled. Perhaps you may want plot_cutflow.")
     return _np.array([i for (i, _) in a] + [a[-1][1]])
 
