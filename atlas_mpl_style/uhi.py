@@ -11,6 +11,21 @@ import numpy as _np
 import atlas_mpl_style.plot as _amplplt
 
 
+class LabeledBinsError(Exception):
+    "Labeled bins when edges expected (or vice versa)"
+
+    def __init__(self, msg):
+        "Labeled bins when edges expected (or vice versa)"
+        super().__init__(self, msg)
+
+
+def _bins(axis):
+    a = list(axis)
+    if not isinstance(a[0], str):
+        raise LabeledBinsError("Bins are labeled. Perhaps you may want plot_cutflow.")
+    return _np.array([i for (i, _) in a] + [a[-1][1]])
+
+
 def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
     """
     Plot data from PlottableHistogram
@@ -46,13 +61,13 @@ def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
     if len(hist.axes) != 1:
         raise _amplplt.DimensionError("Only 1D histograms are supported here")
     hist_obj = hist
-    bins = hist.axes[0].edges()
+    bins = _bins(hist.axes[0])
     hist = hist_obj.values()
     if ignore_variances:
         stat_errs = _np.sqrt(hist)
     else:
         stat_errs = (
-            none if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
+            None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
         )
     return _amplplt.plot_data(bins, hist, stat_errs, color, label, ax)
 
@@ -89,13 +104,13 @@ def plot_signal(
     if len(hist.axes) != 1:
         raise _amplplt.DimensionError("Only 1D histograms are supported here")
     hist_obj = hist
-    bins = hist_obj.axes[0].edges()
+    bins = _bins(hist_obj.axes[0])
     hist = hist_obj.values()
     if ignore_variances:
         stat_errs = _np.sqrt(hist)
     else:
         stat_errs = (
-            none if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
+            None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
         )
     if syst_errs is not None and hasattr(syst_errs, "axes"):
         if not hasattr(syst_errs, "values") or not hasattr(syst_errs, "variances"):
@@ -191,13 +206,13 @@ def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
     if len(hist.axes) != 1:
         raise _amplplt.DimensionError("Only 1D histograms are supported here")
     hist_obj = hist
-    bins = hist.axes[0].edges()
+    bins = _bins(hist_obj.axes[0])
     hist = hist_obj.values()
     if ignore_variances:
         stat_errs = _np.sqrt(hist)
     else:
         stat_errs = (
-            none if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
+            None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
         )
     _amplplt.plot_1d(label, bins, hist, stat_errs, color, ax, **kwargs)
 
@@ -232,6 +247,50 @@ def plot_2d(hist, ax=None, pad=0.005, **kwargs):
         )
     if len(hist.axes) != 2:
         raise _amplplt.DimensionError("Only 2D histograms are supported here")
-    xbins = hist.axes[0].edges()
-    ybins = hist.axes[1].edges()
-    return _amplplt.plot_2d(xbins, ybins, hist, ax, pad, **kwargs)
+    xbins = _bins(hist.axes[0])
+    ybins = _bins(hist.axes[1])
+    h = hist.values()
+    return _amplplt.plot_2d(xbins, ybins, h, ax, pad, **kwargs)
+
+
+def plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs):
+    """
+    Plot cutflow from PlottableHistogram
+
+    Parameters
+    ----------
+    hist : PlottableHistogram
+        Cutflow histogram
+    ax : mpl.axes.Axes, optional
+        Axes to draw on (defaults to current axes)
+    text : bool, optional
+        Whether to label bars (default: True)
+    textcolor: str, optional
+        Text color
+    horizontal : bool, optional
+        Whether to draw horizontal bars (default: True)
+    **kwargs
+        Extra parameters passed to ``bar`` or ``barh``
+    """
+    if (
+        not hasattr(hist, "axes")
+        or not hasattr(hist, "values")
+        or not hasattr(hist, "variances")
+    ):
+        raise _amplplt.ViolatesPlottableHistogramError(
+            "hist violates PlottableHistogram protocol"
+        )
+    if len(hist.axes) != 1:
+        raise _amplplt.DimensionError("Cutflow should be 1D")
+    labels = list(hist.axes[0])
+    if not isinstance(labels[0], str):
+        raise LabeledBinsError("Bins are not labeled")
+    _amplplt.plot_cutflow(
+        labels,
+        hist.values(),
+        ax=ax,
+        text=text,
+        textcolor=textcolor,
+        horizontal=horizontal,
+        **kwargs
+    )

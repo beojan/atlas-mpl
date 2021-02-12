@@ -11,6 +11,29 @@ _usetex = False
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
+def _formatSciNotation(x):
+    s = f"{x:.5g}"
+    # From ScalarFormatter
+    decimal_point = "."
+    positive_sign = "+"
+    tup = s.split("e")
+    try:
+        significand = tup[0].rstrip("0").rstrip(decimal_point)
+        sign = tup[1][0].replace(positive_sign, "")
+        exponent = tup[1][1:].lstrip("0")
+        if significand == "1" and exponent != "":
+            # reformat 1x10^y as 10^y
+            significand = ""
+        if exponent:
+            exponent = "10^{%s%s}" % (sign, exponent)
+        if significand and exponent:
+            return r"$%s{\times}%s$" % (significand, exponent)
+        else:
+            return r"$%s%s$" % (significand, exponent)
+    except IndexError:
+        return s
+
+
 class DimensionError(Exception):
     "Error due to incorrect / unsupported histogram dimension"
 
@@ -184,7 +207,7 @@ def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
         if len(bkg.hist) != len(total_stat_err):
             raise BinningMismatchError(f"Invalid binning for background {i}")
         total_stat_err += _np.square(bkg.stat_errs)
-        if total_err is not None:
+        if total_err is None:
             total_syst_err += _np.square(bkg.syst_errs)
         total_hist += bkg.hist
     # components still variances at this point
@@ -593,6 +616,75 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
     return mesh, cbar
 
 
+def plot_cutflow(
+    labels, hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs
+):
+    """
+    Plot cutflow from PlottableHistogram
+
+    Parameters
+    ----------
+    labels : [str]
+        Cutflow labels
+    hist : PlottableHistogram
+        Cutflow histogram
+    ax : mpl.axes.Axes, optional
+        Axes to draw on (defaults to current axes)
+    text : bool, optional
+        Whether to label bars (default: True)
+    textcolor: str, optional
+        Text color
+    horizontal : bool, optional
+        Whether to draw horizontal bars (default: True)
+    **kwargs
+        Extra parameters passed to ``bar`` or ``barh``
+    """
+    resize_ax = False
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+        resize_ax = True  # only resize axes if they weren't provided
+    if len(labels) != len(hist):
+        raise BinningMismatchError("Invalid binning")
+    if horizontal:
+        y = _np.arange(len(labels))[::-1]
+        rects = ax.barh(
+            y, hist, height=1, tick_label=labels, align="center", ec="k", **kwargs
+        )
+        if text:
+            for rect in rects:
+                w = rect.get_width()
+                ax.annotate(
+                    _formatSciNotation(w),
+                    xy=(w, rect.get_y() + rect.get_height() / 2),
+                    xytext=(-10, 0),
+                    textcoords="offset points",
+                    ha="right",
+                    va="center",
+                    fontsize=16,
+                    color=textcolor,
+                )
+        if resize_ax:
+            ax.set_ylim(-0.5, len(labels) + 2.5)
+    else:
+        x = _np.arange(len(labels))
+        rects = ax.bar(x, hist, width=1, tick_label=labels, align="center", **kwargs)
+        if text:
+            for rect in rects:
+                h = rect.get_height()
+                ax.annotate(
+                    _formatSciNotation(h),
+                    xy=(rect.get_x() + rect.get_width() / 2, h),
+                    xytext=(0, -10),
+                    textcoords="offset points",
+                    ha="center",
+                    va="top",
+                    fontsize=16,
+                    color=textcolor,
+                )
+        if resize_ax:
+            ax.set_xlim(-0.5, len(labels) - 0.5)
+
+
 def plot_limit(
     expected_label,
     x,
@@ -840,7 +932,7 @@ def draw_atlas_label(
             va="top",
             multialignment="left",
             transform=ax.transAxes,
-            size=16,
+            size=20,
             **kwargs,
         )
     else:
@@ -856,7 +948,7 @@ def draw_atlas_label(
             ha="left",
             va="top",
             multialignment="left",
-            size=16,
+            size=20,
         )
         atl_txt = ax.text(
             x,

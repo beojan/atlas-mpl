@@ -168,7 +168,6 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True, usetex=True):
     _style.use("atlas")
     set_color_cycle("ATLAS")
     plot._atlas_label = atlasLabel
-    _mpl.rcParams["font.size"] = 16
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
     if not usetex:
