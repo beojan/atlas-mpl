@@ -94,7 +94,7 @@ that you install `texlive-full` to obtain a complete installation of texlive.
 On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be
 installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
-**TeXLive is not required for the "paper" or "print" style.** `Fira Sans
+**TeXLive is not required for the "slides" or "print" style.** `Fira Sans
 <https://bboxtype.com/typefaces/FiraSans/>`__ and `Iosevka
 <https://github.com/be5invis/Iosevka/releases/>`__ should be installed
 for these styles to appear as intended. However, neither is *necessary*.
