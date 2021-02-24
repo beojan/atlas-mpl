@@ -6,9 +6,9 @@ patch.antialiased: True
 text.usetex: True
 font.size: 20.0
 font.family: sans-serif
-font.sans-serif: Tex Gyre Heros, Helvetica, Nimbus Sans, Arial
-font.serif: Tex Gyre Termes, Times, Times Roman, Times New Roman, Nimbus Roman
-font.monospace: Tex Gyre Cursor, Courier, Courier New, Nimbus Mono
+font.sans-serif: Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial
+font.serif: Tex Gyre Termes, Times, Times Roman, Times New Roman, Nimbus Roman, FreeSerif
+font.monospace: Tex Gyre Cursor, Courier, Courier New, Nimbus Mono, FreeMono
 
 text.color: 000000
 
