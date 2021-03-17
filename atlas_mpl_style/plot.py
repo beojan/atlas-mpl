@@ -3,6 +3,7 @@ import matplotlib.colors as _colors
 import numpy as _np
 from atlas_mpl_style.utils import significance as _significance
 from math import floor, ceil
+from mpl_toolkits.axes_grid1 import make_axes_locatable as _make_axes_locatable
 
 _atlas_label = "ATLAS"
 _usetex = False
@@ -575,7 +576,7 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
         )
 
 
-def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
+def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
     """
     Plot 2D histogram
 
@@ -591,8 +592,8 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
         Bin contents
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
-    pad : float (0. - 1.), optional
-        Padding for colorbar (defaults to 0.005)
+    pad : float, optional
+        Padding for colorbar in inches (defaults to 0.05)
     **kwargs
         Extra parameters passed to ``pcolormesh``
 
@@ -612,7 +613,9 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.005, **kwargs):
     ax.axis("scaled")
     ax.set_xlim(xbins[0], xbins[-1])
     ax.set_ylim(ybins[0], ybins[-1])
-    cbar = ax.figure.colorbar(mesh, ax=ax, pad=pad)
+    cax = _make_axes_locatable(ax).append_axes("right", size="5%", pad=pad)
+    cbar = ax.figure.colorbar(mesh, cax=cax)
+    cax.yaxis.tick_right()
     return mesh, cbar
 
 

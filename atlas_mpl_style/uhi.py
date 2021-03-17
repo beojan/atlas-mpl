@@ -176,7 +176,9 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     )
 
 
-def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
+def plot_1d(
+    hist, label, ignore_variances=False, stat_err=True, color=None, ax=None, **kwargs
+):
     """
     Plot single 1D histogram from PlottableHistogram
 
@@ -188,6 +190,8 @@ def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
         Label for legend
     ignore_variances : bool
         Ignore variances and substitute ``hist``. Defaults to False.
+    stat_err : bool
+        Draw statistical errors. Defaults to True.
     color : color, optional
         Line color
     ax : mpl.axes.Axes, optional
@@ -208,16 +212,19 @@ def plot_1d(hist, label, ignore_variances=False, color=None, ax=None, **kwargs):
     hist_obj = hist
     bins = _bins(hist_obj.axes[0])
     hist = hist_obj.values()
-    if ignore_variances:
-        stat_errs = _np.sqrt(hist)
+    if stat_err:
+        if ignore_variances:
+            stat_errs = _np.sqrt(hist)
+        else:
+            stat_errs = (
+                None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
+            )
     else:
-        stat_errs = (
-            None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
-        )
+        stat_errs = None
     _amplplt.plot_1d(label, bins, hist, stat_errs, color, ax, **kwargs)
 
 
-def plot_2d(hist, ax=None, pad=0.005, **kwargs):
+def plot_2d(hist, ax=None, pad=0.05, **kwargs):
     """
     Plot 2D histogram from PlottableHistogram
 
@@ -227,8 +234,8 @@ def plot_2d(hist, ax=None, pad=0.005, **kwargs):
         Histogram
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
-    pad : float (0. - 1.), optional
-        Padding for colorbar (defaults to 0.005)
+    pad : float, optional
+        Padding for colorbar in inches (defaults to 0.05)
     **kwargs
         Extra parameters passed to ``pcolormesh``
 
