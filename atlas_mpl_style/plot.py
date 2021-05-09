@@ -159,7 +159,9 @@ def plot_band(bins, low, high, ax=None, **kwargs):
     ax.fill_between(x, new_low, new_high, **kwargs)
 
 
-def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
+def plot_backgrounds(
+    backgrounds, bins, *, total_err=None, empty_stat_legend=False, ax=None
+):
     """
     Plot stacked backgrounds
 
@@ -171,6 +173,8 @@ def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
         Bin edges. To preserve backward compatibility, ``backgrounds`` and ``bins`` may be exchanged.
     total_err: array_like, optional
         Total uncertainty. If given, overrides per-background systematics. This is useful for showing post-fit uncertainties.
+    empty_stat_legend: boolean, optional
+        Add stat error band to legend even if empty. Defaults to False.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
 
@@ -220,6 +224,40 @@ def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
     total_stat_err = _np.sqrt(total_stat_err)
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
+    if _np.sum(total_stat_err) != 0:
+        plot_band(
+            bins,
+            total_hist - total_stat_err,
+            total_hist + total_stat_err,
+            ax=ax,
+            fc="transparent",
+            ec="k",
+            hatch=r"////",
+            label="Stat. Uncertainty",
+            zorder=6,
+        )
+    elif empty_stat_legend:
+        plot_band(
+            [0, 0],
+            [0],
+            [0],
+            ax=ax,
+            fc="transparent",
+            ec="k",
+            hatch=r"////",
+            label="Stat. Uncertainty",
+            zorder=6,
+        )
+    if _np.sum(total_syst_err) != 0.0:
+        plot_band(
+            bins,
+            total_hist - total_err,
+            total_hist + total_err,
+            color="grey",
+            alpha=0.5,
+            label="Stat. $\\oplus$ Syst. Unc.",
+            zorder=5,
+        )
     _, _, ps = ax.hist(
         _np.vstack([bin_centers] * n_bkgs).transpose(),
         bins=bins,
@@ -231,27 +269,6 @@ def plot_backgrounds(backgrounds, bins, *, total_err=None, ax=None):
     )
     for p in ps:
         _mpl.pyplot.setp(p, edgecolor="k", lw=1)
-    if _np.sum(total_syst_err) != 0.0:
-        plot_band(
-            bins,
-            total_hist - total_err,
-            total_hist + total_err,
-            color="grey",
-            alpha=0.5,
-            label="Stat. $\\oplus$ Syst. Unc.",
-            zorder=5,
-        )
-    if _np.sum(total_stat_err) != 0:
-        plot_band(
-            bins,
-            total_hist - total_stat_err,
-            total_hist + total_stat_err,
-            ax=ax,
-            fc="transparent",
-            hatch=r"////",
-            label="Stat. Unc.",
-            zorder=5,
-        )
     return total_hist, total_err
 
 
@@ -402,7 +419,15 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
 
 
 def plot_ratio(
-    bins, data, data_errs, bkg, bkg_errs, ratio_ax, max_ratio=None, plottype="diff"
+    bins,
+    data,
+    data_errs,
+    bkg,
+    bkg_errs,
+    ratio_ax,
+    max_ratio=None,
+    plottype="diff",
+    offscale_errs=False,
 ):
     """
     Plot ratio plot
@@ -430,6 +455,8 @@ def plot_ratio(
         | "diff" : (data - bkg) / bkg
         | "raw" : data / bkg
         | "significances" : Significances (using :func:`atlas_mpl_style.utils.significance()`)
+    offscale_err : boolean
+        Draw error bars on off-scale points
     """
     # divide by zero is common -- ignore errors
     olderr = _np.seterr(all="ignore")
@@ -487,9 +514,10 @@ def plot_ratio(
         color="paper:red",
         lw=0,
     )
-    # set out of range to NaN so it doesn't get drawn
-    ratio[~_np.isnan(out_of_range_up)] = _np.NaN
-    ratio[~_np.isnan(out_of_range_down)] = _np.NaN
+    if not offscale_errs:
+        # set out of range to NaN so it doesn't get drawn
+        ratio[~_np.isnan(out_of_range_up)] = _np.NaN
+        ratio[~_np.isnan(out_of_range_down)] = _np.NaN
     if plottype == "significances":
         ratio_ax.plot(bin_centers, ratio, "ko", ms=3)
         ratio_ax.axhline(1, ls="--", color="paper:fg", alpha=0.5)
@@ -935,7 +963,7 @@ def draw_atlas_label(
             va="top",
             multialignment="left",
             transform=ax.transAxes,
-            size=20,
+            size=17,
             **kwargs,
         )
     else:
@@ -951,7 +979,7 @@ def draw_atlas_label(
             ha="left",
             va="top",
             multialignment="left",
-            size=20,
+            size=17,
         )
         atl_txt = ax.text(
             x,

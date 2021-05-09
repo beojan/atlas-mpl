@@ -212,7 +212,7 @@ def ratio_axes(extra_axes=None):
     ratio_ax : axes or list of axes
        Returns list if extra_axes is passed
     """
-    hgt = (6 + 2 * (1 if extra_axes is None else extra_axes)) * (100/72)
+    hgt = 6 + 2 * (1 if extra_axes is None else extra_axes)  # * (100/72)
     fig = _mpl.pyplot.figure(figsize=(hgt, hgt))
     if extra_axes is None:
         gs = _mpl.gridspec.GridSpec(4, 1, hspace=0.0, wspace=0.0)
