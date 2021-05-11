@@ -55,6 +55,19 @@ _EXTRA_COLORS = {
     "series2:blue": "#00a1e0",
     "series2:red": "#a30013",
     "series2:purple": "#5100c2",
+    "hdbs:starcommandblue": "#047cbc",
+    "hdbs:spacecadet": "#283044",
+    "hdbs:mintcream": "#ebf5ee",
+    "hdbs:outrageousorange": "#fa7e61",
+    "hdbs:pictorialcarmine": "#ca1551",
+    "hdbs:maroonX11": "#b8336a",
+    "hh:darkpink": "#f2385a",
+    "hh:darkblue": "#343844",
+    "hh:medturquoise": "#36b1bf",
+    "hh:lightturquoise": "#4ad9d9",
+    "hh:offwhite": "#e9f1df",
+    "hh:darkyellow": "#fdc536",
+    "hh:darkgreen": "#125125",
     "transparent": "#ffffff00",
 }
 
@@ -70,7 +83,7 @@ def set_color_cycle(pal=None, n=4):
 
     Parameters
     ----------
-    pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', None}
+    pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', "HH", "HDBS", None}
       The palette to use. None resets to default palette.
       The ATLAS palette is suitable for histograms, not lines.
        'MPL' (alias 'Tab') provides the default matplotlib palette.
@@ -124,6 +137,16 @@ def set_color_cycle(pal=None, n=4):
             "tab:olive",
             "tab:cyan",
         ]
+    elif pal.lower() == "hdbs":
+        colors = [
+            "hdbs:starcommandblue",
+            "hdbs:spacecadet",
+            "hdbs:maroonX11",
+            "hdbs:outrageousorange",
+            "hdbs:pictorialcarmine",
+        ]
+    elif pal.lower() == "hh":
+        colors = ["hh:darkblue", "hh:darkpink", "hh:darkyellow", "hh:mediumturquoise"]
     else:
         colors = [
             "series:cyan",
@@ -166,7 +189,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True, usetex=True):
             usetex = False
 
     _style.use("atlas")
-    set_color_cycle("ATLAS")
+    set_color_cycle("Paper")
     plot._atlas_label = atlasLabel
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
