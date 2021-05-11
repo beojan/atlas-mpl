@@ -106,6 +106,57 @@ aliases ``atlas:onesigma`` and ``atlas:twosigma`` respectively for use in limit 
 |``series2:purple``       |``#5100c2``              |.. image:: _colors/series2:purple.png      |
 +-------------------------+-------------------------+-------------------------------------------+
 
+HDBS Colors
+-----------
+These are the ATLAS HDBS physics groups colors. Mint cream is not included in the color cycle.
+
++-------------------------+-----------+----------------------------------+
+|``hdbs:starcommandblue`` |``#047cbc``|.. image::                        |
+|                         |           |_colors/hdbs:starcommandblue.png  |
++-------------------------+-----------+----------------------------------+
+|``hdbs:spacecadet``      |``#283044``|.. image::                        |
+|                         |           |_colors/hdbs:spacecadet.png       |
++-------------------------+-----------+----------------------------------+
+|``hdbs:maroonX11``       |``#b8336a``|.. image::                        |
+|                         |           |_colors/hdbs:maroonX11.png        |
++-------------------------+-----------+----------------------------------+
+|``hdbs:outrageousorange``|``#fa7e61``| .. image::                       |
+|                         |           |_colors/hdbs:outrageousorange.png |
++-------------------------+-----------+----------------------------------+
+|``hdbs:pictorialcarmine``|``#ca1551``| .. image::                       |
+|                         |           |_colors/hdbs:pictorialcarmine.png |
++-------------------------+-----------+-------------------------------- -+
+|``hdbs:mintcream``       |``#ebf5ee``| .. image::                       |
+|                         |           |_colors/hdbs:mintcream.png        |
++-------------------------+-----------+-------------------------------- -+
+
+HH Colors
+---------
+These are the ATLAS di-Higgs colors. Light turquoise and off-white are not included
+in the automatic color cycle.
+
++---------------------+-----------+-----------------------------+
+|``hh:darkblue``      |``#343844``|.. image::                   |
+|                     |           |_colors/hh:darkblue.png      |
++---------------------+-----------+-----------------------------+
+|``hh:darkpink``      |``#f2385a``|.. image::                   |
+|                     |           |_colors/hh:darkpink.png      |
++---------------------+-----------+-----------------------------+
+|``hh:darkyellow``    |``#fdc536``|.. image::                   |
+|                     |           |_colors/hh:darkyellow.png    |
++---------------------+-----------+-----------------------------+
+|``hh:medturquoise``  |``#36b1bf``|.. image::                   |
+|                     |           |_colors/hh:medturquoise.png  |
++---------------------+-----------+-----------------------------+
+|``hh:lightturquoise``|``#4ad9d9``|.. image::                   |
+|                     |           |_colors/hh:lightturquoise.png|
++---------------------+-----------+-----------------------------+
+|``hh:offwhite``      |``#e9f1df``|.. image::                   |
+|                     |           |_colors/hh:offwhite.png      |
++---------------------+-----------+-----------------------------+
+
+
+
 Transparent
 -----------
 A fully transparent color is also provided for convenience.

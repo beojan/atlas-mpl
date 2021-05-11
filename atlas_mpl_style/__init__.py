@@ -83,7 +83,7 @@ def set_color_cycle(pal=None, n=4):
 
     Parameters
     ----------
-    pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', "HH", "HDBS", None}
+    pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', "HDBS", "HH", None}
       The palette to use. None resets to default palette.
       The ATLAS palette is suitable for histograms, not lines.
        'MPL' (alias 'Tab') provides the default matplotlib palette.
