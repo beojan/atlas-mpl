@@ -901,8 +901,8 @@ def draw_atlas_label(
         Does the plot show only MC simulation results
     energy : str, optional
         Centre of mass energy, including units
-    lumi : float, optional
-        Integrated luminosity in /fb
+    lumi : float or str, optional
+        Integrated luminosity in /fb. If str, the units should be included.
     lumi_lt: bool, optional
         True if only a subset of data was processed
     desc : str, optional
@@ -935,12 +935,15 @@ def draw_atlas_label(
 
     if lumi is not None:
         show_e_nl = True
-        if _usetex:
-            lumi_str = (
-                fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"\textsf{{fb}}^{{-1}}$"
-            )
+        if isinstance(lumi, str):
+            lumi_str = lumi
         else:
-            lumi_str = fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"{{fb}}^{{-1}}$"
+            if _usetex:
+                lumi_str = (
+                    fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"\textsf{{fb}}^{{-1}}$"
+                )
+            else:
+                lumi_str = fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"{{fb}}^{{-1}}$"
     else:
         lumi_str = ""
 
