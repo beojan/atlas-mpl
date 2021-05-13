@@ -936,14 +936,17 @@ def draw_atlas_label(
     if lumi is not None:
         show_e_nl = True
         if isinstance(lumi, str):
-            lumi_str = lumi
+            lumi_str = f", {lumi}"
         else:
             if _usetex:
                 lumi_str = (
-                    fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"\textsf{{fb}}^{{-1}}$"
+                    fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ '
+                    fr"\textsf{{fb}}^{{-1}}$"
                 )
             else:
-                lumi_str = fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"{{fb}}^{{-1}}$"
+                lumi_str = (
+                    fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"{{fb}}^{{-1}}$"
+                )
     else:
         lumi_str = ""
 
