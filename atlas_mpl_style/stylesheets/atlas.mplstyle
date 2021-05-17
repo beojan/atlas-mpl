@@ -4,7 +4,7 @@ patch.edgecolor: FFFFFF
 patch.antialiased: True
 
 text.usetex: True
-font.size: 16.0
+font.size: 18 # 16.0
 font.family: sans-serif
 font.sans-serif: Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial
 font.serif: Tex Gyre Termes, Times, Times Roman, Times New Roman, Nimbus Roman, FreeSerif
@@ -16,8 +16,8 @@ axes.facecolor: FFFFFF
 axes.edgecolor: 000000
 axes.linewidth: 1
 axes.grid: False
-axes.titlesize: 18
-axes.labelsize: 16
+axes.titlesize: 20 # 18
+axes.labelsize: 20 # 16
 axes.labelcolor: 000000
 axes.axisbelow: False
 axes.formatter.limits: -2, 4

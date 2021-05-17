@@ -1070,7 +1070,6 @@ def draw_atlas_label(
             va="top",
             multialignment="left",
             transform=ax.transAxes,
-            size=17,
             **kwargs,
         )
     else:
@@ -1086,7 +1085,6 @@ def draw_atlas_label(
             ha="left",
             va="top",
             multialignment="left",
-            size=17,
         )
         atl_txt = ax.text(
             x,
