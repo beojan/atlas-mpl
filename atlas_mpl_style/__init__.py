@@ -5,6 +5,7 @@ import atexit as _atexit
 import shutil as _shutil
 import warnings as _warn
 import cycler as _cycler
+import atlas_mpl_style._utils as _u
 import atlas_mpl_style.plot as plot
 import atlas_mpl_style.utils as utils
 import atlas_mpl_style.uhi as uhi
@@ -162,7 +163,7 @@ def set_color_cycle(pal=None, n=4):
     plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
-def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True, usetex=True):
+def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=True):
     """
     Setup ATLAS style.
 
@@ -171,7 +172,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=True, usetex=True):
     atlasLabel : str, optional
        Replace ATLAS with a custom label
     fancyLegend : bool, optional
-       Use matplotlib's fancy legend frame (defaults to True)
+       Use matplotlib's fancy legend frame (defaults to False)
     usetex : bool, optional
        Use LaTeX installation to set text (defaults to True)
        If no LaTeX installation is found, this package will fallback to usetex=False.
@@ -249,16 +250,25 @@ def ratio_axes(extra_axes=None):
         )
         ax2.autoscale(axis="x", tight=True)
         _mpl.pyplot.sca(ax1)
+        _u.decorate_axes(ax1)
+        _u.decorate_axes(ax2)
+        ax1._amplaxesinfo.low_ax = ax2
+        ax2._amplaxesinfo.main_ax = ax1
         return fig, ax1, ax2
     else:
         gs = _mpl.gridspec.GridSpec(3 + extra_axes, 1, hspace=0.0, wspace=0.0)
         ax1 = fig.add_subplot(gs[0:3])
         ax1.tick_params(labelbottom=False)
+        _u.decorate_axes(ax1)
         axs = []
         for i in range(3, extra_axes + 3):
             ax = fig.add_subplot(gs[i], sharex=ax1)
+            _u.decorate_axes(ax)
+            ax._amplaxesinfo.main_ax = ax1
             if i != extra_axes + 2:
                 ax.tick_params(labelbottom=False)
+            else:
+                ax1._amplaxesinfo.low_ax = ax
             ax.yaxis.set_major_locator(
                 _mpl.ticker.MaxNLocator(
                     symmetric=True, prune="both", min_n_ticks=5, nbins=4

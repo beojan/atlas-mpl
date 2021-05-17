@@ -73,7 +73,13 @@ def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
 
 
 def plot_signal(
-    hist, label, ignore_variances=False, syst_errs=None, color=None, ax=None
+    hist,
+    label,
+    ignore_variances=False,
+    syst_errs=None,
+    color=None,
+    attach_bands=False,
+    ax=None,
 ):
     """
     Plot signal histogram from PlottableHistogram
@@ -90,6 +96,8 @@ def plot_signal(
         Systematic errors
     color : color
         Line color
+    attach_bands : boolean, optional
+        Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     """
@@ -125,7 +133,9 @@ def plot_signal(
                 "Binning mismatch between syst_errs and hist"
             )
         syst_errs = syst_errs_obj.values()
-    _amplplt.plot_signal(label, bins, hist, stat_errs, syst_errs, color, ax)
+    _amplplt.plot_signal(
+        label, bins, hist, stat_errs, syst_errs, color, attach_bands, ax
+    )
 
 
 def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
@@ -177,7 +187,14 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
 
 
 def plot_1d(
-    hist, label, ignore_variances=False, stat_err=True, color=None, ax=None, **kwargs
+    hist,
+    label,
+    ignore_variances=False,
+    stat_err=True,
+    color=None,
+    attach_bands=False,
+    ax=None,
+    **kwargs
 ):
     """
     Plot single 1D histogram from PlottableHistogram
@@ -194,6 +211,8 @@ def plot_1d(
         Draw statistical errors. Defaults to True.
     color : color, optional
         Line color
+    attach_bands : boolean, optional
+        Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     **kwargs
@@ -221,7 +240,7 @@ def plot_1d(
             )
     else:
         stat_errs = None
-    _amplplt.plot_1d(label, bins, hist, stat_errs, color, ax, **kwargs)
+    _amplplt.plot_1d(label, bins, hist, stat_errs, color, attach_bands, ax, **kwargs)
 
 
 def plot_2d(hist, ax=None, pad=0.05, **kwargs):

@@ -1,6 +1,7 @@
 import matplotlib as _mpl
 import matplotlib.colors as _colors
 import numpy as _np
+import atlas_mpl_style._utils as _u
 from atlas_mpl_style.utils import significance as _significance
 from math import floor, ceil
 from mpl_toolkits.axes_grid1 import make_axes_locatable as _make_axes_locatable
@@ -130,7 +131,7 @@ class Background:
             self.syst_errs = syst_errs
 
 
-def plot_band(bins, low, high, ax=None, **kwargs):
+def plot_band(bins, low, high, label=None, ax=None, **kwargs):
     """
     Draw a shaded band between high and low
 
@@ -144,6 +145,8 @@ def plot_band(bins, low, high, ax=None, **kwargs):
         Bin contents defining lower bound
     high : array_like
         Bin contents defining upper bound
+    label : str, optional
+        Label for legend. If label matches a line, the band will be attached to that line if ``draw_legend`` is used.
     ax : mpl.axes.Axes, optional
         Axes to draw band on (defaults to current axes)
     **kwargs
@@ -151,12 +154,35 @@ def plot_band(bins, low, high, ax=None, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     # duplicate each edge except first and last
     x = _np.stack((bins, bins), axis=-1).ravel()[1:-1]
     # duplicate each value (once for start, once for end)
     new_low = _np.stack((low, low), axis=-1).ravel()
     new_high = _np.stack((high, high), axis=-1).ravel()
-    ax.fill_between(x, new_low, new_high, **kwargs)
+    a = ax.fill_between(x, new_low, new_high, label=label, **kwargs)
+    if label is not None:
+        ax._ampllegend.bands[label].append(a)
+    return a
+
+
+def register_band(label, artist, ax=None):
+    """
+    Register a manually draw (e.g. with ``fill_between``) error band.
+
+    Parameters
+    ----------
+    label : str
+        Label of line to attach band to.
+    artist : mpl.artist.Artist
+        Band artist, e.g. ``PolyCollection`` returned by ``fill_between``.
+    ax : mpl.axes.Axes, optional
+        Axes to register band in (defaults to current axes).
+    """
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
+    ax._ampllegend.bands[label].append(artist)
 
 
 def plot_backgrounds(
@@ -189,6 +215,7 @@ def plot_backgrounds(
         bins, backgrounds = backgrounds, bins
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     if len(backgrounds) < 1:
         return
     if bins is None:
@@ -225,6 +252,7 @@ def plot_backgrounds(
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
     if _np.sum(total_stat_err) != 0:
+        ax._ampllegend.has_stat = True
         plot_band(
             bins,
             total_hist - total_stat_err,
@@ -237,18 +265,9 @@ def plot_backgrounds(
             zorder=6,
         )
     elif empty_stat_legend:
-        plot_band(
-            [0, 0],
-            [0],
-            [0],
-            ax=ax,
-            fc="transparent",
-            ec="k",
-            hatch=r"////",
-            label="Stat. Uncertainty",
-            zorder=6,
-        )
+        ax._ampllegend.has_stat = True
     if _np.sum(total_syst_err) != 0.0:
+        ax._ampllegend.has_syst = True
         plot_band(
             bins,
             total_hist - total_err,
@@ -267,12 +286,22 @@ def plot_backgrounds(
         color=[b.color for b in backgrounds],
         label=[b.label for b in backgrounds],
     )
-    for p in ps:
+    for b, p in zip(backgrounds, ps):
         _mpl.pyplot.setp(p, edgecolor="k", lw=1)
+        ax._ampllegend.fill_hists[b.label] = p
     return total_hist, total_err
 
 
-def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, ax=None):
+def plot_signal(
+    label,
+    bins,
+    hist,
+    stat_errs=None,
+    syst_errs=None,
+    color=None,
+    attach_bands=False,
+    ax=None,
+):
     """
     Plot signal histogram
 
@@ -292,14 +321,20 @@ def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, a
         Systematic errors
     color : color
         Line color
+    attach_bands : boolean, optional
+        Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
+    have_syst = True
+    have_stat = True
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
     if stat_errs is None:
+        have_stat = False
         stat_errs = _np.zeros_like(hist)
     elif isinstance(stat_errs, str):
         stat_errs = stat_errs.lower()
@@ -311,6 +346,7 @@ def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, a
         if len(hist) != len(stat_errs):
             raise BinningMismatchError("Stat errors may have incorrect binning")
     if syst_errs is None:
+        have_syst = False
         syst_errs = _np.zeros_like(hist)
     else:
         if len(hist) != len(syst_errs):
@@ -328,25 +364,37 @@ def plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, a
     )
     if color is None:
         color = p[0].get_ec()
-    plot_band(
-        bins,
-        hist - total_err,
-        hist + total_err,
-        color=color,
-        ax=ax,
-        alpha=0.25,
-        zorder=5,
-    )
-    plot_band(
-        bins,
-        hist - stat_errs,
-        hist + stat_errs,
-        ax=ax,
-        ec=color,
-        fc="transparent",
-        hatch=r"////",
-        zorder=5,
-    )
+    # Use dummy artist to add to legend as straight line
+    # Original patch won't appear due to the shared label
+    ax._ampllegend.line_hists[label] = _mpl.lines.Line2D([0], [0], color=color, lw=1)
+    if have_syst:
+        ax._ampllegend.has_syst = True
+        a_syst = plot_band(
+            bins,
+            hist - total_err,
+            hist + total_err,
+            color=color,
+            ax=ax,
+            alpha=0.25,
+            zorder=5,
+        )
+    if have_stat:
+        ax._ampllegend.has_stat = True
+        a_stat = plot_band(
+            bins,
+            hist - stat_errs,
+            hist + stat_errs,
+            ax=ax,
+            ec=color,
+            fc="transparent",
+            hatch=r"////",
+            zorder=5,
+        )
+        if attach_bands:
+            ax._ampllegend.bands[label].append(a_stat)
+            if have_syst:
+                # Has to be in this order
+                ax._ampllegend.bands[label].append(a_syst)
 
 
 def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
@@ -379,6 +427,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
 
@@ -395,7 +444,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
             raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     if _np.sum(stat_errs) == 0:
-        ax.plot(
+        a = ax.plot(
             bin_centers,
             hist,
             "o",
@@ -405,7 +454,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
             ms=5,
         )
     else:
-        ax.errorbar(
+        a = ax.errorbar(
             bin_centers,
             hist,
             yerr=stat_errs,
@@ -415,6 +464,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
             zorder=7,
             ms=5,
         )
+    ax._ampllegend.data_hists[label] = a
     return hist, stat_errs
 
 
@@ -449,7 +499,7 @@ def plot_ratio(
     ratio_ax : mpl.axes.Axes
         Ratio axes (produced using :func:`atlas_mpl_style.ratio_axes()`)
     max_ratio : float, optional
-        Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw", 3 for "significances")
+        Maximum ratio (defaults to 0.25 for "diff", 1.25 for "raw", 3.5 for "significances").
     plottype : {"diff", "raw", "significances"}
         | Type of ratio to plot.
         | "diff" : (data - bkg) / bkg
@@ -463,23 +513,23 @@ def plot_ratio(
     if plottype == "diff":
         ratio = (data - bkg) / bkg
         if max_ratio is None:
-            max_ratio = 0.2
+            max_ratio = 0.25
         min_ratio = -max_ratio
     elif plottype == "raw":
         ratio = data / bkg
         if max_ratio is None:
-            max_ratio = 1.2
+            max_ratio = 1.25
         min_ratio = 1 - max_ratio
     elif plottype == "significances":
         ratio = _significance(data, data_errs, bkg, bkg_errs)
         if max_ratio is None:
-            max_ratio = 3
+            max_ratio = 3.5
         min_ratio = -max_ratio
     else:
         raise TypeError("Invalid plottype")
-    # Increase limits by 30% to avoid tick labels clashing
-    max_ratio *= 1.3
-    min_ratio *= 1.3
+    # Increase limits by 10% to avoid tick labels clashing
+    max_ratio *= 1.1
+    min_ratio *= 1.1
 
     ratio_ax.axhline(1 if plottype == "raw" else 0, color="paper:red", lw=1)
     ratio_ax.set_ylim(min_ratio, max_ratio)
@@ -548,7 +598,9 @@ def draw_tag(text, ax=None):
     )
 
 
-def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
+def plot_1d(
+    label, bins, hist, stat_errs=None, color=None, attach_bands=False, ax=None, **kwargs
+):
     """
     Plot single 1D histogram
 
@@ -566,6 +618,8 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
         Statistical errors
     color : color, optional
         Line color
+    attach_bands : boolean, optional
+        Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     **kwargs
@@ -573,17 +627,16 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
-    if stat_errs is None:
-        stat_errs = _np.zeros_like(hist)
-    elif isinstance(stat_errs, str):
+    if isinstance(stat_errs, str):
         stat_errs = stat_errs.lower()
         if "pois" in stat_errs or "sqrt" in stat_errs:
             stat_errs = _np.sqrt(hist)
         else:
             raise TypeError("Invalid stat_errs")
-    else:
+    elif stat_errs is not None:
         if len(hist) != len(stat_errs):
             raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
@@ -598,10 +651,24 @@ def plot_1d(label, bins, hist, stat_errs=None, color=None, ax=None, **kwargs):
     )
     if color is None:
         color = p[0].get_ec()
+    # Use dummy artist to add to legend as straight line
+    # Original patch won't appear due to the shared label
+    ax._ampllegend.line_hists[label] = _mpl.lines.Line2D(
+        [0], [0], color=color, **kwargs
+    )
     if stat_errs is not None:
-        plot_band(
-            bins, hist - stat_errs, hist + stat_errs, color=color, alpha=0.3, zorder=5
+        ax._ampllegend.has_stat = True
+        a = plot_band(
+            bins,
+            hist - stat_errs,
+            hist + stat_errs,
+            fc="transparent",
+            ec=color,
+            hatch=r"////",
+            zorder=5,
         )
+        if attach_bands:
+            ax._ampllegend.bands[label].append(a)
 
 
 def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
@@ -636,12 +703,16 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
         raise BinningMismatchError("ybins does not match 2nd axis of hist")
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     X, Y = _np.meshgrid(xbins, ybins)
     mesh = ax.pcolormesh(X, Y, hist.transpose(), rasterized=True, **kwargs)
     ax.axis("scaled")
     ax.set_xlim(xbins[0], xbins[-1])
     ax.set_ylim(ybins[0], ybins[-1])
     cax = _make_axes_locatable(ax).append_axes("right", size="5%", pad=pad)
+    _u.decorate_axes(cax)
+    ax._amplaxesinfo.cbar = cax
+    cax._amplaxesinfo.main_ax = ax
     cbar = ax.figure.colorbar(mesh, cax=cax)
     cax.yaxis.tick_right()
     return mesh, cbar
@@ -674,6 +745,7 @@ def plot_cutflow(
     if ax is None:
         ax = _mpl.pyplot.gca()
         resize_ax = True  # only resize axes if they weren't provided
+    _u.decorate_axes(ax)
     if len(labels) != len(hist):
         raise BinningMismatchError("Invalid binning")
     if horizontal:
@@ -759,6 +831,7 @@ def plot_limit(
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     if len(x) != len(expected):
         raise BinningMismatchError("expected does not match x")
     if minus_one_sigma is not None and len(x) != len(minus_one_sigma):
@@ -783,43 +856,49 @@ def plot_limit(
         raise ValueError(
             "Either both observed and observed_label must be provided or neither"
         )
+    conf = _u.LimitConfig()
 
     if minus_two_sigma is not None:
+        conf.has_2sig = True
         ax.fill_between(
             x,
             minus_two_sigma,
             plus_two_sigma,
             color=("atlas:twosigma" if color is None else _colors.to_rgba(color, 0.25)),
-            label=r"$2\sigma$ Band",
         )
     if minus_one_sigma is not None:
+        conf.has_1sig = True
         ax.fill_between(
             x,
             minus_one_sigma,
             plus_one_sigma,
             color=("atlas:onesigma" if color is None else _colors.to_rgba(color, 0.5)),
-            label=r"$1\sigma$ Band",
         )
+    conf.color = "black" if color is None else color
+    conf.exp_label = expected_label
     ax.plot(
         x,
         expected,
         "--",
         label=expected_label,
-        color=("black" if color is None else color),
+        color=conf.color,
     )
     if observed is not None:
+        conf.has_obs = True
+        conf.obs_label = observed_label
         ax.plot(
             x,
             observed,
             "-",
             label=observed_label,
-            color=("black" if color is None else color),
+            color=conf.color,
         )
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
     """
     Set x label in ATLAS style (right aligned).
+    If ``ratio_axes`` was used, the label will be set on the lowest ratio axes.
 
     Additional parameters are passed through to `ax.set_xlabel`.
 
@@ -832,7 +911,11 @@ def set_xlabel(label, ax=None, *args, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
-    ax.set_xlabel(label, x=1.0, ha="right", *args, **kwargs)
+    _u.decorate_axes(ax)
+    if ax._amplaxesinfo.low_ax is None:
+        ax.set_xlabel(label, x=1.0, ha="right", *args, **kwargs)
+    else:
+        ax._amplaxesinfo.low_ax.set_xlabel(label, x=1.0, ha="right", *args, **kwargs)
 
 
 def set_ylabel(label, ax=None, *args, **kwargs):
@@ -853,20 +936,38 @@ def set_ylabel(label, ax=None, *args, **kwargs):
     ax.set_ylabel(label, y=1.0, ha="right", *args, **kwargs)
 
 
-def set_zlabel(label, cbar, *args, **kwargs):
+def set_zlabel(label, cbar=None, ax=None, **kwargs):
     """
     Set z label in ATLAS style (top aligned)
 
-    The colorbar to add the label to is *required*
+    The colorbar to add the label to is *required* unless ``plot_2d`` was used.
 
     Parameters
     ----------
     label : str
         Label (LaTeX permitted)
-    cbar : mpl.colorbar.Colorbar
-        Colorbar to set label on
+    cbar : mpl.colorbar.Colorbar, optional
+        Colorbar to set label on. Not required if ``plot_2d`` was used.
+    ax : mpl.axes.Axes, optional
+        If ``plot_2d`` was used, the axes can optionally be provided here.
     """
-    cbar.set_label(label, y=1.0, ha="right", *args, **kwargs)
+    if cbar is not None:
+        cbar.set_label(label, y=1.0, ha="right", **kwargs)
+    else:
+        if ax is None:
+            ax = _mpl.pyplot.gca()
+        if not hasattr(ax, "_amplaxesinfo"):
+            raise ValueError(
+                "Tried to set z label on inappropriate axes. Please provide cbar."
+            )
+        elif ax._amplaxesinfo.cbar is None:
+            raise ValueError(
+                "Tried to set z label on inappropriate axes. Please provide cbar."
+            )
+        else:
+            ax._amplaxesinfo.cbar.set_ylabel(
+                label, loc="right", y=1.0, ha="right", **kwargs
+            )
 
 
 def draw_atlas_label(
@@ -1024,3 +1125,27 @@ def draw_atlas_label(
             **prop,
             **kwargs,
         )
+
+
+def draw_legend(*args, ax=None, **kwargs):
+    """
+    Add legend to axes with data first, and uncertainties last.
+
+    Parameters
+    ----------
+    ax : mpl.axes.Axes, optional
+       Axes to draw legend on (defaults to current axes)
+    *args :
+       Passed to ``ax.legend``
+    **kwargs :
+       Passed to ``ax.legend``
+    """
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+    ptype = _u.plot_type(ax)
+    if ptype is None:
+        ax.legend(*args, **kwargs)
+    elif ptype == "limits":
+        _u.draw_limit_legend(ax, args, kwargs)
+    elif ptype == "hists":
+        _u.draw_hists_legend(ax, args, kwargs)
