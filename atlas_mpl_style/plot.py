@@ -444,14 +444,14 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
             raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     if _np.sum(stat_errs) == 0:
-        a = ax.plot(
+        a = ax.scatter(
             bin_centers,
             hist,
-            "o",
+            s=25,
+            c=color,
+            marker='o',
             label=label,
-            color=color,
             zorder=7,
-            ms=5,
         )
     else:
         a = ax.errorbar(
