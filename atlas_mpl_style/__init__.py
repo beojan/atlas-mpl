@@ -9,7 +9,14 @@ import atlas_mpl_style._utils as _u
 import atlas_mpl_style.plot as plot
 import atlas_mpl_style.utils as utils
 import atlas_mpl_style.uhi as uhi
-from atlas_mpl_style.plot import set_xlabel, set_ylabel, set_zlabel, draw_atlas_label, draw_legend, draw_tag
+from atlas_mpl_style.plot import (
+    set_xlabel,
+    set_ylabel,
+    set_zlabel,
+    draw_atlas_label,
+    draw_legend,
+    draw_tag,
+)
 
 _stylesheets = _pkg.resource_filename(__name__, "stylesheets")
 _atexit.register(_pkg.cleanup_resources)
