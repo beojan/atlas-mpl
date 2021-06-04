@@ -9,7 +9,7 @@ import atlas_mpl_style._utils as _u
 import atlas_mpl_style.plot as plot
 import atlas_mpl_style.utils as utils
 import atlas_mpl_style.uhi as uhi
-from atlas_mpl_style.plot import set_xlabel, set_ylabel, set_zlabel, draw_atlas_label
+from atlas_mpl_style.plot import set_xlabel, set_ylabel, set_zlabel, draw_atlas_label, draw_legend, draw_tag
 
 _stylesheets = _pkg.resource_filename(__name__, "stylesheets")
 _atexit.register(_pkg.cleanup_resources)
@@ -147,7 +147,7 @@ def set_color_cycle(pal=None, n=4):
             "hdbs:pictorialcarmine",
         ]
     elif pal.lower() == "hh":
-        colors = ["hh:darkblue", "hh:darkpink", "hh:darkyellow", "hh:mediumturquoise"]
+        colors = ["hh:darkblue", "hh:darkpink", "hh:darkyellow", "hh:medturquoise"]
     else:
         colors = [
             "series:cyan",
@@ -163,7 +163,7 @@ def set_color_cycle(pal=None, n=4):
     plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
-def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=True):
+def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
     """
     Setup ATLAS style.
 
@@ -174,7 +174,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=True):
     fancyLegend : bool, optional
        Use matplotlib's fancy legend frame (defaults to False)
     usetex : bool, optional
-       Use LaTeX installation to set text (defaults to True)
+       Use LaTeX installation to set text (defaults to False)
        If no LaTeX installation is found, this package will fallback to usetex=False.
        This is on a best-effort basis, since the detected LaTeX installation may be incomplete.
     """

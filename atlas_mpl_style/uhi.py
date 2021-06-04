@@ -169,18 +169,28 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     if len(data.axes) != 1:
         raise _amplplt.DimensionError("Only 1D histograms are supported here")
     data_obj = data
-    bins = data_obj.axes[0].edges()
+    bins = _bins(data_obj.axes[0])
     data = data_obj.values()
     if data_obj.variances() is None:
         data_errs = _np.sqrt(data)
     else:
         data_errs = _np.sqrt(data_obj.variances())
-    if not isinstance(total_bkg, tuple) or len(total_bkg) != 2:
+
+    if (
+        hasattr(total_bkg, "axes")
+        and hasattr(total_bkg, "values")
+        and hasattr(total_bkg, "variances")
+    ):
+        # total_bkg is a UHI histogram
+        bkg = total_bkg.values()
+        bkg_errs = _np.sqrt(total_bkg.variances())
+    elif isinstance(total_bkg, tuple) and len(total_bkg) == 2:
+        bkg = total_bkg[0]
+        bkg_errs = total_bkg[1]
+    else:
         raise TypeError(
             "total_bkg should be a two element tuple of arrays, as returned by plot_backgrounds"
         )
-    bkg = total_bkg[0]
-    bkg_errs = total_bkg[1]
     _amplplt.plot_ratio(
         bins, data, data_errs, bkg, bkg_errs, ratio_ax, max_ratio, plottype
     )

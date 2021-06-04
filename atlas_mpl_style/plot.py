@@ -12,6 +12,12 @@ _usetex = False
 # For histograms with no color set
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
+def _bins(axis):
+    a = list(axis)
+    if isinstance(a[0], str):
+        raise LabeledBinsError("Bins are labeled. Perhaps you may want plot_cutflow.")
+    return _np.array([i for (i, _) in a] + [a[-1][1]])
+
 
 def _formatSciNotation(x):
     s = f"{x:.5g}"
@@ -90,7 +96,7 @@ class Background:
             if len(hist.axes) != 1:
                 raise DimensionError("Only 1D histograms are supported here")
             hist_obj = hist
-            bins = hist.axes[0].edges()
+            bins = _bins(hist.axes[0])
             hist = hist_obj.values()
             if not isinstance(stat_errs, str):
                 stat_errs = (
@@ -186,7 +192,7 @@ def register_band(label, artist, ax=None):
 
 
 def plot_backgrounds(
-    backgrounds, bins, *, total_err=None, empty_stat_legend=False, ax=None
+    backgrounds, bins=None, *, total_err=None, empty_stat_legend=False, ax=None
 ):
     """
     Plot stacked backgrounds
