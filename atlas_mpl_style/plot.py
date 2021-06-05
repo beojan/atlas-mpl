@@ -12,6 +12,7 @@ _usetex = False
 # For histograms with no color set
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
+
 def _bins(axis):
     a = list(axis)
     if isinstance(a[0], str):
@@ -292,9 +293,12 @@ def plot_backgrounds(
         color=[b.color for b in backgrounds],
         label=[b.label for b in backgrounds],
     )
-    for b, p in zip(backgrounds, ps):
+    for b, p in reversed(list(zip(backgrounds, ps))):
         _mpl.pyplot.setp(p, edgecolor="k", lw=1)
-        ax._ampllegend.fill_hists[b.label] = p
+        if isinstance(p, list):
+            ax._ampllegend.fill_hists[b.label] = p[0]
+        else:
+            ax._ampllegend.fill_hists[b.label] = p
     return total_hist, total_err
 
 
@@ -455,7 +459,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
             hist,
             s=25,
             c=color,
-            marker='o',
+            marker="o",
             label=label,
             zorder=7,
         )
