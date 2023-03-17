@@ -7,6 +7,7 @@ import warnings as _warn
 import cycler as _cycler
 import atlas_mpl_style._utils as _u
 import atlas_mpl_style.plot as plot
+import atlas_mpl_style.stats as stats
 import atlas_mpl_style.utils as utils
 import atlas_mpl_style.uhi as uhi
 from atlas_mpl_style.plot import (

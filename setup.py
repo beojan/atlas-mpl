@@ -23,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="0.20.0",
+    version="0.21.0",
     description="ATLAS style for Matplotlib 3.0+",
     long_description=long_description,
     # The project's main homepage.
@@ -69,6 +69,7 @@ setup(
         "matplotlib>=3",
         "numpy",
         "numexpr",
+        "pandas",
         "dataclasses;python_version<'3.7'",
     ],
     python_requires=">=3.6",
