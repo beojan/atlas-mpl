@@ -9,6 +9,11 @@
 .. automodule:: atlas_mpl_style.plot
    :members:
 
+``atlas_mpl_style.stats`` Module
+==========================
+.. automodule:: atlas_mpl_style.stats
+   :members:
+
 ``atlas_mpl_style.uhi`` Module
 ==========================
 .. automodule:: atlas_mpl_style.uhi
