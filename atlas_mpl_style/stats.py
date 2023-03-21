@@ -19,8 +19,8 @@ def sort_impacts(data):
 
     =================== ==========================
     name                Parameter name
-    impact_postfit_up   Central value of POI from fit with parameter fixed to +1σ (using postfit σ)
-    impact_postfit_down Central value of POI from fit with parameter fixed to -1σ (using postfit σ)
+    impact_postfit_up   Impact on POI from fit with parameter fixed to +1σ (using postfit σ)
+    impact_postfit_down Impact on POI from fit with parameter fixed to -1σ (using postfit σ)
     =================== ==========================
 
     Parameters
@@ -117,10 +117,10 @@ def plot_impacts(
 
     =================== ==========================
     name                Parameter name
-    impact_prefit_up    Central value of POI from fit with parameter fixed to +1σ (using prefit σ)
-    impact_prefit_down  Central value of POI from fit with parameter fixed to -1σ (using prefit σ)
-    impact_postfit_up   Central value of POI from fit with parameter fixed to +1σ (using postfit σ)
-    impact_postfit_down Central value of POI from fit with parameter fixed to -1σ (using postfit σ)
+    impact_prefit_up    Impact on POI from fit with parameter fixed to +1σ (using prefit σ)
+    impact_prefit_down  Impact on POI from fit with parameter fixed to -1σ (using prefit σ)
+    impact_postfit_up   Impact on POI from fit with parameter fixed to +1σ (using postfit σ)
+    impact_postfit_down Impact on POI from fit with parameter fixed to -1σ (using postfit σ)
     =================== ==========================
 
     Parameters
