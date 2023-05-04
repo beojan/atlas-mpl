@@ -8,7 +8,7 @@ version = "0.22.0",
 description = "ATLAS style for Matplotlib 3.0+",
 authors = [{name = "Beojan Stanislaus", email = "beojan.stanislaus@cern.ch"}]
 readme = "README.rst"
-license = {file = "LICENSE"}
+license = {file = "LICENSE.md"}
 keywords = "plotting atlas matplotlib cern root hep high-energy-physics physics"
 classifiers = [
     # How mature is this project? Common values are
