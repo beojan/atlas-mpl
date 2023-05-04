@@ -1,0 +1,44 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "atlas-mpl-style"
+version = "0.22.0",
+description = "ATLAS style for Matplotlib 3.0+",
+authors = [{name = "Beojan Stanislaus", email = "beojan.stanislaus@cern.ch"}]
+readme = "README.rst"
+license = {file = "LICENSE"}
+keywords = "plotting atlas matplotlib cern root hep high-energy-physics physics"
+classifiers = [
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    "Development Status :: 4 - Beta",
+    # Indicate who your project is intended for
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Visualization",
+    # Pick your license as you wish (should match "license" above)
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    # Specify the Python versions you support here. In particular, ensure
+    # that you indicate whether you support Python 2, Python 3 or both.
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.6"
+dependencies = [
+   "matplotlib>=3",
+   "numpy",
+   "numexpr",
+   "pandas",
+   "dataclasses;python_version<'3.7'",
+]
+[project.urls]
+Home = "https://github.com/beojan/atlas-mpl"
+Documentation = "https://atlas-mpl.readthedocs.io/en/latest/"
