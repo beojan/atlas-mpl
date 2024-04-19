@@ -10,10 +10,11 @@ ATLAS MPL Style
    :maxdepth: 2
    :caption: Contents:
 
-   atlas_mpl_style Module <atlas-mpl-style.rst>
+   Introduction <readme_link.rst>
+   Example <examples.rst>
    Styles <styles.rst>
    Colors <colors.rst>
-
+   atlas_mpl_style Module <atlas-mpl-style.rst>
 
 Indices and tables
 ==================

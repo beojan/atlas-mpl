@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'ATLAS MPL Style'
-copyright = '2019, Beojan Stanislaus'
+copyright = '2019 - 2024 Beojan Stanislaus'
 author = 'Beojan Stanislaus'
 
 
