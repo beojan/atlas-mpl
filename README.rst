@@ -49,10 +49,8 @@ are merged into those repositories).
 ``usetex=False`` Mode
 ------------------------
 
-From version 0.15, it is possible to use the ATLAS style without a LaTeX
-installation by passing ``usetex=False`` to ``use_atlas_style``. When this is
-done, there are a few of points to bear in mind (particularly when producing PDF
-plots):
+``usetex=False`` is now the default, removing the LaTeX dependency. However, there are a few points to
+bear in mind.
 
 1. The call to ``draw_atlas_label`` should be the last thing done before calling ``savefig``.
 2. The figure ``dpi`` is set to 72 to match that of the PDF backend. This *must
@@ -64,9 +62,11 @@ plots):
    are updated to remove LaTeX macros that are not supported by Matplotlib's
    mathtext.
 
+
 TeXLive and Fonts Needed
 ------------------------
-When using the ATLAS style, text is (by default) typeset using LaTeX. From version 0.15, this can be avoided by passing ``usetex=False`` to ``use_atlas_style``.
+If you have a full LaTeX installation available, you can use LaTeX to typeset the text by passing  ``usetex=True`` to ``use_atlas_style``. This will give you much greater options in terms of what can
+be included in labels.
 
 A working TeXLive installation providing the following is required:
 
