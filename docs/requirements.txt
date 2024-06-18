@@ -2,3 +2,5 @@ numpy
 numexpr
 matplotlib>=3
 sphinx-rtd-theme
+importlib_resources
+packaging
