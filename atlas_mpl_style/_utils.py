@@ -177,7 +177,7 @@ def draw_hists_legend(ax, args, kwargs):
             handler_map[handle_] = BandHandler()
     if handler_map == {}:
         handler_map = None
-    ax.legend(handles, labels, handler_map=handler_map, *args, **kwargs)
+    ax.legend(handles, labels, handler_map=handler_map, **kwargs)
 
 
 def draw_limit_legend(ax, args, kwargs):
@@ -236,4 +236,4 @@ def draw_limit_legend(ax, args, kwargs):
             handler_map[handle_] = BandHandler()
     if handler_map == {}:
         handler_map = None
-    ax.legend(handles, labels, handler_map=handler_map, *args, **kwargs)
+    ax.legend(handles, labels, handler_map=handler_map, **kwargs)
