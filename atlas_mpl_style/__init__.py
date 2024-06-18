@@ -1,6 +1,8 @@
 import matplotlib as _mpl
 import matplotlib.style as _style
-import pkg_resources as _pkg
+import importlib_resources as _ilr
+import packaging as _pkging
+from contextlib import ExitStack
 import atexit as _atexit
 import shutil as _shutil
 import warnings as _warn
@@ -19,8 +21,10 @@ from atlas_mpl_style.plot import (
     draw_tag,
 )
 
-_stylesheets = _pkg.resource_filename(__name__, "stylesheets")
-_atexit.register(_pkg.cleanup_resources)
+_stylesheets_ref = _ilr.files(__name__) / "stylesheets"
+_stylesheets_mgr = ExitStack()
+_atexit.register(_stylesheets_mgr.close)
+_stylesheets = _stylesheets_mgr.enter_context(_ilr.as_file(_stylesheets_ref))
 _style.core.USER_LIBRARY_PATHS.append(_stylesheets)
 _style.core.reload_library()
 
@@ -82,23 +86,42 @@ _EXTRA_COLORS = {
 
 _mpl.colors.EXTRA_COLORS = _EXTRA_COLORS
 _mpl.colors.colorConverter.colors.update(_EXTRA_COLORS)
-_mpl.cm.register_cmap(
-    name="bird",
-    cmap=_mpl.colors.LinearSegmentedColormap.from_list(
-        "bird",
-        [
-            (0.0592, 0.3599, 0.8684),
-            (0.078, 0.5041, 0.8385),
-            (0.0232, 0.6419, 0.7914),
-            (0.1802, 0.7178, 0.6425),
-            (0.5301, 0.7492, 0.4662),
-            (0.8186, 0.7328, 0.3499),
-            (0.9956, 0.7862, 0.1968),
-            (0.9764, 0.9832, 0.0539),
-        ],
-        N=2560,
-    ),
-)
+if _pkging.version.parse(_mpl.__version__) >= _pkging.version.parse('3.6'):
+    _mpl.colormaps.register(
+        name="bird",
+        cmap=_mpl.colors.LinearSegmentedColormap.from_list(
+            "bird",
+            [
+                (0.0592, 0.3599, 0.8684),
+                (0.078, 0.5041, 0.8385),
+                (0.0232, 0.6419, 0.7914),
+                (0.1802, 0.7178, 0.6425),
+                (0.5301, 0.7492, 0.4662),
+                (0.8186, 0.7328, 0.3499),
+                (0.9956, 0.7862, 0.1968),
+                (0.9764, 0.9832, 0.0539),
+            ],
+            N=2560,
+        ),
+    )
+else:
+    _mpl.cm.register_cmap(
+        name="bird",
+        cmap=_mpl.colors.LinearSegmentedColormap.from_list(
+            "bird",
+            [
+                (0.0592, 0.3599, 0.8684),
+                (0.078, 0.5041, 0.8385),
+                (0.0232, 0.6419, 0.7914),
+                (0.1802, 0.7178, 0.6425),
+                (0.5301, 0.7492, 0.4662),
+                (0.8186, 0.7328, 0.3499),
+                (0.9956, 0.7862, 0.1968),
+                (0.9764, 0.9832, 0.0539),
+            ],
+            N=2560,
+        ),
+    )
 
 
 def set_color_cycle(pal=None, n=4):
