@@ -492,7 +492,7 @@ def plot_ratio(
     """
     Plot ratio plot
 
-    .. note:: :func:`atlas_mpl_style.uhi.plot_ratio` provides a version of this function that accepts ``PlottableHistogram``s.
+    .. note:: :func:`atlas_mpl_style.uhi.plot_ratio` provides a version of this function that accepts ``PlottableHistogram``​s.
 
     Parameters
     ----------
