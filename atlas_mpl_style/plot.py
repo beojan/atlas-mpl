@@ -1051,12 +1051,12 @@ def draw_atlas_label(
         else:
             if _usetex:
                 lumi_str = (
-                    fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ '
-                    fr"\textsf{{fb}}^{{-1}}$"
+                    rf', ${"< " if lumi_lt else ""}{lumi:.4g} \ '
+                    rf"\textsf{{fb}}^{{-1}}$"
                 )
             else:
                 lumi_str = (
-                    fr', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' fr"{{fb}}^{{-1}}$"
+                    rf', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' rf"{{fb}}^{{-1}}$"
                 )
     else:
         lumi_str = ""
@@ -1065,11 +1065,11 @@ def draw_atlas_label(
     if _usetex:
         nl = r"\\"
         label = (
-            fr"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
-            fr'{nl + "for education only" if status=="opendata" else ""}'
-            fr'{nl if show_e_nl else ""}'
-            fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
-            fr'{desc if desc_line else ""}'
+            rf"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
+            rf'{nl + "for education only" if status=="opendata" else ""}'
+            rf'{nl if show_e_nl else ""}'
+            rf'{energy_str}{lumi_str}{nl if desc_line else ""}'
+            rf'{desc if desc_line else ""}'
         )
         ax.text(
             x,
@@ -1085,10 +1085,10 @@ def draw_atlas_label(
     else:
         nl = "\n"
         label = (
-            fr'{"for education only" if status=="opendata" else ""}'
-            fr'{nl if show_e_nl and status=="opendata" else ""}'
-            fr'{energy_str}{lumi_str}{nl if desc_line else ""}'
-            fr'{desc if desc_line else ""}'
+            rf'{"for education only" if status=="opendata" else ""}'
+            rf'{nl if show_e_nl and status=="opendata" else ""}'
+            rf'{energy_str}{lumi_str}{nl if desc_line else ""}'
+            rf'{desc if desc_line else ""}'
         )
         # Based on the rainbox_text example in MPL
         prop = dict(

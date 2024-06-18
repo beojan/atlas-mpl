@@ -93,7 +93,7 @@ def plot_pulls(data, ax=None, **kwargs):
         capsize=8,
         ms=10,
         zorder=4,
-        **kwargs
+        **kwargs,
     )
     ax.axvline(x=0, lw=2, ls="--", c="paper:fg", alpha=0.5)
     ax.axvline(x=-1, lw=2, ls="--", c="paper:fg", alpha=0.2)
@@ -295,7 +295,7 @@ def draw_pull_impact_legend(*args, ax=None, **kwargs):
                     xerr_size=1.0
                 )
             },
-            **kwargs
+            **kwargs,
         )
     else:
         ax.legend(

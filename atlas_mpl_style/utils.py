@@ -1,6 +1,7 @@
 import numexpr as _ne
 import numpy as _np
 
+
 def significance(data, data_errs, bkg, bkg_errs):
     """
     Calculates significance in each bin

@@ -86,7 +86,7 @@ _EXTRA_COLORS = {
 
 _mpl.colors.EXTRA_COLORS = _EXTRA_COLORS
 _mpl.colors.colorConverter.colors.update(_EXTRA_COLORS)
-if _pkging.version.parse(_mpl.__version__) >= _pkging.version.parse('3.6'):
+if _pkging.version.parse(_mpl.__version__) >= _pkging.version.parse("3.6"):
     _mpl.colormaps.register(
         name="bird",
         cmap=_mpl.colors.LinearSegmentedColormap.from_list(

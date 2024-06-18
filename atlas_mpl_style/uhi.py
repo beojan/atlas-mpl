@@ -204,7 +204,7 @@ def plot_1d(
     color=None,
     attach_bands=False,
     ax=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot single 1D histogram from PlottableHistogram
@@ -328,5 +328,5 @@ def plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwa
         text=text,
         textcolor=textcolor,
         horizontal=horizontal,
-        **kwargs
+        **kwargs,
     )
