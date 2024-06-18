@@ -315,7 +315,7 @@ def plot_signal(
     """
     Plot signal histogram
 
-    NB: :func:`atlas_mpl_style.uhi.plot_signal` provides a version of this function that accepts a ``PlottableHistogram``.
+    .. note:: :func:`atlas_mpl_style.uhi.plot_signal` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -411,7 +411,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
     """
     Plot data
 
-    NB: :func:`atlas_mpl_style.uhi.plot_data` provides a version of this function that accepts a ``PlottableHistogram``.
+    .. note:: :func:`atlas_mpl_style.uhi.plot_data` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -492,7 +492,7 @@ def plot_ratio(
     """
     Plot ratio plot
 
-    NB: :func:`atlas_mpl_style.uhi.plot_ratio` provides a version of this function that accepts ``PlottableHistogram``s.
+    .. note:: :func:`atlas_mpl_style.uhi.plot_ratio` provides a version of this function that accepts ``PlottableHistogram``s.
 
     Parameters
     ----------
@@ -614,7 +614,7 @@ def plot_1d(
     """
     Plot single 1D histogram
 
-    NB: :func:`atlas_mpl_style.uhi.plot_1d` provides a version of this function that accepts a ``PlottableHistogram``.
+    .. note:: :func:`atlas_mpl_style.uhi.plot_1d` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
@@ -685,7 +685,7 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
     """
     Plot 2D histogram
 
-    NB: :func:`atlas_mpl_style.uhi.plot_2d` provides a version of this function that accepts a ``PlottableHistogram``.
+    .. note:: :func:`atlas_mpl_style.uhi.plot_2d` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
