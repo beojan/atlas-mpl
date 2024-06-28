@@ -558,8 +558,8 @@ def plot_ratio(
         )
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
-    out_of_range_up = _np.where(ratio > max_ratio, max_ratio, _np.NaN)
-    out_of_range_down = _np.where(ratio < min_ratio, min_ratio, _np.NaN)
+    out_of_range_up = _np.where(ratio > max_ratio, max_ratio, _np.nan)
+    out_of_range_down = _np.where(ratio < min_ratio, min_ratio, _np.nan)
     ratio_ax.plot(
         bin_centers,
         out_of_range_up,
@@ -576,8 +576,8 @@ def plot_ratio(
     )
     if not offscale_errs:
         # set out of range to NaN so it doesn't get drawn
-        ratio[~_np.isnan(out_of_range_up)] = _np.NaN
-        ratio[~_np.isnan(out_of_range_down)] = _np.NaN
+        ratio[~_np.isnan(out_of_range_up)] = _np.nan
+        ratio[~_np.isnan(out_of_range_down)] = _np.nan
     if plottype == "significances":
         ratio_ax.plot(bin_centers, ratio, "ko", ms=3)
         ratio_ax.axhline(1, ls="--", color="paper:fg", alpha=0.5)
