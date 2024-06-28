@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "atlas-mpl-style"
-version = "0.23.2"
+version = "0.23.3"
 description = "ATLAS style for Matplotlib 3.0+"
 authors = [{name = "Beojan Stanislaus", email = "beojan.stanislaus@cern.ch"}]
 readme = "README.rst"

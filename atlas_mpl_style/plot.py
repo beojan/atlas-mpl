@@ -238,9 +238,9 @@ def plot_backgrounds(
             raise BinningMismatchError("Total error may have incorrect binning")
     n_bkgs = len(backgrounds)
 
-    total_stat_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float_)
-    total_syst_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float_)
-    total_hist = _np.zeros_like(backgrounds[0].hist, dtype=_np.float_)
+    total_stat_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float64)
+    total_syst_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float64)
+    total_hist = _np.zeros_like(backgrounds[0].hist, dtype=_np.float64)
 
     for i, bkg in enumerate(backgrounds):
         if len(bkg.hist) != len(total_stat_err):
