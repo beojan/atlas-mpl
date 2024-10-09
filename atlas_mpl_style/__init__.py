@@ -39,7 +39,7 @@ _EXTRA_COLORS = {
     "paper:orange": "#d75f00",
     "paper:pink": "#d70087",
     "paper:purple": "#8700af",
-    "paper:lightBlue": "#0087af",
+    "paper:lightblue": "#0087af",
     "paper:olive": "#5f7800",
     "on:bg": "#1b2b34",
     "on:fg": "#cdd3de",
