@@ -160,7 +160,7 @@ def set_color_cycle(pal=None, n=4):
             "paper:orange",
             "paper:purple",
             "paper:yellow",
-            "paper:lightblue",
+            "paper:lightBlue",
             "paper:olive",
         ][0:n]
     elif pal.lower() == "oceanic":
