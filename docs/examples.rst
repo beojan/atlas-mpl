@@ -28,20 +28,23 @@ PlottableHistogram protocol.
     bkg2_dist = dist.expon(1, 3)
     part1_dist = dist.norm(2, 0.2)
     part2_dist = dist.norm(3, 0.4)
-    
+
     bkg1_data = 100*bkg1_dist.rvs(4000, rng)
     bkg2_data = 100*bkg2_dist.rvs(1000, rng)
     part1_data = 100*part1_dist.rvs(300, rng)
     part2_data = 100*part2_dist.rvs(100, rng)
-    noise_data = 100*rng.uniform(0, 10, 200)
-    
+
     x_axis = bh.axis.Regular(30, 0, 1000)
     bkg1_h = bh.Histogram(x_axis).fill(bkg1_data)
     bkg2_h = bh.Histogram(x_axis).fill(bkg2_data)
     part1_h = bh.Histogram(x_axis).fill(part1_data)
     part2_h = bh.Histogram(x_axis).fill(part2_data)
-    error_h = bh.Histogram(x_axis).fill(part2_data)
-    data_h = bh.Histogram(x_axis).fill(bkg1_data).fill(bkg2_data).fill(part1_data).fill(part2_data).fill(noise_data)
+
+    data_h = (bh.Histogram(x_axis)
+                .fill(100*bkg1_dist.rvs(4000, rng))
+                .fill(100*bkg2_dist.rvs(1000, rng))
+                .fill(100*part1_dist.rvs(300, rng))
+                .fill(100*part2_dist.rvs(100, rng)))
 
 Make Plot
 -------------
@@ -74,10 +77,10 @@ it can still take UHI histograms.
 .. code:: python
 
     bkg = ampl.plot.plot_backgrounds([
-        ampl.plot.Background(label="Background 1", hist=bkg1_h, color="paper:blue"),
-        ampl.plot.Background(label="Background 2", hist=bkg2_h, color="paper:green"),
-        ampl.plot.Background(label="Particle 1", hist=part1_h, color="on:yellow"),
-        ampl.plot.Background(label="Particle 2", hist=part2_h, color="on:red"),
+        ampl.plot.Background(label="Background 1", hist=bkg1_h),
+        ampl.plot.Background(label="Background 2", hist=bkg2_h),
+        ampl.plot.Background(label="Particle 1", hist=part1_h),
+        ampl.plot.Background(label="Particle 2", hist=part2_h),
     ], ax=ax)
 
 Next we plot the data, and a “signal”. This ``plot_signal`` function is
@@ -91,7 +94,7 @@ should include that in the stack of “Background”s.
 
 .. code:: python
 
-    ampl.uhi.plot_data(hist=data_h, ax=ax)
+    ampl.uhi.plot_data(hist=data_h, label="Data 18", ax=ax)
     ampl.uhi.plot_signal(label="Signal", hist=part1_h, color="paper:red")
     ampl.uhi.plot_ratio(data_h, bkg, ratio_ax=rax, plottype='diff')
 
@@ -111,6 +114,8 @@ Finally we draw the ATLAS label and the legend. So long as the
 components of the plot have been drawn using the ATLAS MPL style
 functions the order of items in the legend will be determined
 automatically if you use the ``ampl.draw_legend`` function.
+Notice that because the signal has statistical error bands the
+"Stat. Uncertainty" entry has also been added to the legend.
 
 .. code:: python
 

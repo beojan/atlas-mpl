@@ -2,26 +2,32 @@ Additional Colors
 =================
 ATLAS MPL Style adds a number of additional color definitions to Matplotlib.
 
-Default Color Cycle
+Default / ATLAS Color Cycle
 -------------------
-These are the colors of the default color cycle.
+These are the colors of the default (``petroff10``) color cycle.
+See *Accessible Color Sequences for Data Visualization* by Matthew A. Petroff (`arXiv:2107.02270 <https://arxiv.org/abs/2107.02270>`_).
+If 8 or fewer colors are requested in ``set_color_cycle`` the ``petroff8`` or ``petroff6`` color cycle will be used, with slightly different hues.
 
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:cyan``          |``#54c9d1``              |.. image:: _colors/series:cyan.png         |
+|``petroff:blue``          |``#3f90da``              |.. image:: _colors/petroff:blue.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:orange``        |``#eca89a``              |.. image:: _colors/series:orange.png       |
+|``petroff:orange``          |``#ffa90d``              |.. image:: _colors/petroff:orange.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:blue``          |``#95bced``              |.. image:: _colors/series:blue.png         |
+|``petroff:red``          |``#bc1e00``              |.. image:: _colors/petroff:red.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:olive``         |``#ceb776``              |.. image:: _colors/series:olive.png        |
+|``petroff:gray``          |``#94a4a2``              |.. image:: _colors/petroff:gray.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:purple``        |``#d3a9ea``              |.. image:: _colors/series:purple.png       |
+|``petroff:purple``          |``#832db5``              |.. image:: _colors/petroff:purple.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:green``         |``#9bc57f``              |.. image:: _colors/series:green.png        |
+|``petroff:brown``          |``#a96b59``              |.. image:: _colors/petroff:brown.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:pink``          |``#f0a1ca``              |.. image:: _colors/series:pink.png         |
+|``petroff:orange2``          |``#e76300``              |.. image:: _colors/petroff:orange2.png         |
 +-------------------------+-------------------------+-------------------------------------------+
-|``series:turquoise``     |``#5fcbaa``              |.. image:: _colors/series:turquoise.png    |
+|``petroff:tan``          |``#b8ab6f``              |.. image:: _colors/petroff:tan.png         |
++-------------------------+-------------------------+-------------------------------------------+
+|``petroff:gray2``          |``#707480``              |.. image:: _colors/petroff:gray2.png         |
++-------------------------+-------------------------+-------------------------------------------+
+|``petroff:lightBlue``          |``#92dadd``              |.. image:: _colors/petroff:lightBlue.png         |
 +-------------------------+-------------------------+-------------------------------------------+
 
 Paper Colors
@@ -85,27 +91,6 @@ These colors are from the `Oceanic Next
 |``on:brown``             |``#ab7967``              |.. image:: _colors/on:brown.png            |
 +-------------------------+-------------------------+-------------------------------------------+
 
-ATLAS Color Cycle
------------------
-These are the colors from the ``ATLAS`` color cycle. Green and yellow also have the additional
-aliases ``atlas:onesigma`` and ``atlas:twosigma`` respectively for use in limit plots.
-
-+-------------------------+-------------------------+---------------------------------------+
-|``atlas:onesigma``       |``#00ff26``              |.. image:: _colors/atlas:onesigma.png  |
-+-------------------------+-------------------------+---------------------------------------+
-|``atlas:twosigma``       |``#fbff1f``              |.. image:: _colors/atlas:twosigma.png  |
-+-------------------------+-------------------------+---------------------------------------+
-|``series2:green``        |``#00ff26``              |.. image:: _colors/series2:green.png   |
-+-------------------------+-------------------------+---------------------------------------+
-|``series2:yellow``       |``#fbff1f``              |.. image:: _colors/series2:yellow.png  |
-+-------------------------+-------------------------+---------------------------------------+
-|``series2:blue``         |``#00a1e0``              |.. image:: _colors/series2:blue.png    |
-+-------------------------+-------------------------+---------------------------------------+
-|``series2:red``          |``#a30013``              |.. image:: _colors/series2:red.png     |
-+-------------------------+-------------------------+---------------------------------------+
-|``series2:purple``       |``#5100c2``              |.. image:: _colors/series2:purple.png  |
-+-------------------------+-------------------------+---------------------------------------+
-
 HDBS Colors
 -----------
 These are the ATLAS HDBS physics groups colors. Mint cream is not included in the color cycle.
@@ -143,7 +128,16 @@ in the automatic color cycle.
 |``hh:offwhite``      |``#e9f1df``|.. image:: _colors/hh:offwhite.png                 |
 +---------------------+-----------+---------------------------------------------------+
 
+ATLAS Limit Plot Colors
+-----------------
+Also included are ``atlas:onesigma`` and ``atlas:twosigma``, which are the green and red used for these bands
+limit plots.
 
++-------------------------+-------------------------+---------------------------------------+
+|``atlas:onesigma``       |``#00ff26``              |.. image:: _colors/atlas:onesigma.png  |
++-------------------------+-------------------------+---------------------------------------+
+|``atlas:twosigma``       |``#fbff1f``              |.. image:: _colors/atlas:twosigma.png  |
++-------------------------+-------------------------+---------------------------------------+
 
 Transparent
 -----------

@@ -29,6 +29,16 @@ _style.core.USER_LIBRARY_PATHS.append(_stylesheets)
 _style.core.reload_library()
 
 _EXTRA_COLORS = {
+    "petroff:blue": "#3f90da",
+    "petroff:orange": "#ffa90e",
+    "petroff:red": "#bd1f01",
+    "petroff:gray": "#94a4a2",
+    "petroff:purple": "#832db6",
+    "petroff:brown": "#a96b59",
+    "petroff:orange2": "#e76300",
+    "petroff:tan": "#b9ac70",
+    "petroff:gray2": "#717581",
+    "petroff:lightBlue": "#92dadd",
     "paper:bg": "#eeeeee",
     "paper:fg": "#444444",
     "paper:bgAlt": "#e4e4e4",
@@ -124,35 +134,56 @@ else:
     )
 
 
-def set_color_cycle(pal=None, n=4):
+def set_color_cycle(pal=None, n=10):
     """
     Sets a different color cycle.
-
-    The ATLAS palette includes the standard green and yellow.
 
     Parameters
     ----------
     pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', "HDBS", "HH", None}
-      The palette to use. None resets to default palette.
-      The ATLAS palette is suitable for histograms, not lines.
+      The palette to use. None resets to default palette (Petroff 6, 8, or 10 depending on n).
       'MPL' (alias 'Tab') provides the default matplotlib palette.
     n : int, optional
       Number of lines or histograms.
     """
     if n < 2:
         n = 2
-    if pal.upper() == "ATLAS":
-        if n > 5:
-            n = 5
-        colors = reversed(
-            ["series2:yellow", "series2:green", "series2:blue", "series2:purple"][
-                0 : n - 1
+    if pal.upper() == "ATLAS" or pal.upper().startswith("PETROFF") or pal is None:
+        if n <= 6:
+            colors = [
+                (87/255, 144/255, 252/255),
+                (248/255, 156/255, 32/255),
+                (228/255, 37/255, 54/255),
+                (150/255, 74/255, 139/255),
+                (156/255, 156/255, 161/255),
+                (122/255, 33/255, 221/255)
             ]
-            + ["series2:red"]
-        )
+        elif n <= 8:
+            colors = [
+                (24/255, 69/255, 251/255),
+                (255/255, 94/255, 2/255),
+                (201/255, 31/255, 22/255),
+                (200/255, 73/255, 169/255),
+                (173/255, 173/255, 125/255),
+                (134/255, 200/255, 221/255),
+                (87/255, 141/255, 255/255),
+                (101/255, 99/255, 100/255)
+            ]
+        else:
+            colors = [
+                "petroff:blue",
+                "petroff:orange",
+                "petroff:red",
+                "petroff:gray",
+                "petroff:purple",
+                "petroff:brown",
+                "petroff:orange2",
+                "petroff:tan",
+                "petroff:gray2",
+                "petroff:lightBlue"
+            ]
+
     elif pal.lower() == "paper":
-        if n > 8:
-            n = 8
         colors = [
             "paper:green",
             "paper:red",
@@ -162,7 +193,7 @@ def set_color_cycle(pal=None, n=4):
             "paper:yellow",
             "paper:lightBlue",
             "paper:olive",
-        ][0:n]
+        ]
     elif pal.lower() == "oceanic":
         colors = [
             "on:green",
@@ -238,7 +269,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
             usetex = False
 
     _style.use("atlas")
-    set_color_cycle("Paper")
+    set_color_cycle("ATLAS")
     plot._atlas_label = atlasLabel
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
@@ -274,8 +305,6 @@ def ratio_axes(extra_axes=None):
     -----------
     extra_axes : int, optional
        Number of additional axes. If not given, defaults to one.
-    square : bool, optional
-       Whether the plot should be square or tall. Defaults to True (square)
 
     Returns
     -------

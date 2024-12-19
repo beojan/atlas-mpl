@@ -193,7 +193,7 @@ def register_band(label, artist, ax=None):
 
 
 def plot_backgrounds(
-    backgrounds, bins=None, *, total_err=None, empty_stat_legend=False, ax=None
+        backgrounds, bins=None, *, show_errs=False, total_err=None, empty_stat_legend=False, ax=None
 ):
     """
     Plot stacked backgrounds
@@ -204,6 +204,8 @@ def plot_backgrounds(
         List of backgrounds to be plotted, in order (bottom to top)
     bins : array_like, optional
         Bin edges. To preserve backward compatibility, ``backgrounds`` and ``bins`` may be exchanged.
+    show_errs : boolean, optional
+        Draw error bands (if available). Defaults to False following PubCom recommendation.
     total_err: array_like, optional
         Total uncertainty. If given, overrides per-background systematics. This is useful for showing post-fit uncertainties.
     empty_stat_legend: boolean, optional
@@ -258,32 +260,36 @@ def plot_backgrounds(
     total_stat_err = _np.sqrt(total_stat_err)
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
-    if _np.sum(total_stat_err) != 0:
-        ax._ampllegend.has_stat = True
-        plot_band(
-            bins,
-            total_hist - total_stat_err,
-            total_hist + total_stat_err,
-            ax=ax,
-            fc="transparent",
-            ec="k",
-            hatch=r"////",
-            label="Stat. Uncertainty",
-            zorder=6,
-        )
+    if show_errs:
+        if _np.sum(total_stat_err) != 0:
+            ax._ampllegend.has_stat = True
+            plot_band(
+                bins,
+                total_hist - total_stat_err,
+                total_hist + total_stat_err,
+                ax=ax,
+                fc="transparent",
+                ec="k",
+                hatch=r"////",
+                label="Stat. Uncertainty",
+                zorder=6,
+            )
+        elif empty_stat_legend:
+            ax._ampllegend.has_stat = True
+        if _np.sum(total_syst_err) != 0.0:
+            ax._ampllegend.has_syst = True
+            plot_band(
+                bins,
+                total_hist - total_err,
+                total_hist + total_err,
+                color="grey",
+                alpha=0.5,
+                label="Stat. $\\oplus$ Syst. Unc.",
+                zorder=5,
+            )
     elif empty_stat_legend:
         ax._ampllegend.has_stat = True
-    if _np.sum(total_syst_err) != 0.0:
-        ax._ampllegend.has_syst = True
-        plot_band(
-            bins,
-            total_hist - total_err,
-            total_hist + total_err,
-            color="grey",
-            alpha=0.5,
-            label="Stat. $\\oplus$ Syst. Unc.",
-            zorder=5,
-        )
+
     _, _, ps = ax.hist(
         _np.vstack([bin_centers] * n_bkgs).transpose(),
         bins=bins,
