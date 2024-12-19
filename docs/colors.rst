@@ -3,7 +3,7 @@ Additional Colors
 ATLAS MPL Style adds a number of additional color definitions to Matplotlib.
 
 Default / ATLAS Color Cycle
--------------------
+---------------------------
 These are the colors of the default (``petroff10``) color cycle.
 See *Accessible Color Sequences for Data Visualization* by Matthew A. Petroff (`arXiv:2107.02270 <https://arxiv.org/abs/2107.02270>`_).
 If 8 or fewer colors are requested in ``set_color_cycle`` the ``petroff8`` or ``petroff6`` color cycle will be used, with slightly different hues.
@@ -129,7 +129,7 @@ in the automatic color cycle.
 +---------------------+-----------+---------------------------------------------------+
 
 ATLAS Limit Plot Colors
------------------
+-----------------------
 Also included are ``atlas:onesigma`` and ``atlas:twosigma``, which are the green and red used for these bands
 limit plots.
 
