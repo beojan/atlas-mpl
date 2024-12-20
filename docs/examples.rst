@@ -29,10 +29,10 @@ PlottableHistogram protocol.
     part1_dist = dist.norm(2, 0.2)
     part2_dist = dist.norm(3, 0.4)
 
-    bkg1_data = 100*bkg1_dist.rvs(4000, rng)
-    bkg2_data = 100*bkg2_dist.rvs(1000, rng)
-    part1_data = 100*part1_dist.rvs(300, rng)
-    part2_data = 100*part2_dist.rvs(100, rng)
+    bkg1_data = 100*bkg1_dist.rvs(20000, rng)
+    bkg2_data = 100*bkg2_dist.rvs(5000, rng)
+    part1_data = 100*part1_dist.rvs(1500, rng)
+    part2_data = 100*part2_dist.rvs(500, rng)
 
     x_axis = bh.axis.Regular(30, 0, 1000)
     bkg1_h = bh.Histogram(x_axis).fill(bkg1_data)
@@ -41,11 +41,10 @@ PlottableHistogram protocol.
     part2_h = bh.Histogram(x_axis).fill(part2_data)
 
     data_h = (bh.Histogram(x_axis)
-                .fill(100*bkg1_dist.rvs(4000, rng))
-                .fill(100*bkg2_dist.rvs(1000, rng))
-                .fill(100*part1_dist.rvs(300, rng))
-                .fill(100*part2_dist.rvs(100, rng)))
-
+                .fill(100*bkg1_dist.rvs(20000, rng))
+                .fill(100*bkg2_dist.rvs(5000, rng))
+                .fill(100*part1_dist.rvs(1500, rng))
+                .fill(100*part2_dist.rvs(500, rng)))
 Make Plot
 -------------
 
@@ -64,7 +63,7 @@ have no space between them vertically, and share the x-axis.
 
     fig, ax, rax = ampl.ratio_axes()
     ax.set_xlim(0, 1000)
-    ax.set_ylim(0, 800);
+    ax.set_ylim(0, 4000);
 
 First we plot the MC histograms. There’s a slight misnomer here, and all
 the stacked histograms are called “Backgrounds”, but they need not

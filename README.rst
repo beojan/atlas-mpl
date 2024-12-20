@@ -49,18 +49,11 @@ are merged into those repositories).
 ``usetex=False`` Mode
 ------------------------
 
-``usetex=False`` is now the default, removing the LaTeX dependency. However, there are a few points to
-bear in mind.
+``usetex=False`` is now the default, removing the LaTeX dependency.
 
-1. The call to ``draw_atlas_label`` should be the last thing done before calling ``savefig``.
-2. The figure ``dpi`` is set to 72 to match that of the PDF backend. This *must
-   not* be changed if the plot will be exported in PDF or (E)PS format since
-   doing so would cause the spacing in the ATLAS label to be incorrect.
-3. Due to the above, the ``dpi`` parameter should not be passed when exporting to
-   a raster format.
-4. When converting a plotting script that uses ``usetex=True`` mode, ensure labels
-   are updated to remove LaTeX macros that are not supported by Matplotlib's
-   mathtext.
+If you convert a plotting script that uses ``usetex=True`` mode, make sure labels
+are updated to remove LaTeX macros that are not supported by Matplotlib's
+mathtext.
 
 
 TeXLive and Fonts Needed

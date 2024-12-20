@@ -1102,6 +1102,11 @@ def draw_atlas_label(
             va="top",
             multialignment="left",
         )
+        side_prop = dict(
+            ha="left",
+            va="bottom",
+            multialignment="left",
+        )
         atl_txt = ax.text(
             x,
             y,
@@ -1113,29 +1118,19 @@ def draw_atlas_label(
             **prop,
             **kwargs,
         )
-        atl_txt.draw(ax.figure.canvas.get_renderer())
-        ex = atl_txt.get_window_extent()
-        side_t = _mpl.transforms.offset_copy(
-            atl_txt._transform, x=ex.width, units="dots"
-        )
-        under_t = _mpl.transforms.offset_copy(
-            atl_txt._transform, y=-ex.height, units="dots"
-        )
-        ax.text(
-            x,
-            y,
+        ax.annotate(
             f"{sim_str}{status_str}",
             *args,
-            transform=side_t,
-            **prop,
+            xycoords=atl_txt,
+            xy=(1,0),
+            **side_prop,
             **kwargs,
         )
-        ax.text(
-            x,
-            y,
+        ax.annotate(
             label,
             *args,
-            transform=under_t,
+            xycoords=atl_txt,
+            xy=(0,0),
             **prop,
             **kwargs,
         )
