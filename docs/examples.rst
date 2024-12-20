@@ -126,7 +126,7 @@ And save the figure, ensuring everything is visible.
 .. code:: python
 
     fig.tight_layout()
-    plt.savefig('test.png')
+    plt.savefig('test.png', dpi=150)
 
 Output
 ------
