@@ -12,6 +12,16 @@ font.monospace: Tex Gyre Cursor, Courier, Courier New, Nimbus Mono, FreeMono
 
 text.color: 000000
 
+mathtext.fontset: custom
+mathtext.bf:  Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial:bold
+mathtext.bfit: Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial:italic:bold
+mathtext.cal: TeX Gyre Chorus, Zapf Chancery, URW Chancery L, cursive
+mathtext.it:  Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial:italic
+mathtext.rm:  Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial
+mathtext.sf:  Tex Gyre Heros, Helvetica, Nimbus Sans, FreeSans, Arial
+mathtext.tt:  Tex Gyre Cursor, Courier, Courier New, Nimbus Mono, FreeMono, monospace
+mathtext.fallback: stixsans
+
 axes.facecolor: FFFFFF
 axes.edgecolor: 000000
 axes.linewidth: 1

@@ -1012,7 +1012,7 @@ def draw_atlas_label(
         y position (top left)
     ax : mpl.axes.Axes, optional
         Axes to draw label in
-    status : [ *'int'* | 'wip' | 'prelim' | 'final' | 'opendata' ], optional
+    status : [ *'int'* | 'wip' | 'prelim' | 'final' | 'opendata' | 'opendata-res' ], optional
         Approval status
     simulation : bool (optional, default ``False``)
         Does the plot show only MC simulation results
@@ -1038,7 +1038,7 @@ def draw_atlas_label(
         status_str = "Work in Progress"
     elif status == "prelim":
         status_str = "Preliminary"
-    elif status == "opendata":
+    elif status == "opendata" or status == "opendata-res":
         status_str = "Open Data"
     else:
         status_str = status
@@ -1077,63 +1077,26 @@ def draw_atlas_label(
             rf'{energy_str}{lumi_str}{nl if desc_line else ""}'
             rf'{desc if desc_line else ""}'
         )
-        ax.text(
-            x,
-            y,
-            label,
-            *args,
-            ha="left",
-            va="top",
-            multialignment="left",
-            transform=ax.transAxes,
-            **kwargs,
-        )
     else:
         nl = "\n"
         label = (
-            rf'{"for education only" if status=="opendata" else ""}'
-            rf'{nl if show_e_nl and status=="opendata" else ""}'
+            rf"$\mathbfit{{{_atlas_label}}}$ {sim_str}{status_str}"
+            rf'{nl + "for education only" if status=="opendata" else ""}'
+            rf'{nl if show_e_nl else ""}'
             rf'{energy_str}{lumi_str}{nl if desc_line else ""}'
             rf'{desc if desc_line else ""}'
         )
-        # Based on the rainbox_text example in MPL
-        prop = dict(
-            ha="left",
-            va="top",
-            multialignment="left",
-        )
-        side_prop = dict(
-            ha="left",
-            va="bottom",
-            multialignment="left",
-        )
-        atl_txt = ax.text(
-            x,
-            y,
-            f"{_atlas_label} ",
-            *args,
-            style="italic",
-            weight="bold",
-            transform=ax.transAxes,
-            **prop,
-            **kwargs,
-        )
-        ax.annotate(
-            f"{sim_str}{status_str}",
-            *args,
-            xycoords=atl_txt,
-            xy=(1,0),
-            **side_prop,
-            **kwargs,
-        )
-        ax.annotate(
-            label,
-            *args,
-            xycoords=atl_txt,
-            xy=(0,0),
-            **prop,
-            **kwargs,
-        )
+    ax.text(
+        x,
+        y,
+        label,
+        *args,
+        ha="left",
+        va="top",
+        multialignment="left",
+        transform=ax.transAxes,
+        **kwargs,
+    )
 
 
 def draw_legend(*args, ax=None, **kwargs):

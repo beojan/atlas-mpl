@@ -4,12 +4,21 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "atlas-mpl-style"
-version = "0.24.1"
+version = "0.25.0"
 description = "ATLAS style for Matplotlib 3.0+"
-authors = [{name = "Beojan Stanislaus", email = "beojan.stanislaus@cern.ch"}]
+authors = [{ name = "Beojan Stanislaus", email = "beojan.stanislaus@cern.ch" }]
 readme = "README.rst"
-license = {file = "LICENSE.md"}
-keywords = ["plotting", "atlas", "matplotlib", "cern", "root", "hep", "high-energy-physics", "physics"]
+license = { file = "LICENSE.md" }
+keywords = [
+    "plotting",
+    "atlas",
+    "matplotlib",
+    "cern",
+    "root",
+    "hep",
+    "high-energy-physics",
+    "physics",
+]
 classifiers = [
     # How mature is this project? Common values are
     #   3 - Alpha
@@ -28,16 +37,16 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13"
+    "Programming Language :: Python :: 3.13",
 ]
 requires-python = ">=3.9"
 dependencies = [
-   "matplotlib>=3",
-   "numpy",
-   "numexpr",
-   "pandas",
-   "importlib-resources>=6",
-   "packaging"
+    "matplotlib>=3.8",
+    "numpy",
+    "numexpr",
+    "pandas",
+    "importlib-resources>=6",
+    "packaging",
 ]
 
 [project.urls]
