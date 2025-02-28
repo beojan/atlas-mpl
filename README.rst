@@ -1,6 +1,7 @@
 ATLAS Matplotlib Style
 ======================
 .. image:: https://img.shields.io/pypi/v/atlas-mpl-style?label=PyPI&style=for-the-badge   :alt: PyPI 
+   :target: https://pypi.org/project/atlas-mpl-style/
 
 **Despite the last commit date, this package is still maintained. If you have any comments or improvements, open an issue or PR.**
 
