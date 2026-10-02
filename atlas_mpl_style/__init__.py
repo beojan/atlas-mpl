@@ -25,8 +25,8 @@ _stylesheets_ref = _ilr.files(__name__) / "stylesheets"
 _stylesheets_mgr = ExitStack()
 _atexit.register(_stylesheets_mgr.close)
 _stylesheets = _stylesheets_mgr.enter_context(_ilr.as_file(_stylesheets_ref))
-_style.core.USER_LIBRARY_PATHS.append(_stylesheets)
-_style.core.reload_library()
+_style.USER_LIBRARY_PATHS.append(_stylesheets)
+_style.reload_library()
 
 _EXTRA_COLORS = {
     "petroff:blue": "#3f90da",
