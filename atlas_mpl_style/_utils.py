@@ -67,6 +67,8 @@ def get_main_ax(ax):
 
 def plot_type(ax):
     "Does ax show histograms or limits."
+    if not hasattr(ax, "_ampllegend"):
+        decorate_axes(ax)
     if len(ax._ampllegend.limits) != 0:
         return "limits"
     else:
@@ -167,7 +169,7 @@ def draw_hists_legend(ax, args, kwargs):
             handles.append(handle_)
             handler_map[handle_] = BandHandler()
 
-    for label, handle in extras:
+    for label, handle in extras.items():
         labels.append(label)
         if label not in band_labels:
             handles.append(handle)
@@ -191,7 +193,7 @@ def draw_limit_legend(ax, args, kwargs):
 
     if len(al.limits) == 1:
         # Single limit
-        lc = al.limits.values()[0]
+        lc = next(iter(al.limits.values()))
         line_c = "k" if lc.color is None else lc.color
         two_sig_c = "atlas:twosigma" if lc.color is None else to_rgba(lc.color, 0.25)
         one_sig_c = "atlas:onesigma" if lc.color is None else to_rgba(lc.color, 0.5)
@@ -202,9 +204,9 @@ def draw_limit_legend(ax, args, kwargs):
             labels.append(lc.exp_label)
             handles.append(Line2D([0], [0], color=line_c, linestyle="--"))
             labels.append("Expected ±1σ")
-            handles.append(Rectangle((0, 0), [0], [0], fc=one_sig_c, ec=None))
+            handles.append(Rectangle((0, 0), 0, 0, fc=one_sig_c, ec=None))
             labels.append("Expected ±2σ")
-            handles.append(Rectangle((0, 0), [0], [0], fc=two_sig_c, ec=None))
+            handles.append(Rectangle((0, 0), 0, 0, fc=two_sig_c, ec=None))
     else:
         for lc in al.limits.values():
             # Multiple limits
@@ -220,13 +222,13 @@ def draw_limit_legend(ax, args, kwargs):
                 labels.append(lc.exp_label)
                 handle_ = (
                     Line2D([0], [0], color=line_c, linestyle="--"),
-                    Rectangle((0, 0), [0], [0], fc=one_sig_c, ec=None),
-                    Rectangle((0, 0), [0], [0], fc=two_sig_c, ec=None),
+                    Rectangle((0, 0), 0, 0, fc=one_sig_c, ec=None),
+                    Rectangle((0, 0), 0, 0, fc=two_sig_c, ec=None),
                 )
                 handles.append(handle_)
                 handler_map[handle_] = BandHandler()
 
-    for label, handle in extras:
+    for label, handle in extras.items():
         labels.append(label)
         if label not in band_labels:
             handles.append(handle)

@@ -909,6 +909,7 @@ def plot_limit(
             label=observed_label,
             color=conf.color,
         )
+    ax._ampllegend.limits[expected_label] = conf
 
 
 def set_xlabel(label, ax=None, *args, **kwargs):
@@ -1114,6 +1115,7 @@ def draw_legend(*args, ax=None, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
+    _u.decorate_axes(ax)
     ptype = _u.plot_type(ax)
     if ptype is None:
         ax.legend(*args, **kwargs)
