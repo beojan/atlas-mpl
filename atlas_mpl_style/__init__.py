@@ -276,6 +276,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
     if not usetex:
         _mpl.rcParams["text.usetex"] = False
         _mpl.rcParams["mathtext.default"] = "regular"
+        plot._usetex = False
     else:
         plot._usetex = True
         _mpl.rcParams["text.latex.preamble"] = "\n".join(
@@ -331,6 +332,7 @@ def ratio_axes(extra_axes=None):
         _u.decorate_axes(ax2)
         ax1._amplaxesinfo.low_ax = ax2
         ax2._amplaxesinfo.main_ax = ax1
+        fig.align_ylabels((ax1, ax2))
         return fig, ax1, ax2
     else:
         gs = _mpl.gridspec.GridSpec(3 + extra_axes, 1, hspace=0.0, wspace=0.0)
@@ -354,4 +356,5 @@ def ratio_axes(extra_axes=None):
             ax.autoscale(axis="x", tight=True)
             axs.append(ax)
         _mpl.pyplot.sca(ax1)
+        fig.align_ylabels((ax1, *axs))
         return fig, ax1, axs

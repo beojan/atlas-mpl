@@ -929,10 +929,12 @@ def set_xlabel(label, ax=None, *args, **kwargs):
     if ax is None:
         ax = _mpl.pyplot.gca()
     _u.decorate_axes(ax)
+    kwargs.setdefault("x", 1.0)
+    kwargs.setdefault("ha", "right")
     if ax._amplaxesinfo.low_ax is None:
-        ax.set_xlabel(label, x=1.0, ha="right", *args, **kwargs)
+        return ax.set_xlabel(label, *args, **kwargs)
     else:
-        ax._amplaxesinfo.low_ax.set_xlabel(label, x=1.0, ha="right", *args, **kwargs)
+        return ax._amplaxesinfo.low_ax.set_xlabel(label, *args, **kwargs)
 
 
 def set_ylabel(label, ax=None, *args, **kwargs):
@@ -950,7 +952,23 @@ def set_ylabel(label, ax=None, *args, **kwargs):
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
-    ax.set_ylabel(label, y=1.0, ha="right", *args, **kwargs)
+    _u.decorate_axes(ax)
+    kwargs.setdefault("y", 1.0)
+    kwargs.setdefault("ha", "right")
+    ret = ax.set_ylabel(label, *args, **kwargs)
+    if hasattr(ax, "_amplaxesinfo"):
+        axs = []
+        if ax._amplaxesinfo.main_ax is not None:
+            axs.append(ax._amplaxesinfo.main_ax)
+        axs.append(ax)
+        if ax._amplaxesinfo.low_ax is not None:
+            if isinstance(ax._amplaxesinfo.low_ax, list):
+                axs.extend(ax._amplaxesinfo.low_ax)
+            else:
+                axs.append(ax._amplaxesinfo.low_ax)
+        if len(axs) > 1:
+            ax.figure.align_ylabels(axs)
+    return ret
 
 
 def set_zlabel(label, cbar=None, ax=None, **kwargs):
@@ -968,8 +986,10 @@ def set_zlabel(label, cbar=None, ax=None, **kwargs):
     ax : mpl.axes.Axes, optional
         If ``plot_2d`` was used, the axes can optionally be provided here.
     """
+    kwargs.setdefault("y", 1.0)
+    kwargs.setdefault("ha", "right")
     if cbar is not None:
-        cbar.set_label(label, y=1.0, ha="right", **kwargs)
+        cbar.set_label(label, **kwargs)
     else:
         if ax is None:
             ax = _mpl.pyplot.gca()
@@ -983,7 +1003,7 @@ def set_zlabel(label, cbar=None, ax=None, **kwargs):
             )
         else:
             ax._amplaxesinfo.cbar.set_ylabel(
-                label, loc="right", y=1.0, ha="right", **kwargs
+                label, loc="right", **kwargs
             )
 
 
@@ -1047,55 +1067,59 @@ def draw_atlas_label(
     show_e_nl = False
     if energy is not None:
         show_e_nl = True
-        energy_str = rf"$\sqrt{{s}} = $ {energy}"
+        energy_str = rf"$\sqrt{{\mathit{{s}}}} = $ {energy}"
     else:
         energy_str = ""
 
     if lumi is not None:
         show_e_nl = True
+        sep = ", " if energy is not None else ""
         if isinstance(lumi, str):
-            lumi_str = f", {lumi}"
+            lumi_str = f"{sep}{lumi}"
         else:
+            lt_str = "< " if lumi_lt else ""
             if _usetex:
                 lumi_str = (
-                    rf', ${"< " if lumi_lt else ""}{lumi:.4g} \ '
+                    rf'{sep}${lt_str}{lumi:.4g} \ '
                     rf"\textsf{{fb}}^{{-1}}$"
                 )
             else:
                 lumi_str = (
-                    rf', ${"< " if lumi_lt else ""}{lumi:.4g} \ ' rf"{{fb}}^{{-1}}$"
+                    rf'{sep}${lt_str}{lumi:.4g} \ ' rf"{{fb}}^{{-1}}$"
                 )
     else:
         lumi_str = ""
 
-    desc_line = desc is not None
     if _usetex:
         nl = r"\\"
-        label = (
-            rf"\textbf{{\textit{{{_atlas_label}}}}} {sim_str}{status_str}"
-            rf'{nl + "for education only" if status=="opendata" else ""}'
-            rf'{nl if show_e_nl else ""}'
-            rf'{energy_str}{lumi_str}{nl if desc_line else ""}'
-            rf'{desc if desc_line else ""}'
-        )
+        first_line = rf"\textbf{{\textit{{{_atlas_label}}}}}"
     else:
         nl = "\n"
-        label = (
-            rf"$\mathbfit{{{_atlas_label}}}$ {sim_str}{status_str}"
-            rf'{nl + "for education only" if status=="opendata" else ""}'
-            rf'{nl if show_e_nl else ""}'
-            rf'{energy_str}{lumi_str}{nl if desc_line else ""}'
-            rf'{desc if desc_line else ""}'
-        )
+        first_line = rf"$\mathbfit{{{_atlas_label}}}$"
+    if sim_str or status_str:
+        first_line += f" {sim_str}{status_str}".rstrip()
+
+    lines = [first_line]
+    if status == "opendata":
+        lines.append("for education only")
+    if show_e_nl:
+        lines.append(f"{energy_str}{lumi_str}")
+    if desc:
+        if _usetex:
+            lines.append(desc.replace("\n", r"\\"))
+        else:
+            lines.append(desc)
+    label = nl.join(lines)
+
+    kwargs.setdefault("ha", "left")
+    kwargs.setdefault("va", "top")
+    kwargs.setdefault("multialignment", "left")
+    kwargs.setdefault("transform", ax.transAxes)
     ax.text(
         x,
         y,
         label,
         *args,
-        ha="left",
-        va="top",
-        multialignment="left",
-        transform=ax.transAxes,
         **kwargs,
     )
 
