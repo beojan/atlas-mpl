@@ -29,6 +29,21 @@ _style.USER_LIBRARY_PATHS.append(_stylesheets)
 _style.reload_library()
 
 _EXTRA_COLORS = {
+    "atlas:red": "#D55E00",
+    "atlas:vermilion": "#D55E00",
+    "atlas:vermillion": "#D55E00",
+    "atlas:lightBlue": "#56B4E9",
+    "atlas:skyblue": "#56B4E9",
+    "atlas:skyBlue": "#56B4E9",
+    "atlas:orange": "#E69F00",
+    "atlas:yellow": "#F0E442",
+    "atlas:green": "#009E73",
+    "atlas:bluishGreen": "#009E73",
+    "atlas:bluishgreen": "#009E73",
+    "atlas:purple": "#CC79A7",
+    "atlas:reddishPurple": "#CC79A7",
+    "atlas:reddishpurple": "#CC79A7",
+    "atlas:blue": "#0072B2",
     "petroff:blue": "#3f90da",
     "petroff:orange": "#ffa90e",
     "petroff:red": "#bd1f01",
@@ -134,22 +149,59 @@ else:
     )
 
 
-def set_color_cycle(pal=None, n=10):
+def set_color_cycle(pal=None, n=None):
     """
     Sets a different color cycle.
 
     Parameters
     ----------
-    pal : {'ATLAS', 'Paper', 'Oceanic', 'MPL', "HDBS", "HH", None}
-      The palette to use. None resets to default palette (Petroff 6, 8, or 10 depending on n).
+    pal : {'ATLAS', 'Petroff', 'Paper', 'Oceanic', 'MPL', "HDBS", "HH", None}
+      The palette to use. None resets to default palette (ATLAS for n <= 7 or when n is omitted;
+      Petroff for n > 7).
       'MPL' (alias 'Tab') provides the default matplotlib palette.
     n : int, optional
       Number of lines or histograms.
     """
-    if n < 2:
+    if n is not None and n < 2:
         n = 2
-    if pal is None or pal.upper() == "ATLAS" or pal.upper().startswith("PETROFF"):
-        if n <= 6:
+    if pal is None or pal.upper() == "ATLAS":
+        if n is None or n <= 7:
+            colors = [
+                "#D55E00",
+                "#56B4E9",
+                "#E69F00",
+                "#F0E442",
+                "#009E73",
+                "#CC79A7",
+                "#0072B2",
+            ]
+        elif n <= 8:
+            colors = [
+                (24/255, 69/255, 251/255),
+                (255/255, 94/255, 2/255),
+                (201/255, 31/255, 22/255),
+                (200/255, 73/255, 169/255),
+                (173/255, 173/255, 125/255),
+                (134/255, 200/255, 221/255),
+                (87/255, 141/255, 255/255),
+                (101/255, 99/255, 100/255)
+            ]
+        else:
+            colors = [
+                "petroff:blue",
+                "petroff:orange",
+                "petroff:red",
+                "petroff:gray",
+                "petroff:purple",
+                "petroff:brown",
+                "petroff:orange2",
+                "petroff:tan",
+                "petroff:gray2",
+                "petroff:lightBlue"
+            ]
+
+    elif pal.upper().startswith("PETROFF"):
+        if n is not None and n <= 6:
             colors = [
                 (87/255, 144/255, 252/255),
                 (248/255, 156/255, 32/255),
@@ -158,7 +210,7 @@ def set_color_cycle(pal=None, n=10):
                 (156/255, 156/255, 161/255),
                 (122/255, 33/255, 221/255)
             ]
-        elif n <= 8:
+        elif n is not None and n <= 8:
             colors = [
                 (24/255, 69/255, 251/255),
                 (255/255, 94/255, 2/255),

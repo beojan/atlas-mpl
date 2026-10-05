@@ -103,11 +103,35 @@ class TestStylesAndColors(unittest.TestCase):
             "hh:offwhite",
             "atlas:onesigma",
             "atlas:twosigma",
+            "atlas:red",
+            "atlas:vermilion",
+            "atlas:vermillion",
+            "atlas:lightBlue",
+            "atlas:skyblue",
+            "atlas:skyBlue",
+            "atlas:orange",
+            "atlas:yellow",
+            "atlas:green",
+            "atlas:bluishGreen",
+            "atlas:bluishgreen",
+            "atlas:purple",
+            "atlas:reddishPurple",
+            "atlas:reddishpurple",
+            "atlas:blue",
             "transparent",
         ]
         for c in color_names:
             rgba = mpl.colors.to_rgba(c)
             self.assertEqual(len(rgba), 4)
+
+        # Check RGB values of ATLAS colors
+        self.assertEqual(mpl.colors.to_rgba("atlas:red"), (213 / 255, 94 / 255, 0 / 255, 1.0))
+        self.assertEqual(mpl.colors.to_rgba("atlas:lightBlue"), (86 / 255, 180 / 255, 233 / 255, 1.0))
+        self.assertEqual(mpl.colors.to_rgba("atlas:orange"), (230 / 255, 159 / 255, 0 / 255, 1.0))
+        self.assertEqual(mpl.colors.to_rgba("atlas:yellow"), (240 / 255, 228 / 255, 66 / 255, 1.0))
+        self.assertEqual(mpl.colors.to_rgba("atlas:green"), (0 / 255, 158 / 255, 115 / 255, 1.0))
+        self.assertEqual(mpl.colors.to_rgba("atlas:purple"), (204 / 255, 121 / 255, 167 / 255, 1.0))
+        self.assertEqual(mpl.colors.to_rgba("atlas:blue"), (0 / 255, 114 / 255, 178 / 255, 1.0))
 
         # Transparent alpha check
         rgba_trans = mpl.colors.to_rgba("transparent")
@@ -120,17 +144,63 @@ class TestStylesAndColors(unittest.TestCase):
         self.assertEqual(len(val), 4)
 
     def test_set_color_cycle(self):
-        # Default / None
+        atlas_expected = [
+            "#D55E00",
+            "#56B4E9",
+            "#E69F00",
+            "#F0E442",
+            "#009E73",
+            "#CC79A7",
+            "#0072B2",
+        ]
+
+        # Default / None with no number -> 7 ATLAS colors
         ampl.set_color_cycle(None)
-        # ATLAS with various n
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(cycle_colors, atlas_expected)
+
+        # Explicit ATLAS with no n -> 7 ATLAS colors
+        ampl.set_color_cycle("ATLAS")
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(cycle_colors, atlas_expected)
+
+        # ATLAS with n <= 7 -> 7 ATLAS colors
         ampl.set_color_cycle("ATLAS", n=1)
-        ampl.set_color_cycle("ATLAS", n=6)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(cycle_colors, atlas_expected)
+
+        ampl.set_color_cycle("ATLAS", n=7)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(cycle_colors, atlas_expected)
+
+        # ATLAS for n > 7 is Petroff
         ampl.set_color_cycle("ATLAS", n=8)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(len(cycle_colors), 8)
+
         ampl.set_color_cycle("ATLAS", n=10)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(len(cycle_colors), 10)
+        self.assertEqual(cycle_colors[0], "petroff:blue")
+
         # Petroff prefix
         ampl.set_color_cycle("Petroff", n=6)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(len(cycle_colors), 6)
+
         ampl.set_color_cycle("Petroff", n=8)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(len(cycle_colors), 8)
+
         ampl.set_color_cycle("Petroff", n=10)
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(len(cycle_colors), 10)
+        self.assertEqual(cycle_colors[0], "petroff:blue")
+
+        ampl.set_color_cycle("Petroff")
+        cycle_colors = [c["color"] for c in mpl.rcParams["axes.prop_cycle"]]
+        self.assertEqual(len(cycle_colors), 10)
+
         # Other palettes
         ampl.set_color_cycle("Paper")
         ampl.set_color_cycle("Oceanic")

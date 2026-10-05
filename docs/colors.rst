@@ -4,9 +4,36 @@ ATLAS MPL Style adds a number of additional color definitions to Matplotlib.
 
 Default / ATLAS Color Cycle
 ---------------------------
-These are the colors of the default (``petroff10``) color cycle.
+These are the colors of the default (``ATLAS``) color cycle (Okabe & Ito).
+This is the default color cycle when 7 or fewer colors are requested in ``set_color_cycle``, or when no number is given.
+Note that for :math:`n > 7`, the ATLAS color cycle is Petroff (``petroff8`` if 8 colors are requested, or ``petroff10`` if more than 8).
+
+.. image:: _colors/atlas_cycle.png
+   :alt: ATLAS Color Cycle
+
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:red``            |``#D55E00``|.. image:: _colors/atlas:red.png               |
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:lightBlue``      |``#56B4E9``|.. image:: _colors/atlas:lightBlue.png         |
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:orange``         |``#E69F00``|.. image:: _colors/atlas:orange.png            |
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:yellow``         |``#F0E442``|.. image:: _colors/atlas:yellow.png            |
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:green``          |``#009E73``|.. image:: _colors/atlas:green.png             |
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:purple``         |``#CC79A7``|.. image:: _colors/atlas:purple.png            |
++-------------------------+-----------+-----------------------------------------------+
+|``atlas:blue``           |``#0072B2``|.. image:: _colors/atlas:blue.png              |
++-------------------------+-----------+-----------------------------------------------+
+
+Alternative aliases are also available: ``atlas:vermilion``, ``atlas:skyblue``, ``atlas:bluishGreen``, and ``atlas:reddishPurple``.
+
+Petroff Colors
+--------------
+These are the colors of the ``petroff10`` color cycle.
 See *Accessible Color Sequences for Data Visualization* by Matthew A. Petroff (`arXiv:2107.02270 <https://arxiv.org/abs/2107.02270>`_).
-If 8 or fewer colors are requested in ``set_color_cycle`` the ``petroff8`` or ``petroff6`` color cycle will be used, with slightly different hues.
+When more than 7 colors are requested in the ATLAS color cycle (or when ``set_color_cycle(pal="Petroff", n=...)`` is explicitly called), the ``petroff8`` or ``petroff6`` / ``petroff10`` color cycle will be used.
 
 +---------------------+-----------+-----------------------------------------------+
 |``petroff:blue``     |``#3f90da``|.. image:: _colors/petroff:blue.png            |
