@@ -1004,9 +1004,7 @@ def set_zlabel(label, cbar=None, ax=None, **kwargs):
                 "Tried to set z label on inappropriate axes. Please provide cbar."
             )
         else:
-            ax._amplaxesinfo.cbar.set_ylabel(
-                label, loc="right", **kwargs
-            )
+            ax._amplaxesinfo.cbar.set_ylabel(label, **kwargs)
 
 
 def draw_atlas_label(

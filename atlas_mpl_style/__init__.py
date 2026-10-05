@@ -148,7 +148,7 @@ def set_color_cycle(pal=None, n=10):
     """
     if n < 2:
         n = 2
-    if pal.upper() == "ATLAS" or pal.upper().startswith("PETROFF") or pal is None:
+    if pal is None or pal.upper() == "ATLAS" or pal.upper().startswith("PETROFF"):
         if n <= 6:
             colors = [
                 (87/255, 144/255, 252/255),

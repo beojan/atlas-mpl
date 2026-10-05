@@ -299,7 +299,7 @@ def draw_pull_impact_legend(*args, ax=None, **kwargs):
         )
     else:
         ax.legend(
-            (ax._has_pulls),
+            [ax._has_pulls],
             ["Pulls"],
             loc="upper left",
             fontsize=14,

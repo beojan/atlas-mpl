@@ -50,6 +50,13 @@ dependencies = [
     "packaging",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "scipy",
+    "boost_histogram",
+]
+
 [project.urls]
 Home = "https://github.com/beojan/atlas-mpl"
 Documentation = "https://atlas-mpl.readthedocs.io/en/latest/"
