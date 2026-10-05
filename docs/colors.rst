@@ -11,23 +11,21 @@ Note that for :math:`n > 7`, the ATLAS color cycle is Petroff (``petroff8`` if 8
 .. image:: _colors/atlas_cycle.png
    :alt: ATLAS Color Cycle
 
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:red``            |``#D55E00``|.. image:: _colors/atlas:red.png               |
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:lightBlue``      |``#56B4E9``|.. image:: _colors/atlas:lightBlue.png         |
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:orange``         |``#E69F00``|.. image:: _colors/atlas:orange.png            |
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:yellow``         |``#F0E442``|.. image:: _colors/atlas:yellow.png            |
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:green``          |``#009E73``|.. image:: _colors/atlas:green.png             |
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:purple``         |``#CC79A7``|.. image:: _colors/atlas:purple.png            |
-+-------------------------+-----------+-----------------------------------------------+
-|``atlas:blue``           |``#0072B2``|.. image:: _colors/atlas:blue.png              |
-+-------------------------+-----------+-----------------------------------------------+
-
-Alternative aliases are also available: ``atlas:vermilion``, ``atlas:skyblue``, ``atlas:bluishGreen``, and ``atlas:reddishPurple``.
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:red`` (or ``atlas:vermilion``)       |``#D55E00``|.. image:: _colors/atlas:red.png               |
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:lightBlue`` (or ``atlas:skyblue``)   |``#56B4E9``|.. image:: _colors/atlas:lightBlue.png         |
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:orange``                             |``#E69F00``|.. image:: _colors/atlas:orange.png            |
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:yellow``                             |``#F0E442``|.. image:: _colors/atlas:yellow.png            |
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:green`` (or ``atlas:bluishGreen``)   |``#009E73``|.. image:: _colors/atlas:green.png             |
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:purple`` (or ``atlas:reddishPurple``)|``#CC79A7``|.. image:: _colors/atlas:purple.png            |
++---------------------------------------------+-----------+-----------------------------------------------+
+|``atlas:blue``                               |``#0072B2``|.. image:: _colors/atlas:blue.png              |
++---------------------------------------------+-----------+-----------------------------------------------+
 
 Petroff Colors
 --------------
@@ -157,8 +155,7 @@ in the automatic color cycle.
 
 ATLAS Limit Plot Colors
 -----------------------
-Also included are ``atlas:onesigma`` and ``atlas:twosigma``, which are the green and red used for these bands
-limit plots.
+Also included are ``atlas:onesigma`` and ``atlas:twosigma``, which are the green and yellow used for the uncertainty bands in exclusion limit plots (the "Brazil band").
 
 +-------------------------+-------------------------+---------------------------------------+
 |``atlas:onesigma``       |``#00ff26``              |.. image:: _colors/atlas:onesigma.png  |
