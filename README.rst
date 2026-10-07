@@ -16,13 +16,13 @@ In addition, this package also provides:
 
 - A function to draw the ATLAS label
 - A ``plot`` module containing functions to plot pre-binned histograms and
-   limits. This includes functionality for plotting stacked backgrounds along
-   with data and ratios in the usual ATLAS style.
+  limits. This includes functionality for plotting stacked backgrounds along
+  with data and ratios in the usual ATLAS style.
 - An additional "Print" (white background) style.
 - Additional Matplotlib color definitions based on the ATLAS / Okabe & Ito palette, the Petroff accessible color sequences, the
-   `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ theme, and the
-   `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
-   theme
+  `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ theme, and the
+  `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
+  theme
 
 .. image:: docs/output_19_0.png
    :alt: Example ATLAS plot
