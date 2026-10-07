@@ -130,4 +130,4 @@ And save the figure, ensuring everything is visible.
 
 Output
 ------
-.. image:: output_19_0.png
+.. image:: ATLAS_example.png

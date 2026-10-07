@@ -18,13 +18,13 @@ The axis labels should be set using the ``ampl.set_xlabel`` and
 ``ampl.set_ylabel`` functions, to ensure they are correctly
 right / top aligned.
 
-.. image:: output_19_0.png
+.. image:: ATLAS_example.png
    :alt: ATLAS style example plot
 
 Print Style
 ===========
 
-A **Print** style (with an alias ``paper``) is also provided, featuring a clean white background, black axes and text, larger fonts, and a high-contrast subset of the Paper color cycle. This style does not use LaTeX for text typesetting and can be activated using ::
+A ``print`` style is also provided for quick non-ATLAS plots (e.g. for personal notes). This does not use TeX for typesetting and can be activated using ::
 
   import matplotlib.pyplot as plt
   import atlas_mpl_style as ampl

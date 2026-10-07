@@ -24,7 +24,7 @@ In addition, this package also provides:
   `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
   theme
 
-.. image:: docs/output_19_0.png
+.. image:: docs/ATLAS_example.png
    :alt: Example ATLAS plot
 
 UHI and the PlottableHistogram protocol
