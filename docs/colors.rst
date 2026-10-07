@@ -2,14 +2,11 @@ Additional Colors
 =================
 ATLAS MPL Style adds a number of additional color definitions to Matplotlib.
 
-Default / ATLAS Color Cycle
----------------------------
+ATLAS Colors
+------------
 These are the colors of the default (``ATLAS``) color cycle (Okabe & Ito).
 This is the default color cycle when 7 or fewer colors are requested in ``set_color_cycle``, or when no number is given.
-Note that for :math:`n > 7`, the ATLAS color cycle is Petroff (``petroff8`` if 8 colors are requested, or ``petroff10`` if more than 8).
-
-.. image:: _colors/atlas_cycle.png
-   :alt: ATLAS Color Cycle
+Note that for :math:`n > 7`, the ATLAS color cycle falls back to Petroff (``petroff8`` if 8 colors are requested, or ``petroff10`` if more than 8).
 
 +---------------------------------------------+-----------+-----------------------------------------------+
 |``atlas:red`` (or ``atlas:vermilion``)       |``#D55E00``|.. image:: _colors/atlas:red.png               |

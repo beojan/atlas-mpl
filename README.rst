@@ -19,9 +19,9 @@ In addition, this package also provides:
    limits. This includes functionality for plotting stacked backgrounds along
    with data and ratios in the usual ATLAS style.
 - A matplotlib style based on the background / foreground from the VIM `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ color scheme, along with a print version with a white background.
-  - The default color cycle in all three styles is generated with HCL Wizard
+  - The default color cycle is the ATLAS color cycle (based on Okabe & Ito), falling back to Petroff when more than 7 colors are requested.
 
-- Additional Matplotlib color definitions based on the Paper theme, and the
+- Additional Matplotlib color definitions based on the ATLAS / Okabe & Ito palette, the Petroff accessible color sequences, the Paper theme, and the
    `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
    theme
 

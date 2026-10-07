@@ -32,3 +32,20 @@ do not use LaTeX for text typesetting, and can be activated using ::
   plt.style.use('slides')
   # or
   plt.style.use('print')
+
+Color Cycles
+============
+
+By default, the ``ATLAS`` color cycle (based on Okabe & Ito) is used for :math:`n \le 7`.
+When more than 7 colors are requested, it falls back to the accessible Petroff color sequences (``petroff8`` or ``petroff10``).
+
+You can switch or customize the active color cycle at any time using ``ampl.set_color_cycle`` ::
+
+  # Switch to Petroff palette with 6 colors
+  ampl.set_color_cycle(pal='Petroff', n=6)
+
+  # Reset to default ATLAS color cycle
+  ampl.set_color_cycle()
+
+See :doc:`colors` for full details and swatches of available palettes.
+
