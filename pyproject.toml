@@ -48,6 +48,7 @@ dependencies = [
     "pandas",
     "importlib-resources>=6",
     "packaging",
+    "uhi>=1.2.0",
 ]
 
 [project.optional-dependencies]

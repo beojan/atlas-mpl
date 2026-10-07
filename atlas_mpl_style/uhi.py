@@ -7,16 +7,13 @@ functions take the array of bins before the histogram.
 there is no ``atlas_mpl_style.uhi.plot_backgrounds`` function.
 """
 
+import matplotlib as _mpl
 import numpy as _np
 import atlas_mpl_style.plot as _amplplt
+import atlas_mpl_style._uhi_validation as _uhi_val
 
-
-class LabeledBinsError(Exception):
-    "Labeled bins when edges expected (or vice versa)"
-
-    def __init__(self, msg):
-        "Labeled bins when edges expected (or vice versa)"
-        super().__init__(self, msg)
+FlowNotSupportedError = _uhi_val.FlowNotSupportedError
+from atlas_mpl_style.plot import LabeledBinsError
 
 
 def _bins(axis):
@@ -50,16 +47,9 @@ def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
     stat_errs : array_like
         Statistical errors
     """
-    if (
-        not hasattr(hist, "axes")
-        or not hasattr(hist, "values")
-        or not hasattr(hist, "variances")
-    ):
-        raise _amplplt.ViolatesPlottableHistogramError(
-            "hist violates PlottableHistogram protocol"
-        )
-    if len(hist.axes) != 1:
-        raise _amplplt.DimensionError("Only 1D histograms are supported here")
+    _uhi_val.validate_plottable_histogram(
+        hist, name="hist", ndim=1, check_kind=True, func_name="plot_data"
+    )
     hist_obj = hist
     bins = _bins(hist.axes[0])
     hist = hist_obj.values()
@@ -101,16 +91,9 @@ def plot_signal(
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
     """
-    if (
-        not hasattr(hist, "axes")
-        or not hasattr(hist, "values")
-        or not hasattr(hist, "variances")
-    ):
-        raise _amplplt.ViolatesPlottableHistogramError(
-            "hist violates PlottableHistogram protocol"
-        )
-    if len(hist.axes) != 1:
-        raise _amplplt.DimensionError("Only 1D histograms are supported here")
+    _uhi_val.validate_plottable_histogram(
+        hist, name="hist", ndim=1, check_kind=True, func_name="plot_signal"
+    )
     hist_obj = hist
     bins = _bins(hist_obj.axes[0])
     hist = hist_obj.values()
@@ -121,12 +104,13 @@ def plot_signal(
             None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
         )
     if syst_errs is not None and hasattr(syst_errs, "axes"):
-        if not hasattr(syst_errs, "values") or not hasattr(syst_errs, "variances"):
-            raise _amplplt.ViolatesPlottableHistogramError(
-                "syst_errs violates PlottableHistogram protocol"
-            )
-        if len(syst_errs.axes) != 1:
-            raise _amplplt.DimensionError("Only 1D histograms are supported here")
+        _uhi_val.validate_plottable_histogram(
+            syst_errs,
+            name="syst_errs",
+            ndim=1,
+            check_kind=True,
+            func_name="plot_signal",
+        )
         syst_errs_obj = syst_errs
         if len(syst_errs_obj.axes[0]) != len(hist_obj.axes[0]):
             raise _amplplt.BinningMismatchError(
@@ -158,16 +142,9 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
         | "raw" : data / bkg
         | "significances" : Significances (from `ampl.utils.significance()`)
     """
-    if (
-        not hasattr(data, "axes")
-        or not hasattr(data, "values")
-        or not hasattr(data, "variances")
-    ):
-        raise _amplplt.ViolatesPlottableHistogramError(
-            "data violates PlottableHistogram protocol"
-        )
-    if len(data.axes) != 1:
-        raise _amplplt.DimensionError("Only 1D histograms are supported here")
+    _uhi_val.validate_plottable_histogram(
+        data, name="data", ndim=1, check_kind=True, func_name="plot_ratio"
+    )
     data_obj = data
     bins = _bins(data_obj.axes[0])
     data = data_obj.values()
@@ -176,14 +153,21 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     else:
         data_errs = _np.sqrt(data_obj.variances())
 
-    if (
-        hasattr(total_bkg, "axes")
-        and hasattr(total_bkg, "values")
-        and hasattr(total_bkg, "variances")
-    ):
+    if hasattr(total_bkg, "axes"):
         # total_bkg is a UHI histogram
+        _uhi_val.validate_plottable_histogram(
+            total_bkg,
+            name="total_bkg",
+            ndim=1,
+            check_kind=True,
+            func_name="plot_ratio",
+        )
         bkg = total_bkg.values()
-        bkg_errs = _np.sqrt(total_bkg.variances())
+        bkg_errs = (
+            _np.zeros_like(bkg)
+            if total_bkg.variances() is None
+            else _np.sqrt(total_bkg.variances())
+        )
     elif isinstance(total_bkg, tuple) and len(total_bkg) == 2:
         bkg = total_bkg[0]
         bkg_errs = total_bkg[1]
@@ -204,6 +188,7 @@ def plot_1d(
     color=None,
     attach_bands=False,
     ax=None,
+    flow=False,
     **kwargs,
 ):
     """
@@ -225,32 +210,36 @@ def plot_1d(
         Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
         Axes to draw on (defaults to current axes)
+    flow : bool, optional
+        Include and plot underflow and overflow bins if supported (defaults to False).
     **kwargs
         Extra parameters passed to ``plt.hist``
     """
-    if (
-        not hasattr(hist, "axes")
-        or not hasattr(hist, "values")
-        or not hasattr(hist, "variances")
-    ):
-        raise _amplplt.ViolatesPlottableHistogramError(
-            "hist violates PlottableHistogram protocol"
-        )
-    if len(hist.axes) != 1:
-        raise _amplplt.DimensionError("Only 1D histograms are supported here")
-    hist_obj = hist
-    bins = _bins(hist_obj.axes[0])
-    hist = hist_obj.values()
-    if stat_err:
-        if ignore_variances:
-            stat_errs = _np.sqrt(hist)
-        else:
-            stat_errs = (
-                None if hist_obj.variances() is None else _np.sqrt(hist_obj.variances())
-            )
+    _uhi_val.validate_plottable_histogram(
+        hist, name="hist", ndim=1, check_kind=True, func_name="plot_1d"
+    )
+    if ax is None:
+        ax = _mpl.pyplot.gca()
+
+    bins = _bins(hist.axes[0])
+    if flow:
+        h_vals, h_vars = _uhi_val.extract_flow(hist)
+        base_bins = bins
+        bins = _np.concatenate(([bins[0] - (bins[1] - bins[0])], bins, [bins[-1] + (bins[-1] - bins[-2])]))
     else:
-        stat_errs = None
-    _amplplt.plot_1d(label, bins, hist, stat_errs, color, attach_bands, ax, **kwargs)
+        h_vals, h_vars = hist.values(), hist.variances()
+
+    stat_errs = _np.sqrt(h_vals) if (stat_err and ignore_variances) else (_np.sqrt(h_vars) if (stat_err and h_vars is not None) else None)
+    _amplplt.plot_1d(label, bins, h_vals, stat_errs, color, attach_bands, ax, **kwargs)
+
+    if flow:
+        ax.set_xlim(bins[0], bins[-1])
+        ticks = [t for t in ax.get_xticks() if base_bins[0] <= t <= base_bins[-1]]
+        fmt = lambda x: f"{int(x) if float(x).is_integer() else x:g}"
+        ax.set_xticks(
+            [(bins[0] + bins[1]) / 2, *ticks, (bins[-2] + bins[-1]) / 2],
+            labels=[f"<{fmt(base_bins[0])}", *[fmt(t) for t in ticks], f">{fmt(base_bins[-1])}"],
+        )
 
 
 def plot_2d(hist, ax=None, pad=0.05, **kwargs):
@@ -273,16 +262,9 @@ def plot_2d(hist, ax=None, pad=0.05, **kwargs):
     mesh : QuadMesh
     cbar : mpl.colorbar.Colorbar
     """
-    if (
-        not hasattr(hist, "axes")
-        or not hasattr(hist, "values")
-        or not hasattr(hist, "variances")
-    ):
-        raise _amplplt.ViolatesPlottableHistogramError(
-            "hist violates PlottableHistogram protocol"
-        )
-    if len(hist.axes) != 2:
-        raise _amplplt.DimensionError("Only 2D histograms are supported here")
+    _uhi_val.validate_plottable_histogram(
+        hist, name="hist", ndim=2, check_kind=False, func_name="plot_2d"
+    )
     xbins = _bins(hist.axes[0])
     ybins = _bins(hist.axes[1])
     h = hist.values()
@@ -308,19 +290,19 @@ def plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwa
     **kwargs
         Extra parameters passed to ``bar`` or ``barh``
     """
-    if (
-        not hasattr(hist, "axes")
-        or not hasattr(hist, "values")
-        or not hasattr(hist, "variances")
-    ):
-        raise _amplplt.ViolatesPlottableHistogramError(
-            "hist violates PlottableHistogram protocol"
-        )
-    if len(hist.axes) != 1:
-        raise _amplplt.DimensionError("Cutflow should be 1D")
+    _uhi_val.validate_plottable_histogram(
+        hist,
+        name="hist",
+        ndim=1,
+        check_kind=True,
+        func_name="plot_cutflow",
+        dim_msg="Cutflow histogram must be 1D",
+    )
     labels = list(hist.axes[0])
     if not isinstance(labels[0], str):
-        raise LabeledBinsError("Bins are not labeled")
+        raise LabeledBinsError(
+            "Bins are not labeled. Cutflow requires discrete string-labeled bins (e.g. StrCategory axis)."
+        )
     _amplplt.plot_cutflow(
         labels,
         hist.values(),

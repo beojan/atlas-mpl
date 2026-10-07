@@ -12,6 +12,13 @@ _usetex = False
 # For histograms with no color set
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
+class LabeledBinsError(Exception):
+    "Labeled bins when edges expected (or vice versa)"
+
+    def __init__(self, msg):
+        "Labeled bins when edges expected (or vice versa)"
+        super().__init__(self, msg)
+
 
 def _bins(axis):
     a = list(axis)
@@ -67,6 +74,11 @@ class BinningMismatchError(Exception):
         super().__init__(self, msg)
 
 
+import atlas_mpl_style._uhi_validation as _uhi_val
+
+FlowNotSupportedError = _uhi_val.FlowNotSupportedError
+
+
 class Background:
     """Histogram and errors corresponding to a single background"""
 
@@ -90,12 +102,9 @@ class Background:
             Background color for histogram
         """
         if hasattr(hist, "axes"):  # Object should meet the PlottableHistogram protocol
-            if not hasattr(hist, "values") or not hasattr(hist, "variances"):
-                raise ViolatesPlottableHistogramError(
-                    "hist violates PlottableHistogram protocol"
-                )
-            if len(hist.axes) != 1:
-                raise DimensionError("Only 1D histograms are supported here")
+            _uhi_val.validate_plottable_histogram(
+                hist, name="hist", ndim=1, check_kind=True, func_name="Background"
+            )
             hist_obj = hist
             bins = _bins(hist.axes[0])
             hist = hist_obj.values()
@@ -121,7 +130,18 @@ class Background:
             if len(hist) != len(stat_errs):
                 raise BinningMismatchError("Stat errors may have incorrect binning")
         if syst_errs is not None:
-            if len(hist) != len(syst_errs):
+            if hasattr(syst_errs, "axes"):
+                _uhi_val.validate_plottable_histogram(
+                    syst_errs,
+                    name="syst_errs",
+                    ndim=1,
+                    check_kind=True,
+                    func_name="Background",
+                )
+                if len(syst_errs.axes[0]) != len(hist):
+                    raise BinningMismatchError("Syst errors have incorrect binning")
+                syst_errs = syst_errs.values()
+            elif len(hist) != len(syst_errs):
                 raise BinningMismatchError("Syst errors have incorrect binning")
 
         self.bins = bins
