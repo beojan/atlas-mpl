@@ -18,12 +18,14 @@ In addition, this package also provides:
 - A ``plot`` module containing functions to plot pre-binned histograms and
    limits. This includes functionality for plotting stacked backgrounds along
    with data and ratios in the usual ATLAS style.
-- A matplotlib style based on the background / foreground from the VIM `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ color scheme, along with a print version with a white background.
-  - The default color cycle is the ATLAS color cycle (based on Okabe & Ito), falling back to Petroff when more than 7 colors are requested.
-
-- Additional Matplotlib color definitions based on the ATLAS / Okabe & Ito palette, the Petroff accessible color sequences, the Paper theme, and the
+- An additional "Print" (white background) style.
+- Additional Matplotlib color definitions based on the ATLAS / Okabe & Ito palette, the Petroff accessible color sequences, the
+   `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ theme, and the
    `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
    theme
+
+.. image:: docs/output_19_0.png
+   :alt: Example ATLAS plot
 
 UHI and the PlottableHistogram protocol
 ----------------------------------------- 
@@ -88,7 +90,17 @@ that you install `texlive-full` to obtain a complete installation of texlive.
 On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be
 installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
-**TeXLive is not required for the "slides" or "print" style.** `Fira Sans
-<https://bboxtype.com/typefaces/FiraSans/>`__ and `Iosevka
-<https://github.com/be5invis/Iosevka/releases/>`__ should be installed
-for these styles to appear as intended. However, neither is *necessary*.
+**TeXLive is not required for the "print" style.** Matplotlib resolves fonts using the following order of preference:
+
+- **Sans-serif** (default): `Atkinson Hyperlegible <https://brailleinstitute.org/freefont>`__, followed by TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, and DejaVu Sans.
+- **Monospace**: Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono.
+
+Atkinson Hyperlegible was chosen to ensure text and numbers stay crisp and easy to read from the back of an auditorium, or if plots end up scaled down on a poster or paper.
+
+If you prefer the previous look with Fira Sans, you can select it explicitly after activating the style::
+
+  import matplotlib.pyplot as plt
+  import atlas_mpl_style as ampl
+
+  plt.style.use('print')
+  plt.rcParams['font.sans-serif'] = ['Fira Sans'] + plt.rcParams['font.sans-serif']

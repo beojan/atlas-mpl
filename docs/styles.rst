@@ -18,20 +18,21 @@ The axis labels should be set using the ``ampl.set_xlabel`` and
 ``ampl.set_ylabel`` functions, to ensure they are correctly
 right / top aligned.
 
-Other Styles
-============
+.. image:: output_19_0.png
+   :alt: ATLAS style example plot
 
-Additionally, two other styles based on the Paper VIM color scheme
-are provided. **Slides** has an off-white central background, and works well
-on slides. **Print** has a white background, for use in print. These styles
-do not use LaTeX for text typesetting, and can be activated using ::
+Print Style
+===========
 
-  # import matplotlib in the usual way
+A **Print** style (with an alias ``paper``) is also provided, featuring a clean white background, black axes and text, larger fonts, and a high-contrast subset of the Paper color cycle. This style does not use LaTeX for text typesetting and can be activated using ::
+
   import matplotlib.pyplot as plt
   import atlas_mpl_style as ampl
-  plt.style.use('slides')
-  # or
+
   plt.style.use('print')
+
+.. image:: _images/print_example.png
+   :alt: Print style example plot
 
 Color Cycles
 ============

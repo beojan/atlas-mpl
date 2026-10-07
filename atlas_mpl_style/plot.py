@@ -147,10 +147,7 @@ class Background:
         self.bins = bins
         self.hist = hist
         self.stat_errs = stat_errs
-        if color is None:
-            self.color = next(_hist_colors)["color"]
-        else:
-            self.color = color
+        self.color = color
         self.label = label
         if syst_errs is None:
             self.syst_errs = _np.zeros_like(stat_errs)
@@ -311,13 +308,23 @@ def plot_backgrounds(
     elif empty_stat_legend:
         ax._ampllegend.has_stat = True
 
+    # Resolve colors for backgrounds that do not specify an explicit color
+    colors = []
+    for b in backgrounds:
+        if b.color is not None:
+            colors.append(b.color)
+        else:
+            c = ax._get_lines.get_next_color()
+            b.color = c
+            colors.append(c)
+
     _, _, ps = ax.hist(
         _np.vstack([bin_centers] * n_bkgs).transpose(),
         bins=bins,
         weights=_np.vstack([b.hist for b in backgrounds]).transpose(),
         stacked=True,
         histtype="stepfilled",
-        color=[b.color for b in backgrounds],
+        color=colors,
         label=[b.label for b in backgrounds],
     )
     for b, p in reversed(list(zip(backgrounds, ps))):

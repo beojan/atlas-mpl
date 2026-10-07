@@ -3,36 +3,36 @@ patch.facecolor: 348ABD  # blue
 patch.edgecolor: FFFFFF
 patch.antialiased: True
 
-font.size: 10.0
+font.size: 16.0
 font.family: sans-serif
-font.sans-serif: Fira Sans, TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, DejaVu Sans
+font.sans-serif: Atkinson Hyperlegible, TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, DejaVu Sans
 font.serif: TeX Gyre Pagella, Palatino, Palatino Linotype, URW Palladio L, DejaVu Sans
-font.monospace: Iosevka, Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono
+font.monospace: Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono
 
-text.color: 444444
+text.color: 000000
 mathtext.fontset: stixsans
 mathtext.default: regular
 
 axes.facecolor: FFFFFF
-axes.edgecolor: 444444
+axes.edgecolor: 000000
 axes.linewidth: 1
 axes.grid: False
-axes.titlesize: x-large
-axes.labelsize: large
-axes.labelcolor: 444444
+axes.titlesize: 20
+axes.labelsize: 18
+axes.labelcolor: 000000
 axes.axisbelow: False       # grid/ticks are below elements (e.g., lines, text)
 axes.formatter.limits: -2, 4
 axes.formatter.use_mathtext: True
 
-# Generated with HCL Wizard
-axes.prop_cycle: cycler('color', ['54C9D1','ECA89A','95BCED','CEB776','D3A9EA','9BC57F','F0A1CA','5FCBAA'])
+# Paper color cycle (high-contrast subset)
+axes.prop_cycle: cycler('color', ['008700', 'AF0000', '005F87', 'D75F00', '8700AF', '0087AF', '5F7800'])
 
-xtick.color: 444444
+xtick.color: 000000
 xtick.major.size: 5
 xtick.minor.size: 3
 xtick.direction: in
 
-ytick.color: 444444
+ytick.color: 000000
 ytick.major.size: 5
 ytick.minor.size: 3
 ytick.direction: in
