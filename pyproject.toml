@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "atlas-mpl-style"
-version = "0.26.0"
+version = "0.27.0"
 description = "ATLAS style for Matplotlib 3.0+"
 authors = [{ name = "Beojan Stanislaus", email = "beojan.stanislaus@cern.ch" }]
 readme = "README.rst"
@@ -33,14 +33,12 @@ classifiers = [
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.11",
     "numpy",
@@ -48,7 +46,7 @@ dependencies = [
     "pandas",
     "importlib-resources>=6",
     "packaging",
-    "uhi>=1.2.0",
+    "uhi>=0.3.0",
 ]
 
 [project.optional-dependencies]

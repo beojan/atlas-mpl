@@ -1,6 +1,7 @@
 numpy
 numexpr
-matplotlib>=3
+matplotlib>=3.11
 sphinx-rtd-theme
-importlib_resources
+importlib-resources>=6
 packaging
+uhi>=0.3.0
