@@ -13,10 +13,10 @@ _usetex = False
 _hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 class LabeledBinsError(Exception):
-    "Labeled bins when edges expected (or vice versa)"
+    "Error raised when bins are labeled where edges were expected (or vice versa)."
 
     def __init__(self, msg):
-        "Labeled bins when edges expected (or vice versa)"
+        "Labeled bins when edges expected (or vice versa)."
         super().__init__(self, msg)
 
 
@@ -51,26 +51,26 @@ def _formatSciNotation(x):
 
 
 class DimensionError(Exception):
-    "Error due to incorrect / unsupported histogram dimension"
+    "Error raised due to incorrect or unsupported histogram dimension."
 
     def __init__(self, msg):
-        "Histogram has incorrect / unsupported dimension"
+        "Histogram has incorrect or unsupported dimension."
         super().__init__(self, msg)
 
 
 class ViolatesPlottableHistogramError(Exception):
-    "Error due to histogram object violating the PlottableHistogram protocol"
+    "Error raised when a histogram object violates the PlottableHistogram protocol."
 
     def __init__(self, msg):
-        "Histogram violates PlottableHistogram protocol"
+        "Histogram violates PlottableHistogram protocol."
         super().__init__(self, msg)
 
 
 class BinningMismatchError(Exception):
-    "Error due to histogram binning mismatch"
+    "Error raised due to histogram binning mismatch."
 
     def __init__(self, msg):
-        "Histogram binning mismatch error"
+        "Histogram binning mismatch error."
         super().__init__(self, msg)
 
 
@@ -80,26 +80,26 @@ FlowNotSupportedError = _uhi_val.FlowNotSupportedError
 
 
 class Background:
-    """Histogram and errors corresponding to a single background"""
+    """Histogram and errors corresponding to a single background."""
 
     __slots__ = ["bins", "label", "hist", "stat_errs", "syst_errs", "color"]
 
     def __init__(self, label, hist, stat_errs=None, syst_errs=None, color=None):
         """
-        Histogram and errors corresponding to a single background
+        Histogram and errors corresponding to a single background.
 
         Parameters
-        -----------
+        ----------
         label : str
-            Background label for legend
+            Background label for legend.
         hist : array_like or PlottableHistogram
-            Bin contents. If hist is a ``PlottableHistogram`` stat_errs is ignored unless it is `sqrt` or `ignore`.
-        stat_errs : array_like
-            Statistical errors on hist
-        syst_errs : array_like or PlottableHist
-            Systematic errors on hist
-        color : color
-            Background color for histogram
+            Bin contents. If hist is a ``PlottableHistogram``, stat_errs is ignored unless it is "sqrt" or "ignore".
+        stat_errs : array_like, optional
+            Statistical errors on hist.
+        syst_errs : array_like or PlottableHistogram, optional
+            Systematic errors on hist.
+        color : str or color-like, optional
+            Background color for histogram.
         """
         if hasattr(hist, "axes"):  # Object should meet the PlottableHistogram protocol
             _uhi_val.validate_plottable_histogram(
@@ -157,24 +157,24 @@ class Background:
 
 def plot_band(bins, low, high, label=None, ax=None, **kwargs):
     """
-    Draw a shaded band between high and low
+    Draw a shaded band between high and low.
 
-    Use this for drawing error bands
+    Use this for drawing error bands.
 
     Parameters
     ----------
     bins : array_like
-        Bin edges
+        Bin edges.
     low : array_like
-        Bin contents defining lower bound
+        Bin contents defining lower bound.
     high : array_like
-        Bin contents defining upper bound
+        Bin contents defining upper bound.
     label : str, optional
         Label for legend. If label matches a line, the band will be attached to that line if ``draw_legend`` is used.
     ax : mpl.axes.Axes, optional
-        Axes to draw band on (defaults to current axes)
+        Axes to draw band on (defaults to current axes).
     **kwargs
-        Keyword arguments passed to `fill_between`
+        Keyword arguments passed to ``fill_between``.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -192,14 +192,14 @@ def plot_band(bins, low, high, label=None, ax=None, **kwargs):
 
 def register_band(label, artist, ax=None):
     """
-    Register a manually draw (e.g. with ``fill_between``) error band.
+    Register a manually drawn (e.g., with ``fill_between``) error band.
 
     Parameters
     ----------
     label : str
         Label of line to attach band to.
     artist : mpl.artist.Artist
-        Band artist, e.g. ``PolyCollection`` returned by ``fill_between``.
+        Band artist, e.g., ``PolyCollection`` returned by ``fill_between``.
     ax : mpl.axes.Axes, optional
         Axes to register band in (defaults to current axes).
     """
@@ -213,29 +213,29 @@ def plot_backgrounds(
         backgrounds, bins=None, *, show_errs=False, total_err=None, empty_stat_legend=False, ax=None
 ):
     """
-    Plot stacked backgrounds
+    Plot stacked backgrounds.
 
     Parameters
     ----------
-    backgrounds : [Background]
-        List of backgrounds to be plotted, in order (bottom to top)
+    backgrounds : list[Background]
+        List of backgrounds to be plotted, in order (bottom to top).
     bins : array_like, optional
         Bin edges. To preserve backward compatibility, ``backgrounds`` and ``bins`` may be exchanged.
-    show_errs : boolean, optional
+    show_errs : bool, optional
         Draw error bands (if available). Defaults to False following PubCom recommendation.
-    total_err: array_like, optional
+    total_err : array_like, optional
         Total uncertainty. If given, overrides per-background systematics. This is useful for showing post-fit uncertainties.
-    empty_stat_legend: boolean, optional
+    empty_stat_legend : bool, optional
         Add stat error band to legend even if empty. Defaults to False.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
 
     Returns
-    --------
+    -------
     total_hist : array_like
-        Total background histogram
+        Total background histogram.
     total_err : array_like
-        Total error on background histogram
+        Total error on background histogram.
     """
     if bins is not None and isinstance(bins[0], Background):
         bins, backgrounds = backgrounds, bins
@@ -347,28 +347,28 @@ def plot_signal(
     ax=None,
 ):
     """
-    Plot signal histogram
+    Plot a signal histogram.
 
     .. note:: :func:`atlas_mpl_style.uhi.plot_signal` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
     label : str
-        Label for legend
+        Label for legend.
     bins : array_like
-        Bin edges
+        Bin edges.
     hist : array_like
-        Bin contents
-    stat_errs : array_like
-        Statistical errors
-    syst_errs : array_like
-        Systematic errors
-    color : color
-        Line color
-    attach_bands : boolean, optional
+        Bin contents.
+    stat_errs : array_like, optional
+        Statistical errors.
+    syst_errs : array_like, optional
+        Systematic errors.
+    color : str or color-like, optional
+        Line color.
+    attach_bands : bool, optional
         Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -443,31 +443,31 @@ def plot_signal(
 
 def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
     """
-    Plot data
+    Plot data.
 
     .. note:: :func:`atlas_mpl_style.uhi.plot_data` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
     label : str, optional
-        Label for legend (default: "Data")
+        Label for legend (default: "Data").
     bins : array_like
-        Bin edges
+        Bin edges.
     hist : array_like
-        Bin contents
+        Bin contents.
     stat_errs : array_like, optional
-        Statistical errors
-    color : color, optional
-        Point color, defaults to black
+        Statistical errors.
+    color : str or color-like, optional
+        Point color, defaults to black.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
 
     Returns
-    --------
+    -------
     hist : array_like
-        Data histogram
+        Data histogram.
     stat_errs : array_like
-        Statistical errors
+        Statistical errors.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -524,24 +524,24 @@ def plot_ratio(
     offscale_errs=False,
 ):
     """
-    Plot ratio plot
+    Draw a ratio plot.
 
     .. note:: :func:`atlas_mpl_style.uhi.plot_ratio` provides a version of this function that accepts ``PlottableHistogram``​s.
 
     Parameters
     ----------
     bins : array_like
-        Bin edges
+        Bin edges.
     data : array_like
-        Data histogram bin contents
+        Data histogram bin contents.
     data_errs : array_like
-        Statistical errors on data
+        Statistical errors on data.
     bkg : array_like
-        Total background histogram bin contents
+        Total background histogram bin contents.
     bkg_errs : array_like
-        Total errors on total background
+        Total errors on total background.
     ratio_ax : mpl.axes.Axes
-        Ratio axes (produced using :func:`atlas_mpl_style.ratio_axes()`)
+        Ratio axis (produced using :func:`atlas_mpl_style.ratio_axes()`).
     max_ratio : float, optional
         Maximum ratio (defaults to 0.25 for "diff", 1.25 for "raw", 3.5 for "significances").
     plottype : {"diff", "raw", "significances"}
@@ -549,8 +549,8 @@ def plot_ratio(
         | "diff" : (data - bkg) / bkg
         | "raw" : data / bkg
         | "significances" : Significances (using :func:`atlas_mpl_style.utils.significance()`)
-    offscale_err : boolean
-        Draw error bars on off-scale points
+    offscale_errs : bool, optional
+        Draw error bars on off-scale points (defaults to False).
     """
     # divide by zero is common -- ignore errors
     olderr = _np.seterr(all="ignore")
@@ -627,13 +627,14 @@ def plot_ratio(
 
 def draw_tag(text, ax=None):
     """
-    Draw tag just outside plot region
+    Draw a tag just outside the plot region.
 
     Parameters
-    -------------
+    ----------
     text : str
+        Tag text to display.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -646,28 +647,28 @@ def plot_1d(
     label, bins, hist, stat_errs=None, color=None, attach_bands=False, ax=None, **kwargs
 ):
     """
-    Plot single 1D histogram
+    Plot a single 1D histogram.
 
     .. note:: :func:`atlas_mpl_style.uhi.plot_1d` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
     label : str
-        Label for legend
+        Label for legend.
     bins : array_like
-        Bin edges
+        Bin edges.
     hist : array_like
-        Bin contents
+        Bin contents.
     stat_errs : array_like, optional
-        Statistical errors
-    color : color, optional
-        Line color
-    attach_bands : boolean, optional
+        Statistical errors.
+    color : str or color-like, optional
+        Line color.
+    attach_bands : bool, optional
         Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     **kwargs
-        Extra parameters passed to ``plt.hist``
+        Extra parameters passed to ``plt.hist``.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -718,24 +719,24 @@ def plot_1d(
 
 def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
     """
-    Plot 2D histogram
+    Plot a 2D histogram.
 
     .. note:: :func:`atlas_mpl_style.uhi.plot_2d` provides a version of this function that accepts a ``PlottableHistogram``.
 
     Parameters
     ----------
     xbins : array_like
-        x bin edges
-    bins : array_like
-        y bin edges
+        x bin edges.
+    ybins : array_like
+        y bin edges.
     hist : array_like
-        Bin contents
+        Bin contents.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     pad : float, optional
-        Padding for colorbar in inches (defaults to 0.05)
+        Padding for colorbar in inches (defaults to 0.05).
     **kwargs
-        Extra parameters passed to ``pcolormesh``
+        Extra parameters passed to ``pcolormesh``.
 
     Returns
     -------
@@ -767,24 +768,24 @@ def plot_cutflow(
     labels, hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs
 ):
     """
-    Plot cutflow from PlottableHistogram
+    Plot a cutflow from a PlottableHistogram.
 
     Parameters
     ----------
-    labels : [str]
-        Cutflow labels
+    labels : list[str]
+        Cutflow labels.
     hist : PlottableHistogram
-        Cutflow histogram
+        Cutflow histogram.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     text : bool, optional
-        Whether to label bars (default: True)
-    textcolor: str, optional
-        Text color
+        Whether to label bars (default: True).
+    textcolor : str, optional
+        Text color.
     horizontal : bool, optional
-        Whether to draw horizontal bars (default: True)
+        Whether to draw horizontal bars (default: True).
     **kwargs
-        Extra parameters passed to ``bar`` or ``barh``
+        Extra parameters passed to ``bar`` or ``barh``.
     """
     resize_ax = False
     if ax is None:
@@ -847,32 +848,32 @@ def plot_limit(
     ax=None,
 ):
     """
-    Plot a limit
+    Plot a limit.
 
     Parameters
     ----------
     expected_label : str
-        Label for expected limit (for legend)
+        Label for expected limit (for legend).
     x : array_like
-        x values
+        x values.
     expected : array_like
-        Expected limit
+        Expected limit.
     minus_one_sigma : array_like, optional
-        Lower edge of one sigma band
+        Lower edge of one sigma band.
     plus_one_sigma : array_like, optional
-        Upper edge of one sigma band
+        Upper edge of one sigma band.
     minus_two_sigma : array_like, optional
-        Lower edge of two sigma band
+        Lower edge of two sigma band.
     plus_two_sigma : array_like, optional
-        Upper edge of two sigma band
+        Upper edge of two sigma band.
     observed_label : str, optional
-        Label for observed limit
+        Label for observed limit.
     observed : array_like, optional
-        Observed limit
-    color : color, optional
-        Line color (if multiple limits are being drawn)
+        Observed limit.
+    color : str or color-like, optional
+        Line color (if multiple limits are being drawn).
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -943,17 +944,17 @@ def plot_limit(
 
 def set_xlabel(label, ax=None, *args, **kwargs):
     """
-    Set x label in ATLAS style (right aligned).
-    If ``ratio_axes`` was used, the label will be set on the lowest ratio axes.
+    Set x label in ATLAS style (right-aligned).
+    If ``ratio_axes`` was used, the label will be set on the lowest ratio axis.
 
-    Additional parameters are passed through to `ax.set_xlabel`.
+    Additional parameters are passed through to ``ax.set_xlabel``.
 
     Parameters
     ----------
     label : str
-        Label (LaTeX permitted)
+        Label (LaTeX permitted).
     ax : mpl.axes.Axes, optional
-        Axes to set x label on
+        Axes to set x label on (defaults to current axes).
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -968,16 +969,16 @@ def set_xlabel(label, ax=None, *args, **kwargs):
 
 def set_ylabel(label, ax=None, *args, **kwargs):
     """
-    Set y label in ATLAS style (top aligned).
+    Set y label in ATLAS style (top-aligned).
 
     Additional parameters are passed through to ``ax.set_ylabel``.
 
     Parameters
     ----------
     label : str
-        Label (LaTeX permitted)
+        Label (LaTeX permitted).
     ax : mpl.axes.Axes, optional
-        Axes to set y label on
+        Axes to set y label on (defaults to current axes).
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -1002,14 +1003,14 @@ def set_ylabel(label, ax=None, *args, **kwargs):
 
 def set_zlabel(label, cbar=None, ax=None, **kwargs):
     """
-    Set z label in ATLAS style (top aligned)
+    Set z label in ATLAS style (top-aligned).
 
     The colorbar to add the label to is *required* unless ``plot_2d`` was used.
 
     Parameters
     ----------
     label : str
-        Label (LaTeX permitted)
+        Label (LaTeX permitted).
     cbar : mpl.colorbar.Colorbar, optional
         Colorbar to set label on. Not required if ``plot_2d`` was used.
     ax : mpl.axes.Axes, optional
@@ -1055,23 +1056,23 @@ def draw_atlas_label(
     Parameters
     ----------
     x : float
-        x position (top left)
+        x position (top left).
     y : float
-        y position (top left)
+        y position (top left).
     ax : mpl.axes.Axes, optional
-        Axes to draw label in
-    status : [ *'int'* | 'wip' | 'prelim' | 'final' | 'opendata' | 'opendata-res' ], optional
-        Approval status
-    simulation : bool (optional, default ``False``)
-        Does the plot show only MC simulation results
+        Axes to draw label in (defaults to current axes).
+    status : {'int', 'wip', 'prelim', 'final', 'opendata', 'opendata-res', None}, optional
+        Approval status. If None, only "ATLAS" is drawn.
+    simulation : bool, optional
+        Whether the plot shows only MC simulation results (defaults to False).
     energy : str, optional
-        Centre of mass energy, including units
+        Centre-of-mass energy, including units.
     lumi : float or str, optional
-        Integrated luminosity in /fb. If str, the units should be included.
-    lumi_lt: bool, optional
-        True if only a subset of data was processed
+        Integrated luminosity in fb⁻¹. If str, the units should be included.
+    lumi_lt : bool, optional
+        True if only a subset of data was processed.
     desc : str, optional
-        Additional description
+        Additional description.
     """
     global _atlas_label
     if ax is None:
@@ -1158,11 +1159,11 @@ def draw_legend(*args, ax=None, **kwargs):
     Parameters
     ----------
     ax : mpl.axes.Axes, optional
-       Axes to draw legend on (defaults to current axes)
+        Axes to draw legend on (defaults to current axes).
     *args :
-       Passed to ``ax.legend``
+        Passed to ``ax.legend``.
     **kwargs :
-       Passed to ``ax.legend``
+        Passed to ``ax.legend``.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()

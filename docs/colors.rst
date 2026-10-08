@@ -115,7 +115,7 @@ These colors are from the `Oceanic Next
 
 HDBS Colors
 -----------
-These are the ATLAS HDBS physics groups colors. Mint cream is not included in the color cycle.
+These are the ATLAS HDBS physics group's colors. Mint cream is not included in the color cycle.
 
 +-------------------------+-----------+-----------------------------------------------+
 |``hdbs:starcommandblue`` |``#047cbc``|.. image:: _colors/hdbs:starcommandblue.png    |
@@ -124,11 +124,11 @@ These are the ATLAS HDBS physics groups colors. Mint cream is not included in th
 +-------------------------+-----------+-----------------------------------------------+
 |``hdbs:maroonX11``       |``#b8336a``|.. image:: _colors/hdbs:maroonX11.png          |
 +-------------------------+-----------+-----------------------------------------------+
-|``hdbs:outrageousorange``|``#fa7e61``| .. image:: _colors/hdbs:outrageousorange.png  |
+|``hdbs:outrageousorange``|``#fa7e61``|.. image:: _colors/hdbs:outrageousorange.png   |
 +-------------------------+-----------+-----------------------------------------------+
-|``hdbs:pictorialcarmine``|``#ca1551``| .. image:: _colors/hdbs:pictorialcarmine.png  |
+|``hdbs:pictorialcarmine``|``#ca1551``|.. image:: _colors/hdbs:pictorialcarmine.png   |
 +-------------------------+-----------+-----------------------------------------------+
-|``hdbs:mintcream``       |``#ebf5ee``| .. image:: _colors/hdbs:mintcream.png         |
+|``hdbs:mintcream``       |``#ebf5ee``|.. image:: _colors/hdbs:mintcream.png          |
 +-------------------------+-----------+-----------------------------------------------+
 
 HH Colors

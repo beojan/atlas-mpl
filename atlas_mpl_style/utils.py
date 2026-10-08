@@ -4,19 +4,25 @@ import numpy as _np
 
 def significance(data, data_errs, bkg, bkg_errs):
     """
-    Calculates significance in each bin
+    Calculate significance in each bin.
 
-    Uses the significance definition in https://cds.cern.ch/record/2643488
+    Uses the significance definition in https://cds.cern.ch/record/2643488.
 
     Parameters
-    ------------
+    ----------
     data : array_like
+        Observed data counts or yields.
     data_errs : array_like
-              Errors / uncertainties on `data`
+        Errors / uncertainties on ``data``.
     bkg : array_like
-         Total background prediction
+        Total background prediction.
     bkg_errs : array_like
-            Errors / uncertainties on `bkg`
+        Errors / uncertainties on ``bkg``.
+
+    Returns
+    -------
+    array_like
+        Signed Poisson significance in each bin.
     """
     err2 = _ne.evaluate(
         "data_errs**2 + bkg_errs**2",

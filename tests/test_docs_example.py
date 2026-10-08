@@ -14,10 +14,10 @@ class TestDocumentationExample(unittest.TestCase):
         plt.close("all")
 
     def test_documentation_example_end_to_end(self):
-        # 1. Setup style
+        # 1. Set up style
         ampl.use_atlas_style()
 
-        # 2. Setup histograms as in documentation
+        # 2. Set up histograms as in documentation
         rng = np.random.default_rng(42)
         bkg1_dist = dist.expon(0, 3)
         bkg2_dist = dist.expon(1, 3)
@@ -43,7 +43,7 @@ class TestDocumentationExample(unittest.TestCase):
             .fill(100 * part2_dist.rvs(500, rng))
         )
 
-        # 3. Setup axes
+        # 3. Set up axes
         fig, ax, rax = ampl.ratio_axes()
         ax.set_xlim(0, 1000)
         ax.set_ylim(0, 4000)

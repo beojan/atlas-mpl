@@ -151,16 +151,16 @@ else:
 
 def set_color_cycle(pal=None, n=None):
     """
-    Sets a different color cycle.
+    Set a different color cycle.
 
     Parameters
     ----------
-    pal : {'ATLAS', 'Petroff', 'Paper', 'Oceanic', 'MPL', "HDBS", "HH", None}
-      The palette to use. None resets to default palette (ATLAS for n <= 7 or when n is omitted;
-      Petroff for n > 7).
-      'MPL' (alias 'Tab') provides the default matplotlib palette.
+    pal : {'ATLAS', 'Petroff', 'Paper', 'Oceanic', 'MPL', 'HDBS', 'HH', None}
+        The palette to use. None resets to the default palette (ATLAS for n <= 7 or when n is omitted;
+        Petroff for n > 7).
+        'MPL' (alias 'Tab') provides the default matplotlib palette.
     n : int, optional
-      Number of lines or histograms.
+        Number of lines or histograms.
     """
     if n is not None and n < 2:
         n = 2
@@ -296,18 +296,18 @@ def set_color_cycle(pal=None, n=None):
 
 def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
     """
-    Setup ATLAS style.
+    Set up ATLAS style.
 
     Parameters
     ----------
     atlasLabel : str, optional
-       Replace ATLAS with a custom label
+        Replace ATLAS with a custom label.
     fancyLegend : bool, optional
-       Use matplotlib's fancy legend frame (defaults to False)
+        Use matplotlib's fancy legend frame (defaults to False).
     usetex : bool, optional
-       Use LaTeX installation to set text (defaults to False)
-       If no LaTeX installation is found, this package will fallback to usetex=False.
-       This is on a best-effort basis, since the detected LaTeX installation may be incomplete.
+        Use LaTeX installation to set text (defaults to False).
+        If no LaTeX installation is found, this package will fall back to usetex=False.
+        This is on a best-effort basis, since the detected LaTeX installation may be incomplete.
     """
     if usetex:
         if (
@@ -352,19 +352,19 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
 
 def ratio_axes(extra_axes=None):
     """
-    Splits axes for ratio plots.
+    Split axes for ratio plots.
 
     Parameters
-    -----------
+    ----------
     extra_axes : int, optional
-       Number of additional axes. If not given, defaults to one.
+        Number of additional axes. If not given, defaults to one.
 
     Returns
     -------
-    fig : figure
-    main_ax : axes
-    ratio_ax : axes or list of axes
-       Returns list if extra_axes is passed
+    fig : matplotlib.figure.Figure
+    main_ax : matplotlib.axes.Axes
+    ratio_ax : matplotlib.axes.Axes or list[matplotlib.axes.Axes]
+        Returns a list if extra_axes is passed.
     """
     hgt = 6 + 2 * (1 if extra_axes is None else extra_axes)  # * (100/72)
     fig = _mpl.pyplot.figure(figsize=(hgt, hgt))

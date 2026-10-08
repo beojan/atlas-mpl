@@ -36,19 +36,21 @@ def validate_plottable_histogram(
     func_name: str | None = None,
     dim_msg: str | None = None,
 ) -> None:
-    """Validate that `hist` satisfies the PlottableHistogram protocol version 1.2,
+    """
+    Validate that ``hist`` satisfies the PlottableHistogram protocol version 1.2.
 
-    has the expected dimensionality, and has kind='COUNT' if required.
+    Checks that the histogram has the expected dimensionality, and has ``kind='COUNT'``
+    if required.
 
     Parameters
     ----------
     hist : object
         The object to validate.
-    name : str
+    name : str, optional
         The argument name (e.g., 'hist', 'data', 'syst_errs').
-    ndim : int or None
+    ndim : int or None, optional
         Expected number of dimensions, or None if dimensionality is not checked.
-    check_kind : bool
+    check_kind : bool, optional
         If True, requires hist.kind to be 'COUNT' and rejects profile histograms.
     func_name : str, optional
         Calling function/class name for descriptive error messages.

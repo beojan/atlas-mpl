@@ -16,8 +16,8 @@ First, we just load some packages.
 Make Histograms
 --------------------
 
-We need some histograms to plot, so let’s generate some. We’re making
-Boost histograms here but you can also read a TH1 from a ROOT file with
+We need some histograms to plot, so let's generate some. We're making
+Boost histograms here, but you can also read a TH1 from a ROOT file with
 Uproot and convert it. We can deal with anything that follows the UHI
 PlottableHistogram protocol.
 
@@ -45,8 +45,9 @@ PlottableHistogram protocol.
                 .fill(100*bkg2_dist.rvs(5000, rng))
                 .fill(100*part1_dist.rvs(1500, rng))
                 .fill(100*part2_dist.rvs(500, rng)))
+
 Make Plot
--------------
+---------
 
 We start by loading ATLAS MPL Style, and activating the configuration.
 
@@ -55,22 +56,22 @@ We start by loading ATLAS MPL Style, and activating the configuration.
     import atlas_mpl_style as ampl
     ampl.use_atlas_style()
 
-First we setup the axes. ``ratio_axes()`` splits the figure into a large
-main area, and a smaller area below for the ratio plot. The two will
+First, we set up the axes. ``ratio_axes()`` splits the figure into a large
+main area and a smaller area below for the ratio plot. The two will
 have no space between them vertically, and share the x-axis.
 
 .. code:: python
 
     fig, ax, rax = ampl.ratio_axes()
     ax.set_xlim(0, 1000)
-    ax.set_ylim(0, 4000);
+    ax.set_ylim(0, 4000)
 
-First we plot the MC histograms. There’s a slight misnomer here, and all
+First, we plot the MC histograms. There's a slight misnomer here, and all
 the stacked histograms are called “Backgrounds”, but they need not
-necessarily be backgrounds.
+be backgrounds.
 
-The return value is used to make the ratio plot. Note that unlike the
-other plotting functions this one is only in ``ampl.plot``. Nevertheless
+The return value is used to make the ratio plot. Note that, unlike the
+other plotting functions, this one is only in ``ampl.plot``. Nevertheless,
 it can still take UHI histograms.
 
 .. code:: python
@@ -82,14 +83,14 @@ it can still take UHI histograms.
         ampl.plot.Background(label="Particle 2", hist=part2_h),
     ], ax=ax)
 
-Next we plot the data, and a “signal”. This ``plot_signal`` function is
+Next, we plot the data and a “signal”. This ``plot_signal`` function is
 used to plot a representative signal that is layered on top of the other
 histograms (rather than being stacked), and is drawn unfilled. You might
 want to boost the strength of this signal to ensure it is visible.
 
 If you are plotting a signal component whose strength relative to the
-other MC components is accurate (e.g. the signal component of a fit) you
-should include that in the stack of “Background”s.
+other MC components is accurate (e.g., the signal component of a fit), you
+should include that in the stack of “Background” objects.
 
 .. code:: python
 
@@ -98,30 +99,30 @@ should include that in the stack of “Background”s.
     ampl.uhi.plot_ratio(data_h, bkg, ratio_ax=rax, plottype='diff')
 
 Now we set the x and y labels. Note that the ``set_xlabel`` function can
-be given the main axes, and the label will still be drawn below the
-ratio axes.
+be given the main ``Axes`` object, and the label will still be drawn below the
+ratio ``Axes`` object.
 
 .. code:: python
 
     ampl.set_xlabel("Mass [GeV]", ax=ax)
     ampl.set_ylabel("Count", ax=ax)
     
-    # This one uses the axis set_ylabel because we want it centre aligned
-    rax.set_ylabel(r"$\frac{{Data} - {Bkg}}{{Bkg}}$");
+    # This one uses ax.set_ylabel because we want it centre-aligned
+    rax.set_ylabel(r"$\frac{{Data} - {Bkg}}{{Bkg}}$")
 
-Finally we draw the ATLAS label and the legend. So long as the
+Finally, we draw the ATLAS label and the legend. So long as the
 components of the plot have been drawn using the ATLAS MPL style
-functions the order of items in the legend will be determined
+functions, the order of items in the legend will be determined
 automatically if you use the ``ampl.draw_legend`` function.
-Notice that because the signal has statistical error bands the
+Notice that, because the signal has statistical error bands, the
 "Stat. Uncertainty" entry has also been added to the legend.
 
 .. code:: python
 
     ampl.draw_atlas_label(0.05, 0.95, ax=ax, status='int', simulation=False, energy='13 TeV', lumi=140, desc="My example plot")
-    ampl.draw_legend(ax=ax); # Using one column here. If you have space, you can use ncols=2 for two columns
+    ampl.draw_legend(ax=ax) # Using one column here. If you have space, you can use ncols=2 for two columns
 
-And save the figure, ensuring everything is visible.
+Finally, save the figure, ensuring everything is visible.
 
 .. code:: python
 

@@ -1,6 +1,7 @@
 ATLAS Matplotlib Style
 ======================
-.. image:: https://img.shields.io/pypi/v/atlas-mpl-style?label=PyPI&style=for-the-badge   :alt: PyPI 
+.. image:: https://img.shields.io/pypi/v/atlas-mpl-style?label=PyPI&style=for-the-badge
+   :alt: PyPI
    :target: https://pypi.org/project/atlas-mpl-style/
 
 Provides a Matplotlib style replicating that used by the
@@ -22,28 +23,28 @@ In addition, this package also provides:
 - Additional Matplotlib color definitions based on the ATLAS / Okabe & Ito palette, the Petroff accessible color sequences, the
   `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ theme, and the
   `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
-  theme
+  theme.
 
 .. image:: docs/ATLAS_example.png
    :alt: Example ATLAS plot
 
 UHI and the PlottableHistogram protocol
------------------------------------------ 
+---------------------------------------
 
 With the development of the `UHI <https://github.com/henryiii/uhi>`__ interface,
 this package now has support for histogram objects that follow the
 ``PlottableHistogram`` protocol. ``plot.Background`` objects can be constructed
-using ``PlottableHistograms`` and a list of such ``Backgrounds`` can be passed
-to ``plot.plot_backgrounds`` omitting the ``bins`` argument. The other histogram
-plotting functions could not be modified to accept ``PlottableHistogram`` in a
-backward compatible manner since they take ``bins`` before the histogram
+using ``PlottableHistogram`` objects and a list of such ``Background`` objects can be passed
+to ``plot.plot_backgrounds``, omitting the ``bins`` argument. The other histogram
+plotting functions could not be modified to accept ``PlottableHistogram`` objects in a
+backward-compatible manner, since they take ``bins`` before the histogram
 argument. Alternate versions of these functions are therefore provided in the
 ``uhi`` module.
 
 As a result of this support, the histogram objects returned by `Uproot 4
 <https://github.com/scikit-hep/uproot4>`__ can be plotted directly, as can
 `Boost-Histogram <https://github.com/scikit-hep/boost-histogram>`__ histograms
-and `Hist <https://github.com/scikit-hep/hist>`__ objects (once the relevent PRs
+and `Hist <https://github.com/scikit-hep/hist>`__ objects (once the relevant PRs
 are merged into those repositories).
 
 
@@ -59,7 +60,7 @@ mathtext.
 
 TeXLive and Fonts Needed
 ------------------------
-If you have a full LaTeX installation available, you can use LaTeX to typeset the text by passing  ``usetex=True`` to ``use_atlas_style``. This will give you much greater options in terms of what can
+If you have a full LaTeX installation available, you can use LaTeX to typeset the text by passing ``usetex=True`` to ``use_atlas_style``. This will give you greater flexibility in terms of what can
 be included in labels.
 
 A working TeXLive installation providing the following is required:
@@ -76,8 +77,8 @@ To check if all necessary packages are installed, try building ``atlas_mpl_style
 
 On Arch (and related distributions), the ``texlive-most`` group is sufficient.
 
-On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages should be sufficient. It is however highly recommended
-that you install `texlive-full` to obtain a complete installation of texlive.
+On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages should be sufficient. It is, however, highly recommended
+that you install ``texlive-full`` to obtain a complete installation of TeXLive.
 
 - texlive
 - texlive-latex-extra

@@ -1,10 +1,10 @@
-"""This module contains versions of the histogram plotting functions that take PlottableHistograms
+"""This module contains versions of the histogram plotting functions that take PlottableHistograms.
 
 These are in a separate module to preserve backward compatibility since the array versions of these
 functions take the array of bins before the histogram.
 
-:class:`atlas_mpl_style.plot.Background` can be constructed using a ``PlottableHistogram`` and therefore
-there is no ``atlas_mpl_style.uhi.plot_backgrounds`` function.
+:class:`atlas_mpl_style.plot.Background` can be constructed using a ``PlottableHistogram``, and therefore
+no atlas_mpl_style.uhi.plot_backgrounds function is provided.
 """
 
 import matplotlib as _mpl
@@ -25,27 +25,27 @@ def _bins(axis):
 
 def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
     """
-    Plot data from PlottableHistogram
+    Plot data from a PlottableHistogram.
 
     Parameters
     ----------
-    label : str, optional
-        Label for legend (default: "Data")
     hist : PlottableHistogram
-        Histogram
-    ignore_variances : bool
-        Ignore variances and substitute ``hist``. Defaults to False.
-    color : color, optional
-        Point color, defaults to black
+        Data histogram.
+    ignore_variances : bool, optional
+        Ignore stored variances and calculate Poisson errors from bin counts (sqrt(hist)). Defaults to False.
+    color : str or color-like, optional
+        Point color, defaults to black.
+    label : str, optional
+        Label for legend (default: "Data").
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
 
     Returns
-    --------
+    -------
     hist : array_like
-        Data histogram
+        Data histogram.
     stat_errs : array_like
-        Statistical errors
+        Statistical errors.
     """
     _uhi_val.validate_plottable_histogram(
         hist, name="hist", ndim=1, check_kind=True, func_name="plot_data"
@@ -72,24 +72,24 @@ def plot_signal(
     ax=None,
 ):
     """
-    Plot signal histogram from PlottableHistogram
+    Plot a signal histogram from a PlottableHistogram.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Histogram
+        Histogram.
     label : str
-        Label for legend
-    ignore_variances : bool
-        Ignore variances and substitute ``hist``. Defaults to False.
+        Label for legend.
+    ignore_variances : bool, optional
+        Ignore stored variances and calculate Poisson errors from bin counts (sqrt(hist)). Defaults to False.
     syst_errs : array_like or PlottableHistogram, optional
-        Systematic errors
-    color : color
-        Line color
-    attach_bands : boolean, optional
+        Systematic errors.
+    color : str or color-like, optional
+        Line color.
+    attach_bands : bool, optional
         Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     """
     _uhi_val.validate_plottable_histogram(
         hist, name="hist", ndim=1, check_kind=True, func_name="plot_signal"
@@ -124,23 +124,23 @@ def plot_signal(
 
 def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     """
-    Plot ratio plot from PlottableHistogram
+    Draw a ratio plot from PlottableHistogram objects.
 
     Parameters
     ----------
     data : PlottableHistogram
-        Data histogram
-    total_bkg : (array_like, array_like)
-        Tuple returned from :func:`atlas_mpl_style.plot.plot_backgrounds`
+        Data histogram.
+    total_bkg : PlottableHistogram or tuple of (array_like, array_like)
+        Total background as a PlottableHistogram or tuple returned from :func:`atlas_mpl_style.plot.plot_backgrounds`.
     ratio_ax : mpl.axes.Axes
-        Ratio axes (produced using :func:`atlas_mpl_style.ratio_axes()`)
+        Ratio axis (produced using :func:`atlas_mpl_style.ratio_axes()`).
     max_ratio : float, optional
-        Maximum ratio (defaults to 0.2 for "diff", 1.2 for "raw", 3 for "significances")
+        Maximum ratio (defaults to 0.25 for "diff", 1.25 for "raw", 3.5 for "significances").
     plottype : {"diff", "raw", "significances"}
         | Type of ratio to plot.
         | "diff" : (data - bkg) / bkg
         | "raw" : data / bkg
-        | "significances" : Significances (from `ampl.utils.significance()`)
+        | "significances" : Significances (using :func:`~atlas_mpl_style.utils.significance`)
     """
     _uhi_val.validate_plottable_histogram(
         data, name="data", ndim=1, check_kind=True, func_name="plot_ratio"
@@ -192,28 +192,28 @@ def plot_1d(
     **kwargs,
 ):
     """
-    Plot single 1D histogram from PlottableHistogram
+    Plot a single 1D histogram from a PlottableHistogram.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Histogram
+        Histogram.
     label : str
-        Label for legend
-    ignore_variances : bool
-        Ignore variances and substitute ``hist``. Defaults to False.
-    stat_err : bool
+        Label for legend.
+    ignore_variances : bool, optional
+        Ignore stored variances and calculate Poisson errors from bin counts (sqrt(hist)). Defaults to False.
+    stat_err : bool, optional
         Draw statistical errors. Defaults to True.
-    color : color, optional
-        Line color
-    attach_bands : boolean, optional
+    color : str or color-like, optional
+        Line color.
+    attach_bands : bool, optional
         Attach bands to line in legend. Defaults to False.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     flow : bool, optional
         Include and plot underflow and overflow bins if supported (defaults to False).
     **kwargs
-        Extra parameters passed to ``plt.hist``
+        Extra parameters passed to ``plt.hist``.
     """
     _uhi_val.validate_plottable_histogram(
         hist, name="hist", ndim=1, check_kind=True, func_name="plot_1d"
@@ -244,18 +244,18 @@ def plot_1d(
 
 def plot_2d(hist, ax=None, pad=0.05, **kwargs):
     """
-    Plot 2D histogram from PlottableHistogram
+    Plot a 2D histogram from a PlottableHistogram.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Histogram
+        Histogram.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     pad : float, optional
-        Padding for colorbar in inches (defaults to 0.05)
+        Padding for colorbar in inches (defaults to 0.05).
     **kwargs
-        Extra parameters passed to ``pcolormesh``
+        Extra parameters passed to ``pcolormesh``.
 
     Returns
     -------
@@ -273,20 +273,20 @@ def plot_2d(hist, ax=None, pad=0.05, **kwargs):
 
 def plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs):
     """
-    Plot cutflow from PlottableHistogram
+    Plot a cutflow from a PlottableHistogram.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Cutflow histogram
+        Cutflow histogram.
     ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes)
+        Axes to draw on (defaults to current axes).
     text : bool, optional
-        Whether to label bars (default: True)
-    textcolor: str, optional
-        Text color
+        Whether to label bars (default: True).
+    textcolor : str, optional
+        Text color.
     horizontal : bool, optional
-        Whether to draw horizontal bars (default: True)
+        Whether to draw horizontal bars (default: True).
     **kwargs
         Extra parameters passed to ``bar`` or ``barh``
     """

@@ -4,10 +4,10 @@ import matplotlib.pyplot as _plt
 
 
 class IncorrectAxesError(Exception):
-    "Error due to passing incorrect axes to draw_pull_impact_legend"
+    "Error raised due to passing incorrect axes to draw_pull_impact_legend."
 
     def __init__(self, msg):
-        "Axes do not contain pull or impact plots"
+        "Axes do not contain pull or impact plots."
         super().__init__(self, msg)
 
 
@@ -24,9 +24,9 @@ def sort_impacts(data):
     =================== ==========================
 
     Parameters
-    -----------
-    data : pd.DataFrame
-        Pandas dataframe containing impacts
+    ----------
+    data : pandas.DataFrame
+        Pandas DataFrame containing impacts.
     """
     data["max_impact"] = _np.maximum(
         _np.abs(data["impact_postfit_up"]), _np.abs(data["impact_postfit_down"])
@@ -40,13 +40,13 @@ def make_impact_figure(num_parameters):
 
     Parameters
     ----------
-    num_parameters : Integer
-        Number of parameters on this plot
+    num_parameters : int
+        Number of parameters on this plot.
 
     Returns
     -------
-    fig : Figure
-        Created figure
+    fig : matplotlib.figure.Figure
+        Created figure.
     """
     fig = _plt.figure(figsize=(10, 6))
     _plt.ylim(num_parameters + 0.1, -2 - (num_parameters // 5))
@@ -55,32 +55,32 @@ def make_impact_figure(num_parameters):
 
 def plot_pulls(data, ax=None, **kwargs):
     """
-    Plot pulls from a Pandas dataframe (``data``).
+    Plot pulls from a Pandas DataFrame (``data``).
 
     The dataframe must have at least the following columns:
 
     =================== ==========================
     name                Parameter name
-    value               Post nominal fit central value of parameter
-    err_high            Post nominal fit error (high side) on parameter
-    err_low             Post nominal fit error (low side) on parameter.
+    value               Post-nominal fit central value of parameter
+    err_high            Post-nominal fit error (high side) on parameter
+    err_low             Post-nominal fit error (low side) on parameter
     =================== ==========================
 
     Parameters
-    -----------
-    data : pd.DataFrame
-        Pandas dataframe containing pulls
+    ----------
+    data : pandas.DataFrame
+        Pandas DataFrame containing pulls.
     ax : mpl.axes.Axes, optional
-        Axes to draw pulls on (defaults to current axes)
+        Axes to draw pulls on (defaults to current axes).
     **kwargs
-        Keyword arguments passed to ``errorbar``
+        Keyword arguments passed to ``errorbar``.
 
     Returns
     -------
     ax : mpl.axes.Axes
-       The axes pulls were drawn on
+        The axes on which pulls were drawn.
     pull_plot : mpl.container.ErrorbarContainer
-       The return value of ``errorbar``
+        The return value of ``errorbar``.
     """
     if ax is None:
         ax = _plt.gca()
@@ -111,9 +111,9 @@ def plot_impacts(
     data, draw_prefit=False, up_color="paper:blue", down_color="paper:red", ax=None
 ):
     """
-    Plot impacts from a Pandas dataframe (``data``).
+    Plot impacts from a Pandas DataFrame (``data``).
 
-    The dataframe must have the following columns. The prefit columns are not required if ``draw_prefix == False``.
+    The dataframe must have the following columns. The prefit columns are not required if ``draw_prefit is False``.
 
     =================== ==========================
     name                Parameter name
@@ -124,22 +124,22 @@ def plot_impacts(
     =================== ==========================
 
     Parameters
-    -----------
-    data : pd.DataFrame
-        Pandas dataframe containing impacts
-    draw_prefit : Boolean, optional
-        Whether to draw the prefit bands
-    up_color : Color specification
-        Color to use for upper band (postfit band will be at 50% opacity)
-    up_color : Color specification
-        Color to use for lower band (postfit band will be at 50% opacity)
+    ----------
+    data : pandas.DataFrame
+        Pandas DataFrame containing impacts.
+    draw_prefit : bool, optional
+        Whether to draw the prefit bands (defaults to False).
+    up_color : str or color-like, optional
+        Color to use for upper band (postfit band will be at 50% opacity).
+    down_color : str or color-like, optional
+        Color to use for lower band (postfit band will be at 50% opacity).
     ax : mpl.axes.Axes, optional
-        Axes to pulls were drawn on (defaults to current axes). Impact axes will be a twin of these.
+        Axes on which pulls were drawn (defaults to current axes). The impact axis will be a twin of this.
 
     Returns
     -------
     ax : mpl.axes.Axes
-       The axes impacts were drawn on
+        The axes on which impacts were drawn.
     """
     if ax is None:
         ax = _plt.gca()
@@ -220,14 +220,16 @@ def plot_impacts(
 
 def draw_pull_impact_legend(*args, ax=None, **kwargs):
     """
-    Add legend to a pull / impact plot.
+    Add a legend to a pull/impact plot.
 
     Parameters
     ----------
+    *args :
+        Passed to ``ax.legend``.
     ax : mpl.axes.Axes, optional
-        Pull axes
+        Pull axis (defaults to current axes).
     **kwargs :
-       Passed to ``ax.legend``
+        Passed to ``ax.legend``.
     """
     if ax is None:
         ax = _plt.gca()
