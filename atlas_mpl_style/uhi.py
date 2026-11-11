@@ -136,6 +136,8 @@ def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
         Ratio axis (produced using :func:`atlas_mpl_style.ratio_axes()`).
     max_ratio : float, optional
         Maximum ratio (defaults to 0.25 for "diff", 1.25 for "raw", 3.5 for "significances").
+        The axis is symmetric about the reference line, so for "raw" it runs from
+        ``2 - max_ratio`` to ``max_ratio``. The limits are then widened by 10%.
     plottype : {"diff", "raw", "significances"}
         | Type of ratio to plot.
         | "diff" : (data - bkg) / bkg

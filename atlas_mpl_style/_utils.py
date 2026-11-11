@@ -203,10 +203,12 @@ def draw_limit_legend(ax, args, kwargs):
         if lc.has_exp:
             labels.append(lc.exp_label)
             handles.append(Line2D([0], [0], color=line_c, linestyle="--"))
-            labels.append("Expected ±1σ")
-            handles.append(Rectangle((0, 0), 0, 0, fc=one_sig_c, ec=None))
-            labels.append("Expected ±2σ")
-            handles.append(Rectangle((0, 0), 0, 0, fc=two_sig_c, ec=None))
+            if lc.has_1sig:
+                labels.append("Expected ±1σ")
+                handles.append(Rectangle((0, 0), 0, 0, fc=one_sig_c, ec=None))
+            if lc.has_2sig:
+                labels.append("Expected ±2σ")
+                handles.append(Rectangle((0, 0), 0, 0, fc=two_sig_c, ec=None))
     else:
         for lc in al.limits.values():
             # Multiple limits
@@ -220,13 +222,17 @@ def draw_limit_legend(ax, args, kwargs):
                 handles.append(Line2D([0], [0], color=line_c, linestyle="-"))
             if lc.has_exp:
                 labels.append(lc.exp_label)
-                handle_ = (
-                    Line2D([0], [0], color=line_c, linestyle="--"),
-                    Rectangle((0, 0), 0, 0, fc=one_sig_c, ec=None),
-                    Rectangle((0, 0), 0, 0, fc=two_sig_c, ec=None),
-                )
-                handles.append(handle_)
-                handler_map[handle_] = BandHandler()
+                handle_ = [Line2D([0], [0], color=line_c, linestyle="--")]
+                if lc.has_1sig:
+                    handle_.append(Rectangle((0, 0), 0, 0, fc=one_sig_c, ec=None))
+                if lc.has_2sig:
+                    handle_.append(Rectangle((0, 0), 0, 0, fc=two_sig_c, ec=None))
+                if len(handle_) == 1:
+                    handles.append(handle_[0])
+                else:
+                    handle_ = tuple(handle_)
+                    handles.append(handle_)
+                    handler_map[handle_] = BandHandler()
 
     for label, handle in extras.items():
         labels.append(label)

@@ -273,7 +273,10 @@ def plot_backgrounds(
         total_err = _np.sqrt(total_stat_err + total_syst_err)
         total_syst_err = _np.sqrt(total_syst_err)
     else:
-        total_syst_err = _np.sqrt(total_err - total_stat_err)
+        # total_err is an uncertainty, total_stat_err is still a variance here
+        total_syst_err = _np.sqrt(
+            _np.clip(_np.square(total_err) - total_stat_err, 0, None)
+        )
     total_stat_err = _np.sqrt(total_stat_err)
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
@@ -544,6 +547,8 @@ def plot_ratio(
         Ratio axis (produced using :func:`atlas_mpl_style.ratio_axes()`).
     max_ratio : float, optional
         Maximum ratio (defaults to 0.25 for "diff", 1.25 for "raw", 3.5 for "significances").
+        The axis is symmetric about the reference line, so for "raw" it runs from
+        ``2 - max_ratio`` to ``max_ratio``. The limits are then widened by 10%.
     plottype : {"diff", "raw", "significances"}
         | Type of ratio to plot.
         | "diff" : (data - bkg) / bkg
@@ -563,7 +568,7 @@ def plot_ratio(
         ratio = data / bkg
         if max_ratio is None:
             max_ratio = 1.25
-        min_ratio = 1 - max_ratio
+        min_ratio = 2 - max_ratio
     elif plottype == "significances":
         ratio = _significance(data, data_errs, bkg, bkg_errs)
         if max_ratio is None:
@@ -571,11 +576,12 @@ def plot_ratio(
         min_ratio = -max_ratio
     else:
         raise TypeError("Invalid plottype")
-    # Increase limits by 10% to avoid tick labels clashing
-    max_ratio *= 1.1
-    min_ratio *= 1.1
+    # Widen limits by 10% about the reference line to avoid tick labels clashing
+    centre = 1 if plottype == "raw" else 0
+    max_ratio = centre + 1.1 * (max_ratio - centre)
+    min_ratio = centre + 1.1 * (min_ratio - centre)
 
-    ratio_ax.axhline(1 if plottype == "raw" else 0, color="paper:red", lw=1)
+    ratio_ax.axhline(centre, color="paper:red", lw=1)
     ratio_ax.set_ylim(min_ratio, max_ratio)
     if plottype == "diff":
         plot_band(
@@ -920,14 +926,16 @@ def plot_limit(
             plus_one_sigma,
             color=("atlas:onesigma" if color is None else _colors.to_rgba(color, 0.5)),
         )
-    conf.color = "black" if color is None else color
+    # Left as None when no color is given, so the legend uses the default band colors
+    conf.color = color
+    line_color = "black" if color is None else color
     conf.exp_label = expected_label
     ax.plot(
         x,
         expected,
         "--",
         label=expected_label,
-        color=conf.color,
+        color=line_color,
     )
     if observed is not None:
         conf.has_obs = True
@@ -937,7 +945,7 @@ def plot_limit(
             observed,
             "-",
             label=observed_label,
-            color=conf.color,
+            color=line_color,
         )
     ax._ampllegend.limits[expected_label] = conf
 
@@ -1089,6 +1097,8 @@ def draw_atlas_label(
         status_str = "Preliminary"
     elif status == "opendata" or status == "opendata-res":
         status_str = "Open Data"
+    elif status is None:
+        status_str = ""
     else:
         status_str = status
 

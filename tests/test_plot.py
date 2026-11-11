@@ -2,6 +2,7 @@
 
 import unittest
 import numpy as np
+from matplotlib.colors import to_rgba
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import atlas_mpl_style as ampl
@@ -230,6 +231,84 @@ class TestPlotModule(unittest.TestCase):
         # Binning mismatch
         with self.assertRaises(BinningMismatchError):
             plot_cutflow(["A", "B"], hist)
+
+    def test_ratio_limits_are_symmetric(self):
+        bins = np.array([0, 1, 2, 3])
+        data = np.array([10, 20, 30])
+        data_errs = np.array([3, 4, 5])
+        bkg = np.array([10, 18, 32])
+        bkg_errs = np.array([2, 3, 4])
+        expected = {"diff": (-0.275, 0.275), "raw": (0.725, 1.275), "significances": (-3.85, 3.85)}
+        for plottype, limits in expected.items():
+            fig, rax = plt.subplots()
+            plot_ratio(bins, data, data_errs, bkg, bkg_errs, ratio_ax=rax, plottype=plottype)
+            np.testing.assert_allclose(rax.get_ylim(), limits)
+            plt.close(fig)
+
+        # An explicit max_ratio for "raw" is mirrored about 1
+        fig, rax = plt.subplots()
+        plot_ratio(bins, data, data_errs, bkg, bkg_errs, ratio_ax=rax, max_ratio=1.5, plottype="raw")
+        np.testing.assert_allclose(rax.get_ylim(), (0.45, 1.55))
+        plt.close(fig)
+
+    def test_total_err_override_bands(self):
+        bins = np.array([0, 1, 2, 3])
+        hist = np.array([100.0, 200.0, 300.0])
+
+        # Total error larger than the stat error leaves a systematic part
+        fig, ax = plt.subplots()
+        plot_backgrounds([Background("A", hist, stat_errs="sqrt")], bins, show_errs=True, total_err=np.full(3, 30.0), ax=ax)
+        self.assertTrue(ax._ampllegend.has_syst)
+        plt.close(fig)
+
+        # Total error equal to the stat error leaves none, and must not produce NaN
+        fig, ax = plt.subplots()
+        with np.errstate(invalid="raise"):
+            plot_backgrounds([Background("A", hist, stat_errs="sqrt")], bins, show_errs=True, total_err=np.sqrt(hist), ax=ax)
+        self.assertFalse(ax._ampllegend.has_syst)
+        plt.close(fig)
+
+    def test_atlas_label_without_status(self):
+        fig, ax = plt.subplots()
+        draw_atlas_label(0.1, 0.9, ax=ax, status=None, simulation=True)
+        self.assertEqual(ax.texts[0].get_text(), r"$\mathbfit{ATLAS}$ Simulation")
+        plt.close(fig)
+
+    def test_limit_legend_entries(self):
+        x = np.array([100, 200, 300, 400])
+        expected = np.array([10.0, 5.0, 2.5, 1.0])
+
+        def legend_entries(ax):
+            draw_legend(ax=ax)
+            legend = ax.get_legend()
+            return [t.get_text() for t in legend.get_texts()], legend.legend_handles
+
+        # Default colors: the swatches match the green and yellow bands
+        fig, ax = plt.subplots()
+        plot_limit("Expected", x, expected, expected * 0.8, expected * 1.2, expected * 0.6, expected * 1.4, ax=ax)
+        labels, handles = legend_entries(ax)
+        self.assertEqual(labels, ["Expected", "Expected ±1σ", "Expected ±2σ"])
+        self.assertEqual(handles[1].get_facecolor(), to_rgba("atlas:onesigma"))
+        self.assertEqual(handles[2].get_facecolor(), to_rgba("atlas:twosigma"))
+        plt.close(fig)
+
+        # Bands that were not drawn get no legend entry
+        fig, ax = plt.subplots()
+        plot_limit("Expected", x, expected, ax=ax)
+        self.assertEqual(legend_entries(ax)[0], ["Expected"])
+        plt.close(fig)
+
+        fig, ax = plt.subplots()
+        plot_limit("Expected", x, expected, expected * 0.8, expected * 1.2, ax=ax)
+        self.assertEqual(legend_entries(ax)[0], ["Expected", "Expected ±1σ"])
+        plt.close(fig)
+
+        # Several limits, one of them without bands
+        fig, ax = plt.subplots()
+        plot_limit("Exp A", x, expected, expected * 0.8, expected * 1.2, color="atlas:blue", ax=ax)
+        plot_limit("Exp B", x, expected * 2, color="atlas:red", ax=ax)
+        self.assertEqual(legend_entries(ax)[0], ["Exp A", "Exp B"])
+        plt.close(fig)
 
     def test_plot_limit(self):
         x = np.array([100, 200, 300, 400])
