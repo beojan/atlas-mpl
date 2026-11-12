@@ -5,7 +5,7 @@ patch.antialiased: True
 
 font.size: 16.0
 font.family: sans-serif
-font.sans-serif: Atkinson Hyperlegible, TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, DejaVu Sans
+font.sans-serif: TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, DejaVu Sans
 font.serif: TeX Gyre Pagella, Palatino, Palatino Linotype, URW Palladio L, DejaVu Sans
 font.monospace: Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono
 

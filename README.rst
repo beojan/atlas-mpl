@@ -93,15 +93,5 @@ installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
 **TeXLive is not required for the "print" style.** Matplotlib resolves fonts using the following order of preference:
 
-- **Sans-serif** (default): `Atkinson Hyperlegible <https://brailleinstitute.org/freefont>`__, followed by TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, and DejaVu Sans.
+- **Sans-serif** (default): TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, and DejaVu Sans.
 - **Monospace**: Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono.
-
-Atkinson Hyperlegible was chosen to ensure text and numbers stay crisp and easy to read from the back of an auditorium, or if plots end up scaled down on a poster or paper.
-
-If you prefer the previous look with Fira Sans, you can select it explicitly after activating the style::
-
-  import matplotlib.pyplot as plt
-  import atlas_mpl_style as ampl
-
-  plt.style.use('print')
-  plt.rcParams['font.sans-serif'] = ['Fira Sans'] + plt.rcParams['font.sans-serif']
