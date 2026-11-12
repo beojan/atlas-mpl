@@ -1,33 +1,98 @@
+"""
+Plot the pulls and impacts of fit parameters.
+
+Create the figure with :func:`make_impact_figure`, then call :func:`plot_pulls`,
+:func:`plot_impacts`, and :func:`draw_pull_impact_legend`. They take a table with one row
+per parameter, such as a pandas or Polars DataFrame, a PyArrow table, or a dict of arrays.
+Use :func:`sorted_impacts` first to put the largest impacts at the top.
+"""
+
+import warnings as _warn
+from collections.abc import Mapping as _Mapping
 import numpy as _np
 import matplotlib as _mpl
 import matplotlib.pyplot as _plt
 
 
 class IncorrectAxesError(Exception):
-    "Error raised due to passing incorrect axes to draw_pull_impact_legend."
+    """Raised when the axes passed to :func:`draw_pull_impact_legend` have no pull or impact plot."""
 
-    def __init__(self, msg):
-        "Axes do not contain pull or impact plots."
-        super().__init__(self, msg)
+
+def _column(data, name):
+    """Return column ``name`` of ``data`` as a NumPy array."""
+    return _np.asarray(data[name])
+
+
+def _take_rows(data, order):
+    """Return the rows of ``data`` in ``order``, as the same kind of table."""
+    if hasattr(data, "iloc"):  # pandas
+        return data.iloc[order]
+    if isinstance(data, _Mapping):  # dict of columns
+        return {key: _np.asarray(col)[order] for key, col in data.items()}
+    if hasattr(data, "take"):  # PyArrow
+        return data.take(order)
+    return data[order]  # Polars
+
+
+def sorted_impacts(data):
+    """
+    Return the impacts sorted with the largest post-fit impact first.
+
+    ``data`` is not changed.
+
+    The table needs at least these columns:
+
+    =================== ===========================================================
+    name                Parameter name
+    impact_postfit_up   Impact on POI from fit with parameter fixed to +1σ (using postfit σ)
+    impact_postfit_down Impact on POI from fit with parameter fixed to -1σ (using postfit σ)
+    =================== ===========================================================
+
+    Parameters
+    ----------
+    data : DataFrame
+        Impacts, which may share a table with the pulls.
+
+    Returns
+    -------
+    DataFrame
+        A copy of ``data``, of the same type, with its rows sorted.
+    """
+    size = _np.maximum(
+        _np.abs(_column(data, "impact_postfit_up")),
+        _np.abs(_column(data, "impact_postfit_down")),
+    )
+    return _take_rows(data, _np.argsort(-size, kind="stable"))
 
 
 def sort_impacts(data):
     """
-    Sort an impact (and pull) dataframe in-place by descending postfit impacts.
+    Sort impacts in place, largest post-fit impact first.
 
-    The frame must have at least the following columns:
+    .. deprecated:: 0.28.0
+       Use :func:`sorted_impacts`, which returns a sorted copy. Sorting in place works only
+       for pandas DataFrames, and pandas is deprecating it.
 
-    =================== ==========================
+    This adds a ``max_impact`` column, the larger of the two post-fit impacts in absolute value.
+
+    The frame needs at least these columns:
+
+    =================== ===========================================================
     name                Parameter name
     impact_postfit_up   Impact on POI from fit with parameter fixed to +1σ (using postfit σ)
     impact_postfit_down Impact on POI from fit with parameter fixed to -1σ (using postfit σ)
-    =================== ==========================
+    =================== ===========================================================
 
     Parameters
     ----------
     data : pandas.DataFrame
-        Pandas DataFrame containing impacts.
+        Impacts, which may share a frame with the pulls.
     """
+    _warn.warn(
+        "sort_impacts is deprecated. Use data = sorted_impacts(data), which returns a sorted copy.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     data["max_impact"] = _np.maximum(
         _np.abs(data["impact_postfit_up"]), _np.abs(data["impact_postfit_down"])
     )
@@ -36,17 +101,18 @@ def sort_impacts(data):
 
 def make_impact_figure(num_parameters):
     """
-    Create a new figure for a pull / impact plot.
+    Create a figure for a pull/impact plot.
+
+    Call :func:`plot_pulls` and :func:`plot_impacts` without ``ax`` next to draw on it.
 
     Parameters
     ----------
     num_parameters : int
-        Number of parameters on this plot.
+        Number of parameters to show, which is the number of rows in the table.
 
     Returns
     -------
-    fig : matplotlib.figure.Figure
-        Created figure.
+    matplotlib.figure.Figure
     """
     fig = _plt.figure(figsize=(10, 6))
     _plt.ylim(num_parameters + 0.1, -2 - (num_parameters // 5))
@@ -55,40 +121,41 @@ def make_impact_figure(num_parameters):
 
 def plot_pulls(data, ax=None, **kwargs):
     """
-    Plot pulls from a Pandas DataFrame (``data``).
+    Plot pulls as points with horizontal error bars, one row per parameter.
 
-    The dataframe must have at least the following columns:
+    The x range is fixed to -2 to 2, with dashed lines at 0 and ±1.
 
-    =================== ==========================
-    name                Parameter name
-    value               Post-nominal fit central value of parameter
-    err_high            Post-nominal fit error (high side) on parameter
-    err_low             Post-nominal fit error (low side) on parameter
-    =================== ==========================
+    The table needs at least these columns:
+
+    =========== ===================================================
+    name        Parameter name
+    value       Post-fit value of the parameter
+    err_high    Post-fit uncertainty above the value
+    err_low     Post-fit uncertainty below the value (either sign)
+    =========== ===================================================
 
     Parameters
     ----------
-    data : pandas.DataFrame
-        Pandas DataFrame containing pulls.
-    ax : mpl.axes.Axes, optional
-        Axes to draw pulls on (defaults to current axes).
+    data : DataFrame
+        Pulls.
+    ax : matplotlib.axes.Axes, optional
+        Axes to draw on (defaults to current axes).
     **kwargs
-        Keyword arguments passed to ``errorbar``.
+        Passed to ``ax.errorbar``.
 
     Returns
     -------
-    ax : mpl.axes.Axes
-        The axes on which pulls were drawn.
-    pull_plot : mpl.container.ErrorbarContainer
-        The return value of ``errorbar``.
+    ax : matplotlib.axes.Axes
+        The axes the pulls were drawn on.
+    pulls : matplotlib.container.ErrorbarContainer
     """
     if ax is None:
         ax = _plt.gca()
-    xerr = _np.abs(_np.array(data[["err_low", "err_high"]]))
+    xerr = _np.abs(_np.stack([_column(data, "err_low"), _column(data, "err_high")]))
     pulls = ax.errorbar(
-        y=data["name"],
-        x=data["value"],
-        xerr=xerr.T,
+        y=_column(data, "name"),
+        x=_column(data, "value"),
+        xerr=xerr,
         fmt=".k",
         capsize=8,
         ms=10,
@@ -111,35 +178,35 @@ def plot_impacts(
     data, draw_prefit=False, up_color="paper:blue", down_color="paper:red", ax=None
 ):
     """
-    Plot impacts from a Pandas DataFrame (``data``).
+    Plot impacts as horizontal bars on a second x axis above a pull plot.
 
-    The dataframe must have the following columns. The prefit columns are not required if ``draw_prefit is False``.
+    Post-fit impacts are filled bars at 50% opacity, and pre-fit impacts are outlined bars.
 
-    =================== ==========================
+    The table needs these columns. The pre-fit columns are needed only with ``draw_prefit``.
+
+    =================== ===========================================================
     name                Parameter name
     impact_prefit_up    Impact on POI from fit with parameter fixed to +1σ (using prefit σ)
     impact_prefit_down  Impact on POI from fit with parameter fixed to -1σ (using prefit σ)
     impact_postfit_up   Impact on POI from fit with parameter fixed to +1σ (using postfit σ)
     impact_postfit_down Impact on POI from fit with parameter fixed to -1σ (using postfit σ)
-    =================== ==========================
+    =================== ===========================================================
 
     Parameters
     ----------
-    data : pandas.DataFrame
-        Pandas DataFrame containing impacts.
+    data : DataFrame
+        Impacts.
     draw_prefit : bool, optional
-        Whether to draw the prefit bands (defaults to False).
-    up_color : str or color-like, optional
-        Color to use for upper band (postfit band will be at 50% opacity).
-    down_color : str or color-like, optional
-        Color to use for lower band (postfit band will be at 50% opacity).
-    ax : mpl.axes.Axes, optional
-        Axes on which pulls were drawn (defaults to current axes). The impact axis will be a twin of this.
+        Also draw the pre-fit impacts. Defaults to False.
+    up_color, down_color : color-like, optional
+        Colors of the impacts from the +1σ and -1σ fits.
+    ax : matplotlib.axes.Axes, optional
+        Axes of the pull plot (defaults to current axes).
 
     Returns
     -------
-    ax : mpl.axes.Axes
-        The axes on which impacts were drawn.
+    matplotlib.axes.Axes
+        The new axes holding the impacts.
     """
     if ax is None:
         ax = _plt.gca()
@@ -155,12 +222,12 @@ def plot_impacts(
         impact_limits = (
             _np.maximum(
                 _np.maximum(
-                    _np.max(_np.abs(data["impact_postfit_up"])),
-                    _np.max(_np.abs(data["impact_postfit_down"])),
+                    _np.max(_np.abs(_column(data, "impact_postfit_up"))),
+                    _np.max(_np.abs(_column(data, "impact_postfit_down"))),
                 ),
                 _np.maximum(
-                    _np.max(_np.abs(data["impact_prefit_up"])),
-                    _np.max(_np.abs(data["impact_prefit_down"])),
+                    _np.max(_np.abs(_column(data, "impact_prefit_up"))),
+                    _np.max(_np.abs(_column(data, "impact_prefit_down"))),
                 ),
             )
             * 1.05
@@ -168,24 +235,24 @@ def plot_impacts(
     else:
         impact_limits = (
             _np.maximum(
-                _np.max(_np.abs(data["impact_postfit_up"])),
-                _np.max(_np.abs(data["impact_postfit_down"])),
+                _np.max(_np.abs(_column(data, "impact_postfit_up"))),
+                _np.max(_np.abs(_column(data, "impact_postfit_down"))),
             )
             * 1.05
         )
     dn_impacts_postfit = impact_axes.barh(
-        data["name"],
+        _column(data, "name"),
         height=0.5,
-        width=data["impact_postfit_down"],
+        width=_column(data, "impact_postfit_down"),
         color=down_color,
         zorder=1,
         alpha=0.5,
     )
     impact_axes._dn_impacts_post = dn_impacts_postfit
     up_impacts_postfit = impact_axes.barh(
-        data["name"],
+        _column(data, "name"),
         height=0.5,
-        width=data["impact_postfit_up"],
+        width=_column(data, "impact_postfit_up"),
         color=up_color,
         zorder=1,
         alpha=0.5,
@@ -193,18 +260,18 @@ def plot_impacts(
     impact_axes._up_impacts_post = up_impacts_postfit
     if draw_prefit:
         dn_impacts_prefit = impact_axes.barh(
-            data["name"],
+            _column(data, "name"),
             height=0.5,
-            width=data["impact_prefit_down"],
+            width=_column(data, "impact_prefit_down"),
             edgecolor=down_color,
             color="transparent",
             zorder=1,
         )
         impact_axes._dn_impacts_pre = dn_impacts_prefit
         up_impacts_prefit = impact_axes.barh(
-            data["name"],
+            _column(data, "name"),
             height=0.5,
-            width=data["impact_prefit_up"],
+            width=_column(data, "impact_prefit_up"),
             edgecolor=up_color,
             color="transparent",
             zorder=1,
@@ -218,18 +285,21 @@ def plot_impacts(
     return impact_axes
 
 
-def draw_pull_impact_legend(*args, ax=None, **kwargs):
+def draw_pull_impact_legend(*, ax=None, **kwargs):
     """
-    Add a legend to a pull/impact plot.
+    Draw the legend for a pull/impact plot.
 
     Parameters
     ----------
-    *args :
+    ax : matplotlib.axes.Axes, optional
+        Axes of the pull plot or the impact plot (defaults to current axes).
+    **kwargs
         Passed to ``ax.legend``.
-    ax : mpl.axes.Axes, optional
-        Pull axis (defaults to current axes).
-    **kwargs :
-        Passed to ``ax.legend``.
+
+    Raises
+    ------
+    IncorrectAxesError
+        If ``ax`` has no pull or impact plot.
     """
     if ax is None:
         ax = _plt.gca()
@@ -240,6 +310,10 @@ def draw_pull_impact_legend(*args, ax=None, **kwargs):
             raise IncorrectAxesError(
                 "The axes passed to draw_pull_impact_legend do not contain a pull or impact plot."
             )
+    kwargs.setdefault("loc", "upper left")
+    kwargs.setdefault("fontsize", 14)
+    kwargs.setdefault("frameon", False)
+    kwargs.setdefault("handlelength", 3.0)
     if hasattr(ax, "_impact_axes"):
         impact_axes = ax._impact_axes
         if impact_axes._has_prefit:
@@ -283,29 +357,17 @@ def draw_pull_impact_legend(*args, ax=None, **kwargs):
                     impact_axes._dn_impacts_post,
                 )
                 labels = ["Postfit Up", "Postfit Down"]
-        impact_axes.legend(
-            artist_tuple,
-            labels,
-            loc="upper left",
-            fontsize=14,
-            facecolor="white",
-            frameon=False,
-            ncols=2,
-            handlelength=3.0,
-            handler_map={
+        kwargs.setdefault("facecolor", "white")
+        kwargs.setdefault("ncols", 2)
+        kwargs.setdefault(
+            "handler_map",
+            {
                 _mpl.container.ErrorbarContainer: _mpl.legend_handler.HandlerErrorbar(
                     xerr_size=1.0
                 )
             },
-            **kwargs,
         )
+        impact_axes.legend(artist_tuple, labels, **kwargs)
     else:
-        ax.legend(
-            [ax._has_pulls],
-            ["Pulls"],
-            loc="upper left",
-            fontsize=14,
-            facecolor="transparent",
-            frameon=False,
-            handlelength=3.0,
-        )
+        kwargs.setdefault("facecolor", "transparent")
+        ax.legend([ax._has_pulls], ["Pulls"], **kwargs)

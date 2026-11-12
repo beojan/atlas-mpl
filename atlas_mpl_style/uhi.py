@@ -1,10 +1,9 @@
-"""This module contains versions of the histogram plotting functions that take PlottableHistograms.
+"""
+Histogram plotting functions that take UHI PlottableHistogram objects.
 
-These are in a separate module to preserve backward compatibility since the array versions of these
-functions take the array of bins before the histogram.
-
-:class:`atlas_mpl_style.plot.Background` can be constructed using a ``PlottableHistogram``, and therefore
-no atlas_mpl_style.uhi.plot_backgrounds function is provided.
+They match the functions of the same name in :mod:`atlas_mpl_style.plot`, which take bin
+edges and arrays. :class:`atlas_mpl_style.plot.Background` accepts a PlottableHistogram
+directly, so this module has no ``plot_backgrounds``.
 """
 
 import matplotlib as _mpl
@@ -13,6 +12,7 @@ import atlas_mpl_style.plot as _amplplt
 import atlas_mpl_style._uhi_validation as _uhi_val
 
 FlowNotSupportedError = _uhi_val.FlowNotSupportedError
+UnsupportedKindError = _uhi_val.UnsupportedKindError
 from atlas_mpl_style.plot import LabeledBinsError
 
 
@@ -25,27 +25,27 @@ def _bins(axis):
 
 def plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None):
     """
-    Plot data from a PlottableHistogram.
+    Plot data from a PlottableHistogram as points with error bars.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Data histogram.
+        Data histogram. The error bars are the square root of its variances.
     ignore_variances : bool, optional
-        Ignore stored variances and calculate Poisson errors from bin counts (sqrt(hist)). Defaults to False.
-    color : str or color-like, optional
-        Point color, defaults to black.
+        Use the square root of the bin contents for the error bars instead. Defaults to False.
+    color : color-like, optional
+        Point color (defaults to black).
     label : str, optional
-        Label for legend (default: "Data").
-    ax : mpl.axes.Axes, optional
+        Legend label (defaults to "Data").
+    ax : matplotlib.axes.Axes, optional
         Axes to draw on (defaults to current axes).
 
     Returns
     -------
-    hist : array_like
-        Data histogram.
-    stat_errs : array_like
-        Statistical errors.
+    hist : numpy.ndarray
+        The bin contents.
+    stat_errs : numpy.ndarray
+        The statistical uncertainties.
     """
     _uhi_val.validate_plottable_histogram(
         hist, name="hist", ndim=1, check_kind=True, func_name="plot_data"
@@ -72,23 +72,25 @@ def plot_signal(
     ax=None,
 ):
     """
-    Plot a signal histogram from a PlottableHistogram.
+    Plot a signal from a PlottableHistogram as an unfilled histogram over the backgrounds.
+
+    A fitted signal belongs in the stack as a :class:`atlas_mpl_style.plot.Background`.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Histogram.
+        Signal histogram. The hatched band is the square root of its variances.
     label : str
-        Label for legend.
+        Legend label.
     ignore_variances : bool, optional
-        Ignore stored variances and calculate Poisson errors from bin counts (sqrt(hist)). Defaults to False.
+        Use the square root of the bin contents for the band instead. Defaults to False.
     syst_errs : array_like or PlottableHistogram, optional
-        Systematic errors.
-    color : str or color-like, optional
-        Line color.
+        Systematic uncertainty in each bin. For a PlottableHistogram, its bin values are used.
+    color : color-like, optional
+        Line and band color (defaults to the next color in the color cycle).
     attach_bands : bool, optional
-        Attach bands to line in legend. Defaults to False.
-    ax : mpl.axes.Axes, optional
+        Draw the bands behind the signal's line in the legend. Defaults to False.
+    ax : matplotlib.axes.Axes, optional
         Axes to draw on (defaults to current axes).
     """
     _uhi_val.validate_plottable_histogram(
@@ -124,25 +126,24 @@ def plot_signal(
 
 def plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff"):
     """
-    Draw a ratio plot from PlottableHistogram objects.
+    Draw a ratio plot comparing data from a PlottableHistogram with the total background.
+
+    See :func:`atlas_mpl_style.plot.plot_ratio` for what the panel shows.
 
     Parameters
     ----------
     data : PlottableHistogram
-        Data histogram.
+        Data histogram. Its uncertainties are the square root of its variances, or of its bin
+        contents if it has no variances.
     total_bkg : PlottableHistogram or tuple of (array_like, array_like)
-        Total background as a PlottableHistogram or tuple returned from :func:`atlas_mpl_style.plot.plot_backgrounds`.
-    ratio_ax : mpl.axes.Axes
-        Ratio axis (produced using :func:`atlas_mpl_style.ratio_axes()`).
+        Total background, as a histogram whose variances give its uncertainty, or as the
+        ``(total_hist, total_err)`` tuple from :func:`atlas_mpl_style.plot.plot_backgrounds`.
+    ratio_ax : matplotlib.axes.Axes
+        Ratio panel from :func:`atlas_mpl_style.ratio_axes`.
     max_ratio : float, optional
-        Maximum ratio (defaults to 0.25 for "diff", 1.25 for "raw", 3.5 for "significances").
-        The axis is symmetric about the reference line, so for "raw" it runs from
-        ``2 - max_ratio`` to ``max_ratio``. The limits are then widened by 10%.
-    plottype : {"diff", "raw", "significances"}
-        | Type of ratio to plot.
-        | "diff" : (data - bkg) / bkg
-        | "raw" : data / bkg
-        | "significances" : Significances (using :func:`~atlas_mpl_style.utils.significance`)
+        Top of the y range. See :func:`atlas_mpl_style.plot.plot_ratio`.
+    plottype : {"diff", "raw", "significances"}, optional
+        What to plot. See :func:`atlas_mpl_style.plot.plot_ratio`. Defaults to ``"diff"``.
     """
     _uhi_val.validate_plottable_histogram(
         data, name="data", ndim=1, check_kind=True, func_name="plot_ratio"
@@ -194,28 +195,34 @@ def plot_1d(
     **kwargs,
 ):
     """
-    Plot a single 1D histogram from a PlottableHistogram.
+    Plot a 1D histogram from a PlottableHistogram as an unfilled line.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Histogram.
+        Histogram. The hatched band is the square root of its variances.
     label : str
-        Label for legend.
+        Legend label.
     ignore_variances : bool, optional
-        Ignore stored variances and calculate Poisson errors from bin counts (sqrt(hist)). Defaults to False.
+        Use the square root of the bin contents for the band instead. Defaults to False.
     stat_err : bool, optional
-        Draw statistical errors. Defaults to True.
-    color : str or color-like, optional
-        Line color.
+        Draw the statistical uncertainty as a hatched band. Defaults to True.
+    color : color-like, optional
+        Line color (defaults to the next color in the color cycle).
     attach_bands : bool, optional
-        Attach bands to line in legend. Defaults to False.
-    ax : mpl.axes.Axes, optional
+        Draw the band behind the line in the legend. Defaults to False.
+    ax : matplotlib.axes.Axes, optional
         Axes to draw on (defaults to current axes).
     flow : bool, optional
-        Include and plot underflow and overflow bins if supported (defaults to False).
+        Draw the underflow and overflow as an extra bin at each end, labelled "<low" and
+        ">high". Defaults to False.
     **kwargs
-        Extra parameters passed to ``plt.hist``.
+        Passed to ``ax.hist``.
+
+    Raises
+    ------
+    FlowNotSupportedError
+        If ``flow`` is True and ``hist`` has no flow bins.
     """
     _uhi_val.validate_plottable_histogram(
         hist, name="hist", ndim=1, check_kind=True, func_name="plot_1d"
@@ -246,23 +253,28 @@ def plot_1d(
 
 def plot_2d(hist, ax=None, pad=0.05, **kwargs):
     """
-    Plot a 2D histogram from a PlottableHistogram.
+    Plot a 2D PlottableHistogram as a color map with a colorbar on the right.
+
+    The x and y axes get the same scale, which suits related quantities such as two masses,
+    and their limits are set to the bin edges. For unrelated quantities, call
+    ``ax.set_aspect("auto")`` afterwards to let the axes fill their usual space.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Histogram.
-    ax : mpl.axes.Axes, optional
+        2D histogram.
+    ax : matplotlib.axes.Axes, optional
         Axes to draw on (defaults to current axes).
     pad : float, optional
-        Padding for colorbar in inches (defaults to 0.05).
+        Gap between the axes and the colorbar, in inches. Defaults to 0.05.
     **kwargs
-        Extra parameters passed to ``pcolormesh``.
+        Passed to ``ax.pcolormesh``.
 
     Returns
     -------
-    mesh : QuadMesh
-    cbar : mpl.colorbar.Colorbar
+    mesh : matplotlib.collections.QuadMesh
+    cbar : matplotlib.colorbar.Colorbar
+        Use :func:`atlas_mpl_style.set_zlabel` to label it.
     """
     _uhi_val.validate_plottable_histogram(
         hist, name="hist", ndim=2, check_kind=False, func_name="plot_2d"
@@ -275,22 +287,24 @@ def plot_2d(hist, ax=None, pad=0.05, **kwargs):
 
 def plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs):
     """
-    Plot a cutflow from a PlottableHistogram.
+    Plot a cutflow from a PlottableHistogram as a bar chart with the yield on each bar.
 
     Parameters
     ----------
     hist : PlottableHistogram
-        Cutflow histogram.
-    ax : mpl.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Cutflow histogram with one string-labelled bin per cut, such as one with a
+        ``StrCategory`` axis.
+    ax : matplotlib.axes.Axes, optional
+        Axes to draw on. If omitted, the current axes are used and their limits are set to
+        fit the bars.
     text : bool, optional
-        Whether to label bars (default: True).
-    textcolor : str, optional
-        Text color.
+        Write the yield on each bar. Defaults to True.
+    textcolor : color-like, optional
+        Color of the yields (defaults to white).
     horizontal : bool, optional
-        Whether to draw horizontal bars (default: True).
+        Draw horizontal bars, with the first cut at the top. Defaults to True.
     **kwargs
-        Extra parameters passed to ``bar`` or ``barh``
+        Passed to ``ax.barh`` or ``ax.bar``.
     """
     _uhi_val.validate_plottable_histogram(
         hist,

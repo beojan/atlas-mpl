@@ -46,7 +46,7 @@ The package also registers the stylesheets `print`, `paper`, and `slides` for `p
 
 - `ampl.set_xlabel(label, ax=None, **kwargs)` right-aligns the x label. Given the main axes from `ratio_axes`, it puts the label on the lowest panel.
 - `ampl.set_ylabel(label, ax=None, **kwargs)` aligns the y label with the top of the axis and lines up the y labels of the panels made by `ratio_axes`. For a centered label, as is usual on a ratio panel, call `rax.set_ylabel(...)` directly.
-- `ampl.set_zlabel(label, cbar=None, ax=None)` labels a colorbar. Pass the `cbar` you created, or pass `ax=ax` when `plot_2d` created the colorbar. It raises `ValueError` when it gets neither.
+- `ampl.set_zlabel(label, cbar=None, ax=None)` labels a colorbar. Pass the `cbar` you created. For a colorbar made by `plot_2d`, no `cbar` is needed, because `plot_2d` leaves its axes current. It raises `ValueError` for axes without such a colorbar.
 - `ampl.draw_tag(text, ax=None)` writes a small 8 pt tag just above the top right corner of the axes.
 
 ### Legend
@@ -86,7 +86,7 @@ The label has up to four lines: "ATLAS" with the status, the line "for education
 | `status` | Text after "ATLAS" |
 | --- | --- |
 | `"int"` (default) | Internal |
-| `"wip"` | Work in Progress |
+| `"wip"` | Work In Progress |
 | `"prelim"` | Preliminary |
 | `"final"` | nothing |
 | `"opendata"` | Open Data, plus the "for education only" line |
@@ -103,7 +103,7 @@ The label has up to four lines: "ATLAS" with the status, the line "for education
 These take one-dimensional histogram objects that follow the UHI `PlottableHistogram` protocol: Hist, boost-histogram, and histograms read with Uproot. The histogram must hold counts. A profile (mean storage) raises `UnsupportedKindError`.
 
 - `plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None)` draws black points with error bars and returns `(values, stat_errs)`.
-- `plot_1d(hist, label, ignore_variances=False, stat_err=True, color=None, attach_bands=False, ax=None, flow=False, **kwargs)` draws an unfilled step histogram, with a hatched statistical band unless `stat_err=False`. The extra arguments go to both `ax.hist` and the legend line, so use only line properties such as `lw`, `ls`, and `alpha`.
+- `plot_1d(hist, label, ignore_variances=False, stat_err=True, color=None, attach_bands=False, ax=None, flow=False, **kwargs)` draws an unfilled step histogram, with a hatched statistical band unless `stat_err=False`. The extra arguments go to `ax.hist`, and the legend line copies the drawn line's style, width, and transparency.
 - `plot_signal(hist, label, ignore_variances=False, syst_errs=None, color=None, attach_bands=False, ax=None)` draws an unfilled step histogram that is overlaid on the stack, not added to it, with a hatched statistical band and, when `syst_errs` is given, a translucent total band. `syst_errs` is an array or a histogram of absolute per-bin uncertainties. Scale the histogram yourself if the signal is too small to see, and say so in the label. A signal whose normalization is meaningful relative to the backgrounds belongs in the stack.
 - `plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff")`. See [Ratio panels](#ratio-panels).
 - `plot_2d(hist, ax=None, pad=0.05, **kwargs)`. See [2D histograms](#2d-histograms).
@@ -221,17 +221,17 @@ ampl.draw_legend(ax=ax)
 
 ## Pulls and impacts: `ampl.stats`
 
-These functions take a pandas DataFrame with one row for each nuisance parameter. Convert a Polars frame with `.to_pandas()` first.
+These functions take a table with one row for each nuisance parameter: a pandas or Polars DataFrame, a PyArrow table, or a dict of arrays. They only read columns by name.
 
 | Column | Meaning | Needed by |
 | --- | --- | --- |
 | `name` | Parameter name | all |
 | `value`, `err_low`, `err_high` | Post-fit value and its uncertainties | `plot_pulls` |
-| `impact_postfit_up`, `impact_postfit_down` | Impact on the parameter of interest with the nuisance parameter fixed at ±1 post-fit σ | `sort_impacts`, `plot_impacts` |
+| `impact_postfit_up`, `impact_postfit_down` | Impact on the parameter of interest with the nuisance parameter fixed at ±1 post-fit σ | `sorted_impacts`, `plot_impacts` |
 | `impact_prefit_up`, `impact_prefit_down` | The same with the pre-fit σ | `plot_impacts(draw_prefit=True)` |
 
 ```python
-ampl.stats.sort_impacts(df)                      # in place, largest impact first
+df = ampl.stats.sorted_impacts(df)               # sorted copy, largest impact first
 top = df.head(10)
 fig = ampl.stats.make_impact_figure(len(top))
 ax, _ = ampl.stats.plot_pulls(top)
@@ -240,11 +240,11 @@ ampl.stats.draw_pull_impact_legend(ax=ax)
 fig.tight_layout()
 ```
 
-- `sort_impacts(data)` changes the frame in place. It adds a `max_impact` column and sorts by it in descending order.
+- `sorted_impacts(data)` returns a copy of the table, of the same type, sorted by the larger of the two post-fit impacts in absolute value, largest first. It does not change `data` or add columns. `sort_impacts` is the deprecated in-place version: it works only for pandas, issues a `DeprecationWarning`, and adds a `max_impact` column.
 - `make_impact_figure(num_parameters)` creates a 10 in by 6 in figure and sets the y limits so that the first row is at the top, with empty space above it for the legend. The size does not grow with the number of parameters, and about 10 parameter names fit at the default text size. For more, make the figure taller with `fig.set_size_inches`, by roughly 0.4 in for each extra parameter.
 - `plot_pulls(data, ax=None, **kwargs)` draws the pulls on the bottom x axis, fixed to the range -2 to 2 and labelled θ̂, with guide lines at 0 and ±1. It returns `(ax, errorbar_container)`. Extra arguments go to `errorbar`.
 - `plot_impacts(data, draw_prefit=False, up_color="paper:blue", down_color="paper:red", ax=None)` draws the impacts as bars on a second x axis at the top and returns that axis. Post-fit impacts are filled and pre-fit impacts are outlines. Pass the pull axes as `ax`.
-- `draw_pull_impact_legend(ax=None, **kwargs)` draws the combined legend at the upper left. It already sets `loc`, `fontsize`, `ncols`, `frameon`, `facecolor`, `handlelength`, and `handler_map`, so passing any of these raises `TypeError`. Other `ax.legend` arguments, such as `title`, are accepted. It raises `IncorrectAxesError` for axes without pulls or impacts.
+- `draw_pull_impact_legend(ax=None, **kwargs)` draws the combined legend at the upper left. Extra arguments go to `ax.legend` and override its defaults for `loc`, `fontsize`, `ncols`, `frameon`, `facecolor`, `handlelength`, and `handler_map`. It raises `IncorrectAxesError` for axes without pulls or impacts.
 - Pulls and impacts can each be drawn alone.
 
 ## Palettes and named colors
@@ -261,7 +261,7 @@ fig.tight_layout()
 | `"HDBS"` | 5 colors |
 | `"HH"` | 4 colors |
 
-Any other name selects a 7-color pastel `series` palette without an error, so check the spelling. `use_atlas_style` resets the cycle to `"ATLAS"`. More series than the palette has colors reuse the colors from the start, so pass the real `n` and, for many series, vary the line style or the marker as well.
+`"Series"` selects a 7-color pastel palette, and any other name raises `ValueError`. `use_atlas_style` resets the cycle to `"ATLAS"`. More series than the palette has colors reuse the colors from the start, so pass the real `n` and, for many series, vary the line style or the marker as well.
 
 The package registers these names as Matplotlib colors:
 
@@ -283,7 +283,7 @@ Prefer the active color cycle over hard-coding many colors. Use named colors onl
 | `ampl.plot.LabeledBinsError` | A category axis was given where bin edges are needed, or a cutflow got a numeric axis. |
 | `ampl.plot.DimensionError` | The histogram has the wrong number of dimensions. |
 | `ampl.plot.ViolatesPlottableHistogramError` | The object does not follow the UHI `PlottableHistogram` protocol. |
-| `UnsupportedKindError` | The histogram is a profile and not a count histogram. |
+| `ampl.uhi.UnsupportedKindError` | The histogram is a profile and not a count histogram. |
 | `ampl.uhi.FlowNotSupportedError` | `flow=True` was given for a histogram without flow bins. |
 | `TypeError` | An unknown `plottype` or `stat_errs` string, or `bins` missing for array backgrounds. |
 

@@ -10,9 +10,9 @@ This style can be activated by calling::
   import atlas_mpl_style as ampl
   ampl.use_atlas_style()
 
-When the ATLAS style is active, text is typeset using LaTeX, and the
-standard ATLAS label can be drawn using the ``ampl.draw_atlas_label``
-function. The use of LaTeX can be disabled by instead calling ``ampl.use_atlas_style(usetex=False)``.
+The standard ATLAS label can be drawn with the ``ampl.draw_atlas_label`` function. To
+typeset text with LaTeX instead of Matplotlib's own math rendering, call
+``ampl.use_atlas_style(usetex=True)``.
 
 The axis labels should be set using the ``ampl.set_xlabel`` and
 ``ampl.set_ylabel`` functions to ensure they are correctly

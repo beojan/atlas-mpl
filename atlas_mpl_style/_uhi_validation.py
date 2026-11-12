@@ -12,7 +12,7 @@ import numpy as _np
 
 
 class UnsupportedKindError(ValueError):
-    """Error due to unsupported histogram kind (e.g., profile histogram)."""
+    """Raised when a histogram's kind is not supported, such as a profile histogram."""
 
     def __init__(self, msg: str):
         super().__init__(msg)
@@ -22,7 +22,7 @@ ProfileHistogramError = UnsupportedKindError
 
 
 class FlowNotSupportedError(TypeError):
-    """Error raised when flow bins are requested but not supported by the histogram."""
+    """Raised when flow bins are requested from a histogram that has none."""
 
     def __init__(self, msg: str):
         super().__init__(msg)

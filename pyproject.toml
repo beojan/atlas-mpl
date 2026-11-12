@@ -43,7 +43,6 @@ dependencies = [
     "matplotlib>=3.11",
     "numpy",
     "numexpr",
-    "pandas",
     "importlib-resources>=6",
     "packaging",
     "uhi>=0.3.0",
@@ -52,6 +51,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pandas",
     "scipy",
     "boost_histogram",
 ]

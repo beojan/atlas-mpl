@@ -9,6 +9,14 @@ import atlas_mpl_style.stats as stats
 from atlas_mpl_style.stats import IncorrectAxesError
 
 
+def _import_or_skip(name):
+    """Import ``name``, or skip the test if it is not installed."""
+    try:
+        return __import__(name)
+    except ImportError:
+        raise unittest.SkipTest(f"{name} is not installed")
+
+
 class TestStatsModule(unittest.TestCase):
     def setUp(self):
         ampl.use_atlas_style()
@@ -22,10 +30,47 @@ class TestStatsModule(unittest.TestCase):
             "impact_postfit_up": [0.1, 0.5, 0.2],
             "impact_postfit_down": [-0.3, -0.2, -0.6],
         })
-        stats.sort_impacts(df)
+        with self.assertWarns(DeprecationWarning):
+            stats.sort_impacts(df)
         # paramC has max_impact 0.6, paramB has 0.5, paramA has 0.3
         self.assertEqual(list(df["name"]), ["paramC", "paramB", "paramA"])
         self.assertAlmostEqual(df.iloc[0]["max_impact"], 0.6)
+
+    def _impact_columns(self):
+        return {
+            "name": ["paramA", "paramB", "paramC"],
+            "value": [0.1, -0.2, 0.3],
+            "err_low": [-0.9, -0.8, -0.7],
+            "err_high": [0.9, 0.8, 0.7],
+            "impact_postfit_up": [0.1, 0.5, 0.2],
+            "impact_postfit_down": [-0.3, -0.2, -0.6],
+        }
+
+    def _check_sorted_and_plotted(self, data, names):
+        sorted_data = stats.sorted_impacts(data)
+        self.assertIs(type(sorted_data), type(data))
+        self.assertEqual(names(sorted_data), ["paramC", "paramB", "paramA"])
+        self.assertEqual(names(data), ["paramA", "paramB", "paramC"])  # input unchanged
+        fig = stats.make_impact_figure(3)
+        ax, _ = stats.plot_pulls(sorted_data)
+        stats.plot_impacts(sorted_data, ax=ax)
+        stats.draw_pull_impact_legend(ax=ax)
+        fig.canvas.draw()
+        plt.close(fig)
+
+    def test_sorted_impacts_pandas(self):
+        self._check_sorted_and_plotted(pd.DataFrame(self._impact_columns()), lambda d: list(d["name"]))
+
+    def test_sorted_impacts_dict(self):
+        self._check_sorted_and_plotted(self._impact_columns(), lambda d: list(d["name"]))
+
+    def test_sorted_impacts_polars(self):
+        pl = _import_or_skip("polars")
+        self._check_sorted_and_plotted(pl.DataFrame(self._impact_columns()), lambda d: d["name"].to_list())
+
+    def test_sorted_impacts_pyarrow(self):
+        pa = _import_or_skip("pyarrow")
+        self._check_sorted_and_plotted(pa.table(self._impact_columns()), lambda d: d["name"].to_pylist())
 
     def test_make_impact_figure(self):
         fig = stats.make_impact_figure(5)
@@ -141,6 +186,27 @@ class TestStatsModule(unittest.TestCase):
             stats.draw_pull_impact_legend(ax=ax)
         plt.close(fig)
 
+
+    def test_exception_message(self):
+        self.assertEqual(str(stats.IncorrectAxesError("no plot")), "no plot")
+
+    def test_legend_kwargs_override_defaults(self):
+        df = pd.DataFrame({
+            "name": ["NP 1", "NP 2"],
+            "value": [0.1, -0.1],
+            "err_low": [0.9, 0.8],
+            "err_high": [0.9, 0.8],
+            "impact_postfit_up": [0.4, 0.2],
+            "impact_postfit_down": [-0.3, -0.1],
+        })
+        fig = stats.make_impact_figure(2)
+        ax, _ = stats.plot_pulls(df)
+        stats.draw_pull_impact_legend(ax=ax, loc="lower right", title="Pulls only")
+        self.assertEqual(ax.get_legend().get_title().get_text(), "Pulls only")
+        impact_ax = stats.plot_impacts(df, ax=ax)
+        stats.draw_pull_impact_legend(ax=ax, loc="lower right", ncols=1)
+        self.assertEqual(impact_ax.get_legend()._loc, 4)
+        plt.close(fig)
 
 if __name__ == "__main__":
     unittest.main()

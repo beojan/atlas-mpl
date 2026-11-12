@@ -41,11 +41,9 @@ backward-compatible manner, since they take ``bins`` before the histogram
 argument. Alternate versions of these functions are therefore provided in the
 ``uhi`` module.
 
-As a result of this support, the histogram objects returned by `Uproot 4
-<https://github.com/scikit-hep/uproot4>`__ can be plotted directly, as can
-`Boost-Histogram <https://github.com/scikit-hep/boost-histogram>`__ histograms
-and `Hist <https://github.com/scikit-hep/hist>`__ objects (once the relevant PRs
-are merged into those repositories).
+As a result, histograms read with `Uproot <https://github.com/scikit-hep/uproot5>`__,
+`Boost-Histogram <https://github.com/scikit-hep/boost-histogram>`__ histograms, and
+`Hist <https://github.com/scikit-hep/hist>`__ objects can be plotted directly.
 
 
 ``usetex=False`` Mode

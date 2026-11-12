@@ -235,7 +235,9 @@ class TestStylesAndColors(unittest.TestCase):
         ampl.set_color_cycle("Tableau")
         ampl.set_color_cycle("HDBS")
         ampl.set_color_cycle("HH")
-        ampl.set_color_cycle("series_other")
+        ampl.set_color_cycle("Series")
+        with self.assertRaises(ValueError):
+            ampl.set_color_cycle("petrof")
 
 
 if __name__ == "__main__":

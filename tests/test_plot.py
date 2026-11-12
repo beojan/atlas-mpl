@@ -512,5 +512,31 @@ class TestPlotModule(unittest.TestCase):
         plt.close(fig)
 
 
+    def test_exception_message(self):
+        self.assertEqual(str(BinningMismatchError("bad bins")), "bad bins")
+
+    def test_set_zlabel_after_plot_2d(self):
+        fig, ax = plt.subplots()
+        plot_2d(np.arange(4.0), np.arange(3.0), np.ones((3, 2)), ax=ax)
+        self.assertIs(plt.gca(), ax)
+        set_zlabel("Events")
+        self.assertEqual(ax._amplaxesinfo.cbar.get_ylabel(), "Events")
+        plt.close(fig)
+
+    def test_plot_1d_histogram_kwargs(self):
+        fig, ax = plt.subplots()
+        plot_1d("h", np.arange(4.0), np.ones(3), ax=ax, density=True, lw=3, ls="--")
+        line = ax._ampllegend.line_hists["h"]
+        self.assertEqual(line.get_linewidth(), 3)
+        self.assertEqual(line.get_linestyle(), "--")
+        draw_legend(ax=ax)
+        plt.close(fig)
+
+    def test_draw_legend_rejects_positional_args(self):
+        fig, ax = plt.subplots()
+        with self.assertRaises(TypeError):
+            draw_legend(["a"], ax=ax)
+        plt.close(fig)
+
 if __name__ == "__main__":
     unittest.main()

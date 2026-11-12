@@ -383,5 +383,9 @@ class TestUHIModule(unittest.TestCase):
         self.assertIs(ProfileHistogramError, UnsupportedKindError)
 
 
+    def test_unsupported_kind_error_exported(self):
+        self.assertIs(ampl.uhi.UnsupportedKindError, UnsupportedKindError)
+        self.assertIs(ampl.plot.UnsupportedKindError, UnsupportedKindError)
+
 if __name__ == "__main__":
     unittest.main()

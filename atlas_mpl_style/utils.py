@@ -1,28 +1,32 @@
+"""Statistical functions used by the plotting functions."""
+
 import numexpr as _ne
 import numpy as _np
 
 
 def significance(data, data_errs, bkg, bkg_errs):
     """
-    Calculate significance in each bin.
+    Calculate the significance of the difference between data and background in each bin.
 
-    Uses the significance definition in https://cds.cern.ch/record/2643488.
+    This uses the definition in https://cds.cern.ch/record/2643488, with the uncertainties on
+    the data and the background added in quadrature as the background uncertainty. The result
+    is positive where the data are at least the background.
 
     Parameters
     ----------
     data : array_like
-        Observed data counts or yields.
+        Observed yields.
     data_errs : array_like
-        Errors / uncertainties on ``data``.
+        Uncertainties on ``data``.
     bkg : array_like
-        Total background prediction.
+        Background prediction.
     bkg_errs : array_like
-        Errors / uncertainties on ``bkg``.
+        Uncertainties on ``bkg``.
 
     Returns
     -------
-    array_like
-        Signed Poisson significance in each bin.
+    numpy.ndarray
+        Significance in each bin.
     """
     err2 = _ne.evaluate(
         "data_errs**2 + bkg_errs**2",

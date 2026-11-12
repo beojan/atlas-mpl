@@ -1,3 +1,10 @@
+"""
+Matplotlib styles, colors, and plotting functions for ATLAS plots.
+
+Call :func:`use_atlas_style` to activate the ATLAS style. Importing the package also
+registers the extra named colors and a ``print`` style.
+"""
+
 import matplotlib as _mpl
 import matplotlib.style as _style
 import importlib_resources as _ilr
@@ -152,16 +159,22 @@ else:
 
 def set_color_cycle(pal=None, n=None):
     """
-    Set a different color cycle.
+    Set the color cycle used for new lines and histograms.
 
     Parameters
     ----------
-    pal : {'ATLAS', 'Petroff', 'Paper', 'Oceanic', 'MPL', 'HDBS', 'HH', None}
-        The palette to use. None resets to the default palette (ATLAS for n <= 7 or when n is omitted;
-        Petroff for n > 7).
-        'MPL' (alias 'Tab') provides the default matplotlib palette.
+    pal : {'ATLAS', 'Petroff', 'Paper', 'Oceanic', 'MPL', 'HDBS', 'HH', 'Series'}, optional
+        Palette name, in any case. The default, ``'ATLAS'``, uses the Okabe & Ito colors for
+        up to 7 colors and the Petroff colors for more. ``'MPL'`` (or ``'Tab'``) is
+        Matplotlib's default palette.
     n : int, optional
-        Number of lines or histograms.
+        Number of colors needed. The ATLAS and Petroff palettes use it to choose a palette of
+        that size. The other palettes ignore it.
+
+    Raises
+    ------
+    ValueError
+        If ``pal`` is not one of these names.
     """
     if n is not None and n < 2:
         n = 2
@@ -280,7 +293,7 @@ def set_color_cycle(pal=None, n=None):
         ]
     elif pal.lower() == "hh":
         colors = ["hh:darkblue", "hh:darkpink", "hh:darkyellow", "hh:medturquoise"]
-    else:
+    elif pal.lower() == "series":
         colors = [
             "series:cyan",
             "series:orange",
@@ -290,6 +303,8 @@ def set_color_cycle(pal=None, n=None):
             "series:green",
             "series:pink",
         ]
+    else:
+        raise ValueError(f"Unknown palette {pal!r}")
 
     _mpl.rcParams["axes.prop_cycle"] = _cycler.cycler(color=colors)
     plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
@@ -297,18 +312,18 @@ def set_color_cycle(pal=None, n=None):
 
 def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
     """
-    Set up ATLAS style.
+    Activate the ATLAS style.
 
     Parameters
     ----------
     atlasLabel : str, optional
-        Replace ATLAS with a custom label.
+        Text that :func:`draw_atlas_label` draws in place of "ATLAS".
     fancyLegend : bool, optional
-        Use matplotlib's fancy legend frame (defaults to False).
+        Keep Matplotlib's legend frame. By default legends have no frame.
     usetex : bool, optional
-        Use LaTeX installation to set text (defaults to False).
-        If no LaTeX installation is found, this package will fall back to usetex=False.
-        This is on a best-effort basis, since the detected LaTeX installation may be incomplete.
+        Typeset text with LaTeX, which needs the TeX packages listed in the README. If
+        ``pdflatex``, ``dvipng``, or Ghostscript cannot be found, a warning is issued and
+        Matplotlib's own math rendering is used instead.
     """
     if usetex:
         if (
@@ -353,19 +368,23 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
 
 def ratio_axes(extra_axes=None):
     """
-    Split axes for ratio plots.
+    Create a figure with a main panel above one or more ratio panels.
+
+    The figure is always square, whatever ``figure.figsize`` says. The panels share the x axis
+    and have no gap between them. The main panel becomes the current axes.
 
     Parameters
     ----------
     extra_axes : int, optional
-        Number of additional axes. If not given, defaults to one.
+        Number of ratio panels. If omitted, one panel is created and returned on its own
+        rather than in a list.
 
     Returns
     -------
     fig : matplotlib.figure.Figure
     main_ax : matplotlib.axes.Axes
-    ratio_ax : matplotlib.axes.Axes or list[matplotlib.axes.Axes]
-        Returns a list if extra_axes is passed.
+    ratio_ax : matplotlib.axes.Axes or list of matplotlib.axes.Axes
+        A list when ``extra_axes`` is given.
     """
     hgt = 6 + 2 * (1 if extra_axes is None else extra_axes)  # * (100/72)
     fig = _mpl.pyplot.figure(figsize=(hgt, hgt))

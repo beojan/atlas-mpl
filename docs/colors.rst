@@ -28,7 +28,9 @@ Petroff Colors
 --------------
 These are the colors of the ``petroff10`` color cycle.
 See *Accessible Color Sequences for Data Visualization* by Matthew A. Petroff (`arXiv:2107.02270 <https://arxiv.org/abs/2107.02270>`_).
-When more than 7 colors are requested in the ATLAS color cycle (or when ``set_color_cycle(pal="Petroff", n=...)`` is explicitly called), the ``petroff8`` or ``petroff6`` / ``petroff10`` color cycle will be used.
+The ATLAS cycle switches to ``petroff8`` for 8 colors and ``petroff10`` for more.
+``set_color_cycle(pal="Petroff", n=...)`` selects ``petroff6``, ``petroff8``, or
+``petroff10``, whichever is the smallest with at least ``n`` colors.
 
 +---------------------+-----------+-----------------------------------------------+
 |``petroff:blue``     |``#3f90da``|.. image:: _colors/petroff:blue.png            |

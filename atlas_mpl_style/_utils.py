@@ -28,7 +28,8 @@ class LimitConfig:
 
 @dataclass
 class AMPLLegend:
-    "Keep track of legend."
+    """Legend entries recorded by the plotting functions for one axes."""
+
     has_stat: bool = False
     has_syst: bool = False
     fill_hists: Dict[str, Artist] = field(default_factory=dict)
@@ -42,14 +43,15 @@ class AMPLLegend:
 
 @dataclass
 class AMPLAxesInfo:
-    "Keep track of attached axes."
+    """Panels linked to one axes: its main panel, lowest ratio panel, and colorbar."""
+
     main_ax: Axes = None
     low_ax: Axes = None
     cbar: Axes = None
 
 
 def decorate_axes(ax):
-    "Add AMPLLegend and AMPLAxesInfo to an Axes object if they don't exist."
+    """Attach an AMPLLegend and an AMPLAxesInfo to ``ax`` if it does not have them."""
     if not hasattr(ax, "_ampllegend"):
         ax._ampllegend = AMPLLegend()
     if not hasattr(ax, "_amplaxesinfo"):
@@ -66,7 +68,7 @@ def get_main_ax(ax):
 
 
 def plot_type(ax):
-    "Determine whether ax shows histograms or limits."
+    """Return "limits" if ``ax`` shows limits, otherwise "hists"."""
     if not hasattr(ax, "_ampllegend"):
         decorate_axes(ax)
     if len(ax._ampllegend.limits) != 0:
@@ -76,7 +78,7 @@ def plot_type(ax):
 
 
 def get_extras(ax):
-    "Get extra items."
+    """Return the legend entries of ``ax`` that this package did not draw, by label."""
     al = ax._ampllegend
     ampl_labels = set().union(
         al.fill_hists.keys(),
@@ -95,7 +97,7 @@ def get_extras(ax):
 
 
 class BandHandler(HandlerTuple):
-    "Legend handler for bands."
+    """Legend handler that draws a line together with its uncertainty bands."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -140,8 +142,8 @@ class BandHandler(HandlerTuple):
         return list(reversed(a_list))
 
 
-def draw_hists_legend(ax, args, kwargs):
-    "Draw hist-type legend."
+def draw_hists_legend(ax, kwargs):
+    """Draw the legend for a histogram plot on ``ax``."""
     al = ax._ampllegend
     extras = get_extras(ax)
     band_labels = set(al.bands.keys())
@@ -182,8 +184,8 @@ def draw_hists_legend(ax, args, kwargs):
     ax.legend(handles, labels, handler_map=handler_map, **kwargs)
 
 
-def draw_limit_legend(ax, args, kwargs):
-    "Draw limit-type legend."
+def draw_limit_legend(ax, kwargs):
+    """Draw the legend for a limit plot on ``ax``."""
     al = ax._ampllegend
     extras = get_extras(ax)
     band_labels = set(al.bands.keys())
