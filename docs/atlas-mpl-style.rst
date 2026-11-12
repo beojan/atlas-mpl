@@ -4,6 +4,8 @@
 .. automodule:: atlas_mpl_style
    :members:
 
+.. autofunction:: atlas_mpl_style.set_font
+
 ``atlas_mpl_style.plot`` Module
 ===============================
 .. automodule:: atlas_mpl_style.plot

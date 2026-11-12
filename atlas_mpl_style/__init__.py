@@ -12,6 +12,7 @@ import atlas_mpl_style.plot as plot
 import atlas_mpl_style.stats as stats
 import atlas_mpl_style.utils as utils
 import atlas_mpl_style.uhi as uhi
+from atlas_mpl_style._fonts import set_font
 from atlas_mpl_style.plot import (
     set_xlabel,
     set_ylabel,

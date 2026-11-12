@@ -95,3 +95,5 @@ installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
 
 - **Sans-serif** (default): TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, and DejaVu Sans.
 - **Monospace**: Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono.
+
+To use a different font or size, call ``ampl.set_font`` after activating the style.

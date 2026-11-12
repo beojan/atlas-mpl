@@ -46,6 +46,32 @@ class TestStylesAndColors(unittest.TestCase):
             # Reset
             ampl.use_atlas_style(usetex=False)
 
+    def test_set_font_all_styles(self):
+        for style_name in ("atlas", "paper", "print", "slides"):
+            if style_name == "atlas":
+                ampl.use_atlas_style()
+            else:
+                plt.style.use(style_name)
+            base = mpl.rcParams["font.size"]
+            label = mpl.rcParams["axes.labelsize"]
+            ampl.set_font("DejaVu Sans", base / 2)
+            self.assertEqual(mpl.rcParams["font.sans-serif"][0], "DejaVu Sans")
+            self.assertEqual(mpl.rcParams["font.size"], base / 2)
+            self.assertAlmostEqual(mpl.rcParams["axes.labelsize"], label / 2)
+            if mpl.rcParams["mathtext.fontset"] == "custom":
+                self.assertTrue(mpl.rcParams["mathtext.it"].startswith("DejaVu Sans"))
+                self.assertTrue(mpl.rcParams["mathtext.it"].endswith(":italic"))
+
+    def test_set_font_usetex_warns(self):
+        with patch("shutil.which", return_value="/usr/bin/mock_latex"):
+            ampl.use_atlas_style(usetex=True)
+        sans = list(mpl.rcParams["font.sans-serif"])
+        with self.assertWarns(UserWarning):
+            ampl.set_font("DejaVu Sans", 12)
+        self.assertEqual(list(mpl.rcParams["font.sans-serif"]), sans)
+        self.assertEqual(mpl.rcParams["font.size"], 12)
+        ampl.use_atlas_style(usetex=False)
+
     def test_stylesheets_available(self):
         for style_name in ("atlas", "paper", "print", "slides"):
             plt.style.use(style_name)
