@@ -22,7 +22,7 @@ Upstream documentation: <https://atlas-mpl.readthedocs.io/en/latest/>
 
 ## Style and figure setup
 
-`ampl.use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False)` applies the `atlas` stylesheet, resets the color cycle to the ATLAS palette, turns on minor ticks, and removes the legend frame. Call it before creating figures. The settings that most often matter:
+`ampl.use_atlas_style(atlas_label="ATLAS", fancy_legend=False, usetex=False)` applies the `atlas` stylesheet, resets the color cycle to the ATLAS palette, turns on minor ticks, and removes the legend frame. Call it before creating figures. The settings that most often matter:
 
 | Setting | Value |
 | --- | --- |
@@ -30,15 +30,17 @@ Upstream documentation: <https://atlas-mpl.readthedocs.io/en/latest/>
 | Text size | 18 pt, with 20 pt axis labels and titles |
 | Font | TeX Gyre Heros, then Helvetica, Nimbus Sans, FreeSans, Arial |
 | Ticks | Inward, on all four sides, with minor ticks |
-| Axis limits | Rounded outwards to tick values (`axes.autolimit_mode: round_numbers`) |
+| Axis limits | Rounded outwards to tick values (`axes.autolimit_mode: round_numbers`). The histogram helpers set the x limits to the bin range, unless the x limits were already set by the caller. |
 | Saved background | Transparent. Pass `facecolor="white"` to `savefig` for an opaque image. |
 
-- `atlasLabel` replaces the word "ATLAS" in `draw_atlas_label`, for example for another experiment.
-- `fancyLegend=True` keeps Matplotlib's framed legend box.
+- `atlas_label` replaces the word "ATLAS" in `draw_atlas_label`, for example for another experiment.
+- `fancy_legend=True` keeps Matplotlib's framed legend box.
 - `usetex=True` typesets text with LaTeX and needs `pdflatex`, `dvipng`, Ghostscript, TeX Gyre Heros, `mathastext`, `physics`, and `siunitx`. If the executables are missing it warns and falls back to `usetex=False`. It does not check the TeX packages.
 - With `usetex=False`, math text is upright by default (`mathtext.default: regular`). Use `\mathit{...}` for italic symbols.
 
-The package also registers the stylesheets `print`, `paper`, and `slides` for `plt.style.use`. `print` and `paper` are the same: a white background, 8 in by 6 in figures at 200 dpi, 16 pt TeX Gyre Heros text, the Paper color cycle, and no ticks on the top and right. `slides` has a grey background with a white grid and the Petroff cycle. None of them use LaTeX. Prefer `use_atlas_style()` unless the user asks for one of these. To combine them, call `use_atlas_style()` first and `plt.style.use("print")` second. The result keeps the minor ticks, the four-sided ticks, and the frameless legend of the ATLAS style, and takes the font, sizes, figure size, and color cycle from `print`.
+The package also registers a `print` stylesheet for `plt.style.use`, for plots outside ATLAS publications: a white background, 8 in by 6 in figures at 200 dpi, 16 pt TeX Gyre Heros text, the Paper color cycle, no ticks on the top and right, and no LaTeX. Prefer `use_atlas_style()` unless the user asks for it, and do not draw the ATLAS label on a `print` plot. The `paper` and `slides` stylesheets exist only so that old code keeps working. Do not use them. To combine the styles, call `use_atlas_style()` first and `plt.style.use("print")` second. The result keeps the minor ticks, the four-sided ticks, and the frameless legend of the ATLAS style, and takes the font, sizes, figure size, and color cycle from `print`.
+
+`ampl.set_font(family=None, size=None)` changes the font and the base text size of the active style, after `use_atlas_style()` or `plt.style.use("print")`. `family` is a font name or a list of them, placed ahead of the style's fonts. `size` is the base size in points, and every other text size the style sets in points scales with it. With `usetex=True` it warns and changes only the size.
 
 `ampl.ratio_axes(extra_axes=None)` creates a figure with a main panel above a ratio panel that shares its x axis, with no gap between them. It returns `(fig, main_ax, ratio_ax)`. With `extra_axes=n` it creates `n` lower panels and returns them as a list in third place. The figure is square, `6 + 2n` inches on a side (8 in for one ratio panel), whatever `figure.figsize` says. The lower panels use symmetric y ticks with the end ticks removed, so their labels do not collide with the panel above.
 
@@ -60,7 +62,7 @@ The package also registers the stylesheets `print`, `paper`, and `slides` for `p
 5. Line histograms (`plot_signal`, `plot_1d`).
 6. Every other labelled Matplotlib artist on the axes.
 
-Keyword arguments go to `ax.legend`. Positional handles and labels are ignored, so to control the entries, set or remove the labels on the artists. For axes that contain limits it builds the limit legend described under [Limits](#limits). On axes without any package helper it lists the labelled artists, like `ax.legend()`.
+Keyword arguments go to `ax.legend`. It takes no positional handles or labels, so to control the entries, set or remove the labels on the artists. For axes that contain limits it builds the limit legend described under [Limits](#limits). On axes without any package helper it lists the labelled artists, like `ax.legend()`.
 
 A band can share the legend entry of a line. `plot_1d` and `plot_signal` do this for their own bands with `attach_bands=True`. For a line you drew yourself, call `ampl.plot.plot_band(bins, low, high, label=<the line's label>, ax=ax)`, or draw the band with `fill_between` and call `ampl.plot.register_band(label, artist, ax=ax)`.
 
@@ -102,9 +104,9 @@ The label has up to four lines: "ATLAS" with the status, the line "for education
 
 These take one-dimensional histogram objects that follow the UHI `PlottableHistogram` protocol: Hist, boost-histogram, and histograms read with Uproot. The histogram must hold counts. A profile (mean storage) raises `UnsupportedKindError`.
 
-- `plot_data(hist, ignore_variances=False, color="k", label="Data", ax=None)` draws black points with error bars and returns `(values, stat_errs)`.
-- `plot_1d(hist, label, ignore_variances=False, stat_err=True, color=None, attach_bands=False, ax=None, flow=False, **kwargs)` draws an unfilled step histogram, with a hatched statistical band unless `stat_err=False`. The extra arguments go to `ax.hist`, and the legend line copies the drawn line's style, width, and transparency.
-- `plot_signal(hist, label, ignore_variances=False, syst_errs=None, color=None, attach_bands=False, ax=None)` draws an unfilled step histogram that is overlaid on the stack, not added to it, with a hatched statistical band and, when `syst_errs` is given, a translucent total band. `syst_errs` is an array or a histogram of absolute per-bin uncertainties. Scale the histogram yourself if the signal is too small to see, and say so in the label. A signal whose normalization is meaningful relative to the backgrounds belongs in the stack.
+- `plot_data(hist, *, stat_errs=None, color="k", label="Data", ax=None)` draws black points with error bars and returns `(values, stat_errs)`. Every argument after `hist` is keyword-only.
+- `plot_1d(hist, label, *, stat_errs=None, color=None, attach_bands=False, ax=None, flow=False, **kwargs)` draws an unfilled step histogram, with a hatched statistical band unless `stat_errs=False`. A profile (mean) histogram is drawn as points with the error on the mean, and then takes no `**kwargs`. The extra arguments go to `ax.hist`, and the legend line copies the drawn line's style, width, and transparency.
+- `plot_signal(hist, label, *, stat_errs=None, syst_errs=None, color=None, attach_bands=False, ax=None, **kwargs)` draws an unfilled step histogram that is overlaid on the stack, not added to it, with a hatched statistical band and, when `syst_errs` is given, a translucent total band. `syst_errs` is an array or a histogram of absolute per-bin uncertainties. Scale the histogram yourself if the signal is too small to see, and say so in the label. A signal whose normalization is meaningful relative to the backgrounds belongs in the stack.
 - `plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff")`. See [Ratio panels](#ratio-panels).
 - `plot_2d(hist, ax=None, pad=0.05, **kwargs)`. See [2D histograms](#2d-histograms).
 - `plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs)`. See [Cutflows](#cutflows).
@@ -136,17 +138,18 @@ The helpers decide what to draw from the histogram's variances, and a wrong assu
 
 | Helper | Variances present | No variances | Override |
 | --- | --- | --- | --- |
-| `uhi.plot_data` | Error bars of `sqrt(variance)` | Points without error bars | `ignore_variances=True` uses `sqrt(count)` |
-| `uhi.plot_1d` | Hatched band | No band | `stat_err=False` removes the band. `ignore_variances=True` uses `sqrt(count)`. |
-| `uhi.plot_signal` | Hatched band | No band | `ignore_variances=True` uses `sqrt(count)` |
-| `Background(hist=<UHI>)` | `sqrt(variance)` | Zero | `stat_errs="sqrt"` or `"poisson"` uses `sqrt(count)`. `stat_errs="ignore"` uses zero. An array passed as `stat_errs` is ignored. |
-| `uhi.plot_ratio`, data | `sqrt(variance)` | `sqrt(count)` | none |
+| `uhi.plot_data` | Error bars of `sqrt(variance)` | Error bars of `sqrt(count)` | `stat_errs="sqrt"` uses `sqrt(count)`. `stat_errs="poisson"` or `"poisson2"` uses a Poisson interval. |
+| `uhi.plot_1d` | Hatched band | No band | `stat_errs=False` removes the band. Otherwise `stat_errs` works as for `uhi.plot_data`. |
+| `uhi.plot_signal` | Hatched band | No band | `stat_errs` (an array or `"sqrt"`) replaces the variances. |
+| `Background(hist=<UHI>)` | `sqrt(variance)` | Zero | `stat_errs="sqrt"` uses `sqrt(count)`. `stat_errs="ignore"` uses zero. An explicit `stat_errs` array replaces the variances. |
+| `uhi.plot_ratio`, data | `sqrt(variance)` | `sqrt(count)` | `stat_errs` works as for `uhi.plot_data`. Pass the same value to both so the panels agree. |
 | `uhi.plot_ratio`, background histogram | `sqrt(variance)` | Zero | Pass the tuple from `plot_backgrounds` instead |
 
 - boost-histogram and Hist report variances equal to the counts for an unweighted histogram with the default storage, so such histograms get Poisson uncertainties. Fill weighted histograms with `Weight` storage so that the variances are the sum of squared weights.
-- The array functions take `stat_errs` as an array of absolute uncertainties, or the string `"sqrt"` or `"poisson"` for `sqrt(hist)`. With `stat_errs=None`, `plot_data` draws points without error bars and `plot_1d` and `plot_signal` draw no band. `Background` also accepts `"ignore"`.
+- The array functions take `stat_errs` as an array of absolute uncertainties, or the string `"sqrt"` for `sqrt(hist)`. `plot_data` and `plot_1d` also take `"poisson"` and `"poisson2"`: the asymmetric 68.27% and 95% central Poisson intervals of ROOT's `TH1::kPoisson` and `kPoisson2`, computed by `ampl.utils.poisson_errors(counts, interval)`, which needs SciPy. They are meant for raw unweighted counts such as data, so negative or non-integer bin contents raise `ValueError`. `Background` and `plot_signal`, which plot weighted simulation, do not offer them. An empty bin gets an up error only. With `stat_errs=None`, `plot_data` draws points without error bars and `plot_1d` and `plot_signal` draw no band. `Background` also accepts `"ignore"`.
 - `plot_data` draws plain points whenever all the uncertainties are zero.
-- `syst_errs` is always an array or histogram of absolute per-bin uncertainties, and it is combined in quadrature with the statistical uncertainty. `plot_backgrounds` adds the systematic uncertainties of different components in quadrature too, so it treats them as uncorrelated. Pass `total_err` when that is not right.
+- Every uncertainty argument (`stat_errs`, `syst_errs`, `total_err`, `data_errs`, `bkg_errs`) also takes a pair `(down, up)` for asymmetric uncertainties, for example up and down systematic variations. Each element is an array, or for `syst_errs` a histogram, and signs are ignored. Compute the sizes from varied templates first, as `(nominal - down, up - nominal)`. An array with one row per bin, shape `(N, 2)`, raises `BinningMismatchError`. `plot_data` and `plot_backgrounds` return a `(2, N)` array when the uncertainties are asymmetric, ready for `plot_ratio`. The `uhi` helpers take statistical uncertainties from the variances, so those are symmetric.
+- `syst_errs` holds absolute per-bin uncertainties, and it is combined in quadrature with the statistical uncertainty, separately for the down and up sides. `plot_backgrounds` adds the systematic uncertainties of different components in quadrature too, so it treats them as uncorrelated. Pass `total_err` when that is not right.
 
 ## Ratio panels
 
@@ -194,7 +197,7 @@ ampl.set_xlabel("Events", ax=ax)
 
 - The first label is drawn at the top. Bars are horizontal by default, and `horizontal=False` gives vertical bars. Extra arguments go to `barh` or `bar`.
 - Each bar carries its value, written inside the end of the bar in white 16 pt text. On a linear axis the short bars cannot hold the text, which then runs over the category labels. Large counts also make the axis show a `×10ⁿ` multiplier that collides with the right-aligned x label. A log axis avoids both problems. Otherwise pass `text=False` and annotate the bars yourself.
-- When `ax` is omitted, the function also adds space above the bars for a label and legend. With an explicit `ax`, set the limits yourself.
+- When `ax` is omitted, the function sets the axis limits to fit the bars, and for horizontal bars it adds space above them for a label and legend. With an explicit `ax`, set the limits yourself.
 - `ampl.uhi.plot_cutflow(hist, ...)` needs a histogram with a string category axis and raises `LabeledBinsError` otherwise. The other UHI helpers raise the same error when they get a category axis.
 
 ## Limits
@@ -260,8 +263,9 @@ fig.tight_layout()
 | `"MPL"`, `"Tab"` | Matplotlib's default 10 colors |
 | `"HDBS"` | 5 colors |
 | `"HH"` | 4 colors |
+| `"Series"` | 7 pastel colors |
 
-`"Series"` selects a 7-color pastel palette, and any other name raises `ValueError`. `use_atlas_style` resets the cycle to `"ATLAS"`. More series than the palette has colors reuse the colors from the start, so pass the real `n` and, for many series, vary the line style or the marker as well.
+Any other name raises `ValueError`. Names are not case-sensitive. `use_atlas_style` resets the cycle to `"ATLAS"`. More series than the palette has colors reuse the colors from the start, so pass the real `n` and, for many series, vary the line style or the marker as well.
 
 The package registers these names as Matplotlib colors:
 
@@ -285,7 +289,9 @@ Prefer the active color cycle over hard-coding many colors. Use named colors onl
 | `ampl.plot.ViolatesPlottableHistogramError` | The object does not follow the UHI `PlottableHistogram` protocol. |
 | `ampl.uhi.UnsupportedKindError` | The histogram is a profile and not a count histogram. |
 | `ampl.uhi.FlowNotSupportedError` | `flow=True` was given for a histogram without flow bins. |
-| `TypeError` | An unknown `plottype` or `stat_errs` string, or `bins` missing for array backgrounds. |
+| `ampl.stats.IncorrectAxesError` | `draw_pull_impact_legend` got axes without pulls or impacts. |
+| `TypeError` | An unknown `plottype` or `stat_errs` string, `bins` missing for array backgrounds, or positional arguments to `draw_legend`. |
+| `ValueError` | An unknown palette name, only one edge of a limit band, `observed` without `observed_label`, or `set_zlabel` on axes without a colorbar. |
 
 ## Verification checklist
 

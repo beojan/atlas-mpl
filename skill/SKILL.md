@@ -141,10 +141,10 @@ The details that are easy to get wrong:
 
 A figure that is scaled to fit a text column or a slide has its text scaled with it. The ATLAS style's 800 by 600 px figure with 18 pt text suits a figure shown on its own. When the figure sits beside body text, size it for its place:
 
-- Set the figure size to the size at which it will be shown, in inches, with `figsize=` or `fig.set_size_inches(...)`. Then set `plt.rcParams["font.size"]` and the related sizes (`axes.labelsize`, `axes.titlesize`, `xtick.labelsize`, `ytick.labelsize`, `legend.fontsize`) after `ampl.use_atlas_style()`, so that the text matches the surrounding text. Change the rcParams and do not pass `fontsize=` to individual elements, so all the text stays consistent.
+- Set the figure size to the size at which it will be shown, in inches, with `figsize=` or `fig.set_size_inches(...)`. Then call `ampl.set_font(size=...)` after `ampl.use_atlas_style()`, so that the text matches the surrounding text. It sets the base size and scales the axis labels, titles, tick labels, and legend with it. Do not pass `fontsize=` to individual elements, so all the text stays consistent.
 - If text collides at that size, make the figure taller or simplify it. Do not shrink the text below the size of the surrounding text.
 - `ampl.ratio_axes()` and `ampl.stats.make_impact_figure()` set their own figure sizes, 8 in square and 10 in by 6 in, and ignore `figure.figsize`. Resize those figures with `fig.set_size_inches(...)`.
-- A few package helpers set their own text size and do not follow `font.size`: the bar labels of `plot_cutflow` (16 pt), `draw_tag` (8 pt), and `ampl.stats.draw_pull_impact_legend` (14 pt). For a cutflow, pass `text=False` and add the bar labels with `ax.annotate`. Replace `draw_tag` with `ax.text`.
+- The bar labels of `plot_cutflow`, `draw_tag`, and `ampl.stats.draw_pull_impact_legend` use their own sizes, scaled with `font.size` (16 pt, 8 pt, and 14 pt in the ATLAS style). Pass `fontsize=` to `draw_pull_impact_legend` to change its size.
 - For a set of figures in one document, save them all at the same width and avoid `bbox_inches="tight"`, which crops each figure to a different size and so gives each a different scale on the page.
 
 ## Seaborn for statistical plots
@@ -183,4 +183,4 @@ Use long-form data frames with `hue=`, `x=`, `y=`, and `order=` so categories ha
 
 ## Reference routing
 
-Read [references/atlas-mpl-style.md](./references/atlas-mpl-style.md) before using anything beyond the histogram pattern above: uncertainty handling, overflow bins, ratio modes, the ATLAS label options, limits, cutflows, 2D plots, palettes and named colors, the other package styles, or pull and impact plots. It records the 0.28.0 API as implemented, with worked examples and the behaviors that the docstrings do not mention.
+Read [references/atlas-mpl-style.md](./references/atlas-mpl-style.md) before using anything beyond the histogram pattern above: uncertainty handling, overflow bins, ratio modes, the ATLAS label options, limits, cutflows, 2D plots, palettes and named colors, the `print` style and `set_font`, or pull and impact plots. It records the 0.28.0 API with worked examples.
