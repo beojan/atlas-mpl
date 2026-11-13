@@ -65,11 +65,13 @@ Use `atlas_mpl_style` for every plot. Keep ordinary Matplotlib available for plo
    ampl.draw_legend(ax=ax)
    ```
 
-   `ampl.draw_legend` orders the entries of plots made with the package helpers (data first, uncertainties after the stack) and also lists ordinary Matplotlib artists that have labels. It forwards keyword arguments such as `loc=` and `ncols=` to `ax.legend`, but it ignores positional handles and labels. Do not use it on seaborn distribution plots (see below).
+   `ampl.draw_legend` orders the entries of plots made with the package helpers (data first, uncertainties after the stack) and also lists ordinary Matplotlib artists that have labels. It forwards keyword arguments such as `loc=` and `ncols=` to `ax.legend`, and takes no positional arguments (`ax` is keyword-only). Do not use it on seaborn distribution plots (see below).
 
    Use `ampl.draw_atlas_label(...)` only when ATLAS branding or approval status is appropriate. Never invent status, luminosity, energy, simulation state, or descriptive text.
 
 6. Make the result legible and truthful: include units, state logarithmic axes, separate startup or warm-up populations when they distort steady-state behavior, show uncertainty or sample counts where useful, and avoid misleading truncated axes.
+
+   Do not make scientific or statistical decisions yourself at the plotting stage. Keep the analysis code's binning, selection, normalization, and uncertainty prescription unless the user asks to change them. In particular, pass `stat_errs="poisson"` or `"poisson2"` only when requested.
 
 7. Save the figure in the format its destination needs, and apply layout before saving:
 
@@ -114,8 +116,6 @@ ampl.uhi.plot_signal(signal, "Signal", color="atlas:blue", ax=ax)
 ampl.uhi.plot_data(data, label="Data", ax=ax)
 ampl.uhi.plot_ratio(data, total, ratio_ax=rax, plottype="diff")
 
-edges = data.axes[0].edges
-ax.set_xlim(edges[0], edges[-1])
 ax.set_ylim(0, 1.5 * ax.get_ylim()[1])  # headroom for the label and legend
 
 ampl.set_xlabel(r"$\mathit{m}$ [GeV]", ax=ax)  # goes below the ratio panel
@@ -131,7 +131,7 @@ fig.savefig("plot.png", dpi=180)  # for inspection
 The details that are easy to get wrong:
 
 - `plot_backgrounds` stacks the list from bottom to top and returns `(total_hist, total_err)`, which `ampl.uhi.plot_ratio` accepts as the denominator. It draws the uncertainty bands only with `show_errs=True`. The returned `total_err` includes the uncertainties either way, so the ratio panel shows its grey band regardless.
-- Set the x limits explicitly. The uncertainty bands add margins, and the style then rounds the limits outwards, so a histogram from 0 to 500 can end up on an axis from -100 to 600.
+- The package's 1D histogram helpers fit the x limits to the bin range automatically unless you set them yourself. Plain Matplotlib and seaborn plots (`ax.hist`, `sns.histplot`) do not, and the style rounds their limits outwards to tick values, so call `ax.set_xlim(...)` explicitly on those when empty margins at the sides are unwanted.
 - The ratio panel has no y label until you set one. `plot_ratio` draws `"diff"` as `(data - bkg) / bkg` around 0, `"raw"` as `data / bkg` around 1, and `"significances"` as per-bin significance.
 - The ratio axis is symmetric about its reference line. Pass `max_ratio` to change the range. With `plottype="raw"`, `max_ratio=1.5` gives an axis from 0.5 to 1.5 before a 10% margin is added.
 - Uncertainties come from the histogram's variances. Read "Where uncertainties come from" in the reference when histograms are weighted, have no variances, or the error bars look wrong.
@@ -179,7 +179,7 @@ Pick the plot that shows the distribution, not just a summary:
 - Relationships: `sns.scatterplot`, `sns.regplot` or `sns.lmplot` for trends, `sns.jointplot` and `sns.pairplot` for exploration, `sns.heatmap` for matrices (annotate cells and center diverging maps).
 - Estimates with uncertainty: `sns.pointplot`, `sns.barplot` with confidence intervals, and `sns.lineplot` with the `errorbar=` option. State what the interval means.
 
-Use long-form data frames with `hue=`, `x=`, `y=`, and `order=` so categories have a stable, meaningful order. Use `sns.FacetGrid` or the figure-level functions (`displot`, `catplot`, `relplot`) for many groups, then check the ATLAS style still applied to them.
+Use long-form data frames with `hue=`, `x=`, `y=`, and `order=` so categories have a stable, meaningful order. Use `sns.FacetGrid` or the figure-level functions (`displot`, `catplot`, `relplot`) for many groups. Those remove the top and right spines by default (`despine=True`) while leaving the ATLAS style's inward ticks in place, so pass `despine=False` where accepted or re-enable `ax.spines["top"]` and `ax.spines["right"]`.
 
 ## Reference routing
 

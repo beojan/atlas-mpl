@@ -325,7 +325,7 @@ def use_atlas_style(
     fancy_legend : bool, optional
         Keep Matplotlib's legend frame. By default legends have no frame.
     usetex : bool, optional
-        Typeset text with LaTeX, which needs the TeX packages listed in the README. If
+        Typeset text with LaTeX, which needs the TeX packages listed in :doc:`texlive`. If
         ``pdflatex``, ``dvipng``, or Ghostscript cannot be found, a warning is issued and
         Matplotlib's own math rendering is used instead.
     """

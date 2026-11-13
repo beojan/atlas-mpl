@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "atlas-mpl-plots",
+  "version": "0.28.0",
+  "description": "Create and revise Python data visualizations with atlas_mpl_style.",
+  "author": {
+    "name": "Beojan Stanislaus",
+    "email": "beojan.stanislaus@cern.ch"
+  },
+  "homepage": "https://atlas-mpl.readthedocs.io/en/latest/",
+  "repository": "https://github.com/beojan/atlas-mpl",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "atlas",
+    "matplotlib",
+    "plotting",
+    "hep",
+    "physics",
+    "visualization"
+  ]
+}

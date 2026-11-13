@@ -12,7 +12,8 @@ This style can be activated by calling::
 
 The standard ATLAS label can be drawn with the ``ampl.draw_atlas_label`` function. To
 typeset text with LaTeX instead of Matplotlib's own math rendering, call
-``ampl.use_atlas_style(usetex=True)``.
+``ampl.use_atlas_style(usetex=True)`` (see :doc:`texlive` for the required TeX
+packages and font settings).
 
 The axis labels should be set using the ``ampl.set_xlabel`` and
 ``ampl.set_ylabel`` functions to ensure they are correctly

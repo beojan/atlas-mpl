@@ -5,93 +5,40 @@ ATLAS Matplotlib Style
    :target: https://pypi.org/project/atlas-mpl-style/
 
 Provides a Matplotlib style replicating that used by the
-`ATLAS <http://atlas.cern>`__ collaboration.
+`ATLAS <http://atlas.cern>`__ collaboration, along with a rich set of functionality to make various types of publication-ready plots following the ATLAS guidelines.
 
 **Please open an issue if you find this style deviates from the guidelines.**
 
 Install from PyPI using pip: :code:`pip install atlas-mpl-style`
 
-Documentation: https://atlas-mpl.readthedocs.io/en/latest/index.html
-
-In addition, this package also provides:
-
-- A function to draw the ATLAS label
-- A ``plot`` module containing functions to plot pre-binned histograms and
-  limits. This includes functionality for plotting stacked backgrounds along
-  with data and ratios in the usual ATLAS style.
-- An additional "Print" (white background) style.
-- Additional Matplotlib color definitions based on the ATLAS / Okabe & Ito palette, the Petroff accessible color sequences, the
-  `Paper <https://github.com/NLKNguyen/papercolor-theme>`__ theme, and the
-  `Oceanic Next <https://github.com/voronianski/oceanic-next-color-scheme>`__
-  theme.
+See the reference documentation for more details: https://atlas-mpl.readthedocs.io/en/latest/index.html
 
 .. image:: docs/ATLAS_example.png
    :alt: Example ATLAS plot
 
-UHI and the PlottableHistogram protocol
----------------------------------------
+Agent Skill
+-----------
 
-With the development of the `UHI <https://github.com/henryiii/uhi>`__ interface,
-this package now has support for histogram objects that follow the
-``PlottableHistogram`` protocol. ``plot.Background`` objects can be constructed
-using ``PlottableHistogram`` objects and a list of such ``Background`` objects can be passed
-to ``plot.plot_backgrounds``, omitting the ``bins`` argument. The other histogram
-plotting functions could not be modified to accept ``PlottableHistogram`` objects in a
-backward-compatible manner, since they take ``bins`` before the histogram
-argument. Alternate versions of these functions are therefore provided in the
-``uhi`` module.
+This repository includes an ``atlas-mpl-plots`` skill that teaches coding agents
+how to make and check Python plots with ``atlas_mpl_style``. Install
+``atlas-mpl-style`` in the Python environment your project uses, then install
+the skill into your agent:
 
-As a result, histograms read with `Uproot <https://github.com/scikit-hep/uproot5>`__,
-`Boost-Histogram <https://github.com/scikit-hep/boost-histogram>`__ histograms, and
-`Hist <https://github.com/scikit-hep/hist>`__ objects can be plotted directly.
+- **Antigravity**:
 
+  .. code:: sh
 
-``usetex=False`` Mode
-------------------------
+     agy plugin install https://github.com/beojan/atlas-mpl
 
-``usetex=False`` is now the default, removing the LaTeX dependency.
+- **Claude Code**:
 
-If you convert a plotting script that uses ``usetex=True`` mode, make sure labels
-are updated to remove LaTeX macros that are not supported by Matplotlib's
-mathtext.
+  .. code:: sh
 
+     claude plugin install atlas-mpl-plots --marketplace beojan/atlas-mpl
 
-TeXLive and Fonts Needed
-------------------------
-If you have a full LaTeX installation available, you can use LaTeX to typeset the text by passing ``usetex=True`` to ``use_atlas_style``. This will give you greater flexibility in terms of what can
-be included in labels.
+- **Codex** (run inside a Codex prompt):
 
-A working TeXLive installation providing the following is required:
+  .. code:: text
 
-- pdflatex
-- amsmath
-- TeX Gyre Heros
-- mathastext
-- physics (the package)
-- siunitx
+     $skill-installer install https://github.com/beojan/atlas-mpl/tree/main/skills/atlas-mpl-plots
 
-If no LaTeX installation is available, the style will warn and fall back to the ``usetex=False`` behaviour.
-To check if all necessary packages are installed, try building ``atlas_mpl_style/testing/ampl-test.tex``.
-
-On Arch (and related distributions), the ``texlive-most`` group is sufficient.
-
-On Debian (Jessie or above) or Ubuntu (18.04+), the following set of packages should be sufficient. It is, however, highly recommended
-that you install ``texlive-full`` to obtain a complete installation of TeXLive.
-
-- texlive
-- texlive-latex-extra
-- texlive-fonts-recommended
-- texlive-lang-greek
-- tex-gyre
-- dvipng
-- ghostscript
-
-On CentOS 7, the supplied TeXLive (2012) is extremely old. TeXLive should be
-installed from `upstream <https://www.tug.org/texlive/quickinstall.html>`__.
-
-**TeXLive is not required for the "print" style.** Matplotlib resolves fonts using the following order of preference:
-
-- **Sans-serif** (default): TeX Gyre Heros, Helvetica Neue, Helvetica, Free Sans, Nimbus Sans L, Arial, and DejaVu Sans.
-- **Monospace**: Source Code Pro, Inconsolata, Monaco, Consolas, Ubuntu Mono, DejaVu Sans Mono.
-
-To use a different font or size, call ``ampl.set_font`` after activating the style.

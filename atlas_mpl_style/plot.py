@@ -521,11 +521,12 @@ def plot_signal(
             hatch=r"////",
             zorder=5,
         )
-        if attach_bands:
+    if attach_bands:
+        if have_stat:
             ax._ampllegend.bands[label].append(a_stat)
-            if have_syst:
-                # Has to be in this order
-                ax._ampllegend.bands[label].append(a_syst)
+        if have_syst:
+            # Has to be in this order
+            ax._ampllegend.bands[label].append(a_syst)
 
 
 def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):

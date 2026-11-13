@@ -1,0 +1,23 @@
+{
+  "name": "atlas-mpl",
+  "owner": {
+    "name": "Beojan Stanislaus",
+    "email": "beojan.stanislaus@cern.ch",
+    "url": "https://github.com/beojan"
+  },
+  "plugins": [
+    {
+      "name": "atlas-mpl-plots",
+      "source": "./",
+      "description": "Create and revise Python data visualizations with atlas_mpl_style.",
+      "version": "0.28.0",
+      "author": {
+        "name": "Beojan Stanislaus",
+        "email": "beojan.stanislaus@cern.ch"
+      },
+      "homepage": "https://atlas-mpl.readthedocs.io/en/latest/",
+      "repository": "https://github.com/beojan/atlas-mpl",
+      "license": "GPL-3.0-or-later"
+    }
+  ]
+}

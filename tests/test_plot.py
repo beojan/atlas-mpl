@@ -439,6 +439,8 @@ class TestPlotModule(unittest.TestCase):
         fig, ax = plt.subplots()
         plot_1d("1D_with_band", bins, hist, stat_errs="sqrt", attach_bands=True, ax=ax)
         plot_signal("Sig_with_band", bins, hist, stat_errs="sqrt", attach_bands=True, ax=ax)
+        plot_signal("Sig_syst_only", bins, hist, syst_errs=np.ones(3), attach_bands=True, ax=ax)
+        self.assertEqual(len(ax._ampllegend.bands["Sig_syst_only"]), 1)
         draw_legend(ax=ax)
         self.assertIsNotNone(ax.get_legend())
         fig.canvas.draw()  # Triggers BandHandler.create_artists

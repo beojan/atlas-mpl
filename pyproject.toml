@@ -61,5 +61,5 @@ Home = "https://github.com/beojan/atlas-mpl"
 Documentation = "https://atlas-mpl.readthedocs.io/en/latest/"
 
 [tool.flit.sdist]
-include = ["docs/", "tests/", "skill/"]
+include = ["docs/", "tests/"]
 exclude = ["docs/_build/"]

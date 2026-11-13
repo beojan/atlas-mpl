@@ -11,9 +11,10 @@ ATLAS MPL Style
    :caption: Contents:
 
    Introduction <readme_link.rst>
-   Example <examples.rst>
+   Examples <examples.rst>
    Styles <styles.rst>
    Colors <colors.rst>
+   TeXLive and Fonts <texlive.rst>
    atlas_mpl_style Module <atlas-mpl-style.rst>
 
 Indices and tables

@@ -38,7 +38,7 @@ Upstream documentation: <https://atlas-mpl.readthedocs.io/en/latest/>
 - `usetex=True` typesets text with LaTeX and needs `pdflatex`, `dvipng`, Ghostscript, TeX Gyre Heros, `mathastext`, `physics`, and `siunitx`. If the executables are missing it warns and falls back to `usetex=False`. It does not check the TeX packages.
 - With `usetex=False`, math text is upright by default (`mathtext.default: regular`). Use `\mathit{...}` for italic symbols.
 
-The package also registers a `print` stylesheet for `plt.style.use`, for plots outside ATLAS publications: a white background, 8 in by 6 in figures at 200 dpi, 16 pt TeX Gyre Heros text, the Paper color cycle, no ticks on the top and right, and no LaTeX. Prefer `use_atlas_style()` unless the user asks for it, and do not draw the ATLAS label on a `print` plot. The `paper` and `slides` stylesheets exist only so that old code keeps working. Do not use them. To combine the styles, call `use_atlas_style()` first and `plt.style.use("print")` second. The result keeps the minor ticks, the four-sided ticks, and the frameless legend of the ATLAS style, and takes the font, sizes, figure size, and color cycle from `print`.
+The package also registers a `print` stylesheet for `plt.style.use`, for plots outside ATLAS publications: white figure and axes backgrounds (the saved background is still transparent unless `facecolor="white"` is passed to `savefig`), 8 in by 6 in figures at 200 dpi, 16 pt TeX Gyre Heros text, the Paper color cycle, no ticks on the top and right, and `stixsans` math text without LaTeX. Prefer `use_atlas_style()` unless the user asks for it, and do not draw the ATLAS label on a `print` plot. The `paper` and `slides` stylesheets exist only so that old code keeps working. Do not use them. To combine the styles, call `use_atlas_style()` first and `plt.style.use("print")` second. The result keeps the minor ticks, the four-sided ticks, the rounded axis limits, and the frameless legend of the ATLAS style, and takes the font, `stixsans` math text, sizes, figure size, and color cycle from `print`.
 
 `ampl.set_font(family=None, size=None)` changes the font and the base text size of the active style, after `use_atlas_style()` or `plt.style.use("print")`. `family` is a font name or a list of them, placed ahead of the style's fonts. `size` is the base size in points, and every other text size the style sets in points scales with it. With `usetex=True` it warns and changes only the size.
 
@@ -48,12 +48,12 @@ The package also registers a `print` stylesheet for `plt.style.use`, for plots o
 
 - `ampl.set_xlabel(label, ax=None, **kwargs)` right-aligns the x label. Given the main axes from `ratio_axes`, it puts the label on the lowest panel.
 - `ampl.set_ylabel(label, ax=None, **kwargs)` aligns the y label with the top of the axis and lines up the y labels of the panels made by `ratio_axes`. For a centered label, as is usual on a ratio panel, call `rax.set_ylabel(...)` directly.
-- `ampl.set_zlabel(label, cbar=None, ax=None)` labels a colorbar. Pass the `cbar` you created. For a colorbar made by `plot_2d`, no `cbar` is needed, because `plot_2d` leaves its axes current. It raises `ValueError` for axes without such a colorbar.
+- `ampl.set_zlabel(label, cbar=None, ax=None, **kwargs)` labels a colorbar. Pass the `cbar` you created. For a colorbar made by `plot_2d`, no `cbar` is needed, because `plot_2d` leaves its axes current. Extra keyword arguments set text properties on the label. It raises `ValueError` for axes without such a colorbar.
 - `ampl.draw_tag(text, ax=None)` writes a small 8 pt tag just above the top right corner of the axes.
 
 ### Legend
 
-`ampl.draw_legend(ax=None, **kwargs)` builds the legend from what the package helpers registered on the axes, in this order:
+`ampl.draw_legend(*, ax=None, **kwargs)` builds the legend from what the package helpers registered on the axes, in this order:
 
 1. Data (`plot_data`).
 2. Stack components (`plot_backgrounds`), from the top of the stack down, which matches how they appear.
@@ -62,9 +62,9 @@ The package also registers a `print` stylesheet for `plt.style.use`, for plots o
 5. Line histograms (`plot_signal`, `plot_1d`).
 6. Every other labelled Matplotlib artist on the axes.
 
-Keyword arguments go to `ax.legend`. It takes no positional handles or labels, so to control the entries, set or remove the labels on the artists. For axes that contain limits it builds the limit legend described under [Limits](#limits). On axes without any package helper it lists the labelled artists, like `ax.legend()`.
+Keyword arguments go to `ax.legend`. Every argument is keyword-only and no positional handles or labels are accepted, so to control the entries, set or remove the labels on the artists. For axes that contain limits it builds the limit legend described under [Limits](#limits). On axes without any package helper it lists the labelled artists, like `ax.legend()`.
 
-A band can share the legend entry of a line. `plot_1d` and `plot_signal` do this for their own bands with `attach_bands=True`. For a line you drew yourself, call `ampl.plot.plot_band(bins, low, high, label=<the line's label>, ax=ax)`, or draw the band with `fill_between` and call `ampl.plot.register_band(label, artist, ax=ax)`.
+A band can share the legend entry of a line. `plot_1d` and `plot_signal` do this for their own bands with `attach_bands=True` (while still keeping the separate uncertainty entries in the legend). For a line you drew yourself, call `ampl.plot.plot_band(bins, low, high, label=<the line's label>, ax=ax)`, or draw the band with `fill_between` and call `ampl.plot.register_band(label, artist, ax=ax)`.
 
 `ampl.plot.plot_band(bins, low, high, label=None, ax=None, **kwargs)` draws a stepped band between per-bin `low` and `high` values and returns the artist. Extra arguments go to `fill_between`.
 
@@ -102,13 +102,13 @@ The label has up to four lines: "ATLAS" with the status, the line "for education
 
 ## Histograms from UHI objects: `ampl.uhi`
 
-These take one-dimensional histogram objects that follow the UHI `PlottableHistogram` protocol: Hist, boost-histogram, and histograms read with Uproot. The histogram must hold counts. A profile (mean storage) raises `UnsupportedKindError`.
+These take histogram objects that follow the UHI `PlottableHistogram` protocol: Hist, boost-histogram, and histograms read with Uproot. All of them are for 1D histograms except `plot_2d`, which takes a 2D histogram. `plot_1d` and `plot_2d` accept both count and profile (mean storage) histograms. Every other helper, along with `Background` and any histogram passed as `stat_errs` or `syst_errs`, requires a count histogram and raises `UnsupportedKindError` for a profile.
 
 - `plot_data(hist, *, stat_errs=None, color="k", label="Data", ax=None)` draws black points with error bars and returns `(values, stat_errs)`. Every argument after `hist` is keyword-only.
-- `plot_1d(hist, label, *, stat_errs=None, color=None, attach_bands=False, ax=None, flow=False, **kwargs)` draws an unfilled step histogram, with a hatched statistical band unless `stat_errs=False`. A profile (mean) histogram is drawn as points with the error on the mean, and then takes no `**kwargs`. The extra arguments go to `ax.hist`, and the legend line copies the drawn line's style, width, and transparency.
-- `plot_signal(hist, label, *, stat_errs=None, syst_errs=None, color=None, attach_bands=False, ax=None, **kwargs)` draws an unfilled step histogram that is overlaid on the stack, not added to it, with a hatched statistical band and, when `syst_errs` is given, a translucent total band. `syst_errs` is an array or a histogram of absolute per-bin uncertainties. Scale the histogram yourself if the signal is too small to see, and say so in the label. A signal whose normalization is meaningful relative to the backgrounds belongs in the stack.
-- `plot_ratio(data, total_bkg, ratio_ax, max_ratio=None, plottype="diff")`. See [Ratio panels](#ratio-panels).
-- `plot_2d(hist, ax=None, pad=0.05, **kwargs)`. See [2D histograms](#2d-histograms).
+- `plot_1d(hist, label, *, stat_errs=None, color=None, attach_bands=False, ax=None, flow=False, **kwargs)` draws an unfilled step histogram, with a hatched statistical band unless `stat_errs=False`. For a count histogram, the extra arguments go to `ax.hist`, and the legend line copies the drawn line's style, width, and transparency. A profile (mean) histogram is drawn as points with the error on the mean (ordered with data points in `draw_legend`), rejects string `stat_errs` with `ValueError`, and takes no `**kwargs`.
+- `plot_signal(hist, label, *, stat_errs=None, syst_errs=None, color=None, attach_bands=False, ax=None, **kwargs)` draws an unfilled step histogram that is overlaid on the stack rather than added to it, with a hatched statistical band and, when `syst_errs` is given, a translucent total band. `syst_errs` is an array or a histogram of absolute per-bin uncertainties (or a `(down, up)` pair). Scale the histogram only when requested, and say so in the label. A fitted signal whose normalization is meaningful relative to the backgrounds belongs in the stack as a `Background`.
+- `plot_ratio(data, total_bkg, ratio_ax, *, stat_errs=None, max_ratio=None, plottype="diff", offscale_errs=False)`. Every argument after `ratio_ax` is keyword-only. See [Ratio panels](#ratio-panels).
+- `plot_2d(hist, ax=None, pad=0.05, **kwargs)`. Accepts a 2D count or profile histogram. See [2D histograms](#2d-histograms).
 - `plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwargs)`. See [Cutflows](#cutflows).
 
 There is no `ampl.uhi.plot_backgrounds`. Build `ampl.plot.Background` objects from the histograms and pass them to `ampl.plot.plot_backgrounds` without `bins`.
@@ -123,7 +123,7 @@ Use these for pre-binned NumPy arrays. `bins` holds the bin edges, so it is one 
 
 - `plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None)` returns `(hist, stat_errs)`.
 - `plot_1d(label, bins, hist, stat_errs=None, color=None, attach_bands=False, ax=None, **kwargs)`.
-- `plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, attach_bands=False, ax=None)`.
+- `plot_signal(label, bins, hist, stat_errs=None, syst_errs=None, color=None, attach_bands=False, ax=None, **kwargs)`.
 - `Background(label, hist, stat_errs=None, syst_errs=None, color=None)` describes one stack component, from an array or a UHI histogram.
 - `plot_backgrounds(backgrounds, bins=None, *, show_errs=False, total_err=None, empty_stat_legend=False, ax=None)` draws the stack in list order from the bottom up, with black outlines, and returns `(total_hist, total_err)`. `bins` is required when the backgrounds were built from arrays. The options after `bins` are keyword-only.
   - `show_errs=True` draws a hatched band for the combined statistical uncertainty and a grey band for the total. They are off by default, following the ATLAS publication committee's recommendation.
@@ -140,15 +140,15 @@ The helpers decide what to draw from the histogram's variances, and a wrong assu
 | --- | --- | --- | --- |
 | `uhi.plot_data` | Error bars of `sqrt(variance)` | Error bars of `sqrt(count)` | `stat_errs="sqrt"` uses `sqrt(count)`. `stat_errs="poisson"` or `"poisson2"` uses a Poisson interval. |
 | `uhi.plot_1d` | Hatched band | No band | `stat_errs=False` removes the band. Otherwise `stat_errs` works as for `uhi.plot_data`. |
-| `uhi.plot_signal` | Hatched band | No band | `stat_errs` (an array or `"sqrt"`) replaces the variances. |
+| `uhi.plot_signal` | Hatched band | No band | `stat_errs` (an array, a histogram, or `"sqrt"`) replaces the variances. |
 | `Background(hist=<UHI>)` | `sqrt(variance)` | Zero | `stat_errs="sqrt"` uses `sqrt(count)`. `stat_errs="ignore"` uses zero. An explicit `stat_errs` array replaces the variances. |
 | `uhi.plot_ratio`, data | `sqrt(variance)` | `sqrt(count)` | `stat_errs` works as for `uhi.plot_data`. Pass the same value to both so the panels agree. |
 | `uhi.plot_ratio`, background histogram | `sqrt(variance)` | Zero | Pass the tuple from `plot_backgrounds` instead |
 
 - boost-histogram and Hist report variances equal to the counts for an unweighted histogram with the default storage, so such histograms get Poisson uncertainties. Fill weighted histograms with `Weight` storage so that the variances are the sum of squared weights.
-- The array functions take `stat_errs` as an array of absolute uncertainties, or the string `"sqrt"` for `sqrt(hist)`. `plot_data` and `plot_1d` also take `"poisson"` and `"poisson2"`: the asymmetric 68.27% and 95% central Poisson intervals of ROOT's `TH1::kPoisson` and `kPoisson2`, computed by `ampl.utils.poisson_errors(counts, interval)`, which needs SciPy. They are meant for raw unweighted counts such as data, so negative or non-integer bin contents raise `ValueError`. `Background` and `plot_signal`, which plot weighted simulation, do not offer them. An empty bin gets an up error only. With `stat_errs=None`, `plot_data` draws points without error bars and `plot_1d` and `plot_signal` draw no band. `Background` also accepts `"ignore"`.
+- The array functions take `stat_errs` as an array of absolute uncertainties, or the string `"sqrt"` for `sqrt(hist)`. `plot_data` and `plot_1d` (and `uhi.plot_ratio`) also take `"poisson"` and `"poisson2"`: the asymmetric 68.27% and 95% central Poisson intervals of ROOT's `TH1::kPoisson` and `kPoisson2`, computed by `ampl.utils.poisson_errors(counts, interval="poisson")`, which needs SciPy. Pass `"poisson"` or `"poisson2"` only when the user explicitly requests Poisson intervals rather than choosing them yourself. They apply only to unweighted counts, so negative or non-integer bin contents raise `ValueError`. `Background` and `plot_signal` do not offer them. An empty bin gets an up error only. With `stat_errs=None`, `plot_data` draws points without error bars and `plot_1d` and `plot_signal` draw no band. `Background` also accepts `"ignore"`.
 - `plot_data` draws plain points whenever all the uncertainties are zero.
-- Every uncertainty argument (`stat_errs`, `syst_errs`, `total_err`, `data_errs`, `bkg_errs`) also takes a pair `(down, up)` for asymmetric uncertainties, for example up and down systematic variations. Each element is an array, or for `syst_errs` a histogram, and signs are ignored. Compute the sizes from varied templates first, as `(nominal - down, up - nominal)`. An array with one row per bin, shape `(N, 2)`, raises `BinningMismatchError`. `plot_data` and `plot_backgrounds` return a `(2, N)` array when the uncertainties are asymmetric, ready for `plot_ratio`. The `uhi` helpers take statistical uncertainties from the variances, so those are symmetric.
+- Every uncertainty argument (`stat_errs`, `syst_errs`, `total_err`, `data_errs`, `bkg_errs`) also takes a pair `(down, up)` for asymmetric uncertainties, for example up and down systematic variations. Each element is an array, or a histogram in `syst_errs` and in the `stat_errs` of the `uhi` helpers, and signs are ignored. Compute the sizes from varied templates first, as `(nominal - down, up - nominal)`. An array with one row per bin, shape `(N, 2)`, raises `BinningMismatchError`. `plot_data` and `plot_backgrounds` return a `(2, N)` array when the uncertainties are asymmetric, ready for `plot_ratio`. By default, the `uhi` helpers take statistical uncertainties from the variances, which are symmetric.
 - `syst_errs` holds absolute per-bin uncertainties, and it is combined in quadrature with the statistical uncertainty, separately for the down and up sides. `plot_backgrounds` adds the systematic uncertainties of different components in quadrature too, so it treats them as uncorrelated. Pass `total_err` when that is not right.
 
 ## Ratio panels
@@ -163,7 +163,7 @@ The helpers decide what to draw from the histogram's variances, and a wrong assu
 
 - The y range is symmetric about the reference line. For `"diff"` and `"significances"` it runs from `-max_ratio` to `max_ratio`, and for `"raw"` from `2 - max_ratio` to `max_ratio`. It is then widened by 10% about the reference line so that tick labels do not touch the main panel.
 - `"diff"` and `"raw"` draw the data points with error bars of `data_errs / bkg` and a grey band for the relative background uncertainty. `"significances"` draws points without error bars and dashed lines at ±1 and ±2.
-- Points outside the range are replaced by red carets at the edge of the panel. `offscale_errs=True` (array version only) also draws their error bars.
+- Points outside the range are replaced by red carets at the edge of the panel. `offscale_errs=True` also draws their error bars.
 - Significances use the definition of <https://cds.cern.ch/record/2643488>, which is also available as `ampl.utils.significance(data, data_errs, bkg, bkg_errs)`.
 - The function does not set a y label. Add one with `rax.set_ylabel(...)`.
 
@@ -220,7 +220,7 @@ ampl.draw_legend(ax=ax)
 - The expected limit is a dashed line and the observed limit is a solid line. The band arguments are the values of the band edges, not offsets from the expected limit.
 - Give both edges of a band or neither, and give `observed` together with `observed_label`. Otherwise the function raises `ValueError`.
 - Without `color`, the lines are black and the bands are the usual green (±1σ) and yellow (±2σ). With `color`, the bands are translucent versions of that color. Use this to draw several limits on the same axes, one call for each.
-- `ampl.draw_legend` recognises the limits. For one limit it lists the observed line, the expected line, and an "Expected ±1σ" and "Expected ±2σ" entry for each band that was drawn. For several limits it draws one entry for each expected limit, with its bands behind the line.
+- `ampl.draw_legend` recognises the limits. For one limit it lists the observed line, the expected line, and an "Expected ±1σ" and "Expected ±2σ" entry for each band that was drawn. For several limits (each with its own distinct `expected_label`) it lists each limit's observed line, when given, and its expected line with its bands behind it.
 
 ## Pulls and impacts: `ampl.stats`
 
@@ -247,7 +247,7 @@ fig.tight_layout()
 - `make_impact_figure(num_parameters)` creates a 10 in by 6 in figure and sets the y limits so that the first row is at the top, with empty space above it for the legend. The size does not grow with the number of parameters, and about 10 parameter names fit at the default text size. For more, make the figure taller with `fig.set_size_inches`, by roughly 0.4 in for each extra parameter.
 - `plot_pulls(data, ax=None, **kwargs)` draws the pulls on the bottom x axis, fixed to the range -2 to 2 and labelled θ̂, with guide lines at 0 and ±1. It returns `(ax, errorbar_container)`. Extra arguments go to `errorbar`.
 - `plot_impacts(data, draw_prefit=False, up_color="paper:blue", down_color="paper:red", ax=None)` draws the impacts as bars on a second x axis at the top and returns that axis. Post-fit impacts are filled and pre-fit impacts are outlines. Pass the pull axes as `ax`.
-- `draw_pull_impact_legend(ax=None, **kwargs)` draws the combined legend at the upper left. Extra arguments go to `ax.legend` and override its defaults for `loc`, `fontsize`, `ncols`, `frameon`, `facecolor`, `handlelength`, and `handler_map`. It raises `IncorrectAxesError` for axes without pulls or impacts.
+- `draw_pull_impact_legend(*, ax=None, **kwargs)` draws the combined legend at the upper left (`ax` is keyword-only). Extra arguments go to `ax.legend` and override its defaults for `loc`, `fontsize`, `ncols`, `frameon`, `facecolor`, `handlelength`, and `handler_map`. It raises `IncorrectAxesError` for axes without pulls or impacts.
 - Pulls and impacts can each be drawn alone.
 
 ## Palettes and named colors
@@ -287,11 +287,11 @@ Prefer the active color cycle over hard-coding many colors. Use named colors onl
 | `ampl.plot.LabeledBinsError` | A category axis was given where bin edges are needed, or a cutflow got a numeric axis. |
 | `ampl.plot.DimensionError` | The histogram has the wrong number of dimensions. |
 | `ampl.plot.ViolatesPlottableHistogramError` | The object does not follow the UHI `PlottableHistogram` protocol. |
-| `ampl.uhi.UnsupportedKindError` | The histogram is a profile and not a count histogram. |
-| `ampl.uhi.FlowNotSupportedError` | `flow=True` was given for a histogram without flow bins. |
+| `ampl.uhi.UnsupportedKindError` (also `ampl.plot.UnsupportedKindError`) | A profile (or other non-count) histogram was passed where counts are required. |
+| `ampl.uhi.FlowNotSupportedError` (also `ampl.plot.FlowNotSupportedError`) | `flow=True` was given for a histogram without flow bins. |
 | `ampl.stats.IncorrectAxesError` | `draw_pull_impact_legend` got axes without pulls or impacts. |
-| `TypeError` | An unknown `plottype` or `stat_errs` string, `bins` missing for array backgrounds, or positional arguments to `draw_legend`. |
-| `ValueError` | An unknown palette name, only one edge of a limit band, `observed` without `observed_label`, or `set_zlabel` on axes without a colorbar. |
+| `TypeError` | `bins` missing for non-empty array backgrounds, an invalid `total_bkg` in `uhi.plot_ratio`, `**kwargs` passed with a profile histogram in `uhi.plot_1d`, or positional arguments where keyword-only arguments are required (such as `draw_legend`, `draw_pull_impact_legend`, and optional `uhi` arguments). |
+| `ValueError` | An unknown `plottype`, `stat_errs`, or palette name, `stat_errs` as a string on a profile in `uhi.plot_1d`, negative or non-integer counts with `"poisson"` or `"poisson2"`, an empty `backgrounds` list without `bins`, only one edge of a limit band, `observed` without `observed_label`, or `set_zlabel` on axes without a colorbar. |
 
 ## Verification checklist
 
