@@ -139,7 +139,7 @@ def plot_pulls(data, ax=None, **kwargs):
     data : DataFrame
         Pulls.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     **kwargs
         Passed to ``ax.errorbar``.
 
@@ -201,7 +201,7 @@ def plot_impacts(
     up_color, down_color : color-like, optional
         Colors of the impacts from the +1σ and -1σ fits.
     ax : matplotlib.axes.Axes, optional
-        Axes of the pull plot (defaults to current axes).
+        Axes of the pull plot. Defaults to the current axes.
 
     Returns
     -------
@@ -292,7 +292,7 @@ def draw_pull_impact_legend(*, ax=None, **kwargs):
     Parameters
     ----------
     ax : matplotlib.axes.Axes, optional
-        Axes of the pull plot or the impact plot (defaults to current axes).
+        Axes of the pull plot or the impact plot. Defaults to the current axes.
     **kwargs
         Passed to ``ax.legend``.
 

@@ -77,11 +77,11 @@ def plot_data(hist, *, stat_errs=None, color="k", label="Data", ax=None, ignore_
         A histogram's values are used. If omitted, the square root of the variances, or of
         the bin contents if ``hist`` has no variances.
     color : color-like, optional
-        Point color (defaults to black).
+        Point color. Defaults to black.
     label : str, optional
-        Legend label (defaults to "Data").
+        Legend label. Defaults to "Data".
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
 
     Returns
     -------
@@ -145,11 +145,11 @@ def plot_signal(
 
         A histogram's values are used.
     color : color-like, optional
-        Line and band color (defaults to the next color in the color cycle).
+        Line and band color. Defaults to the next color in the color cycle.
     attach_bands : bool, optional
         Draw the bands behind the signal's line in the legend. Defaults to False.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     **kwargs
         Passed to ``ax.hist``.
     """
@@ -293,11 +293,11 @@ def plot_1d(
 
         A histogram's values are used. If omitted, the square root of the variances.
     color : color-like, optional
-        Line color (defaults to the next color in the color cycle).
+        Line color. Defaults to the next color in the color cycle.
     attach_bands : bool, optional
         Draw the band behind the line in the legend. Defaults to False.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     flow : bool, optional
         Draw the underflow and overflow as an extra bin at each end, labelled "<low" and
         ">high". Defaults to False.
@@ -386,16 +386,15 @@ def plot_2d(hist, ax=None, pad=0.05, **kwargs):
     """
     Plot a 2D PlottableHistogram as a color map with a colorbar on the right.
 
-    The x and y axes get the same scale, which suits related quantities such as two masses,
-    and their limits are set to the bin edges. For unrelated quantities, call
-    ``ax.set_aspect("auto")`` afterwards to let the axes fill their usual space.
+    The x and y axes get the same scale, and their limits are set to the bin edges. If this
+    is inappropriate, call ``ax.set_aspect("auto")`` afterwards.
 
     Parameters
     ----------
     hist : PlottableHistogram
         2D histogram, or a profile.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     pad : float, optional
         Gap between the axes and the colorbar, in inches. Defaults to 0.05.
     **kwargs
@@ -431,7 +430,7 @@ def plot_cutflow(hist, ax=None, text=True, textcolor="w", horizontal=True, **kwa
     text : bool, optional
         Write the yield on each bar. Defaults to True.
     textcolor : color-like, optional
-        Color of the yields (defaults to white).
+        Color of the yields. Defaults to white.
     horizontal : bool, optional
         Draw horizontal bars, with the first cut at the top. Defaults to True.
     **kwargs

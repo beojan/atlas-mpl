@@ -164,7 +164,7 @@ class Background:
 
             A histogram's values are used.
         color : color-like, optional
-            Fill color (defaults to the next color in the color cycle).
+            Fill color. Defaults to the next color in the color cycle.
         """
         if hasattr(hist, "axes"):  # Object should meet the PlottableHistogram protocol
             _uhi_val.validate_plottable_histogram(
@@ -218,7 +218,7 @@ def plot_band(bins, low, high, label=None, ax=None, **kwargs):
         Legend label. If it matches the label of a line, :func:`draw_legend` draws the band
         behind that line in the legend.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     **kwargs
         Passed to ``ax.fill_between``.
 
@@ -251,7 +251,7 @@ def register_band(label, artist, ax=None):
     artist : matplotlib.artist.Artist
         The band, for example the collection returned by ``fill_between``.
     ax : matplotlib.axes.Axes, optional
-        Axes holding the line (defaults to current axes).
+        Axes holding the line. Defaults to the current axes.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -270,11 +270,9 @@ def plot_backgrounds(
     backgrounds : list of Background
         Backgrounds in stacking order, from bottom to top.
     bins : array_like, optional
-        Bin edges. Required unless the backgrounds were built from PlottableHistograms. For
-        backward compatibility, ``backgrounds`` and ``bins`` may be given in either order.
+        Bin edges. Required unless the backgrounds were built from PlottableHistograms.
     show_errs : bool, optional
-        Draw the uncertainty bands of the total background. Defaults to False, following the
-        PubCom recommendation.
+        Draw the uncertainty bands of the total background. Defaults to False.
     total_err : array_like, optional
         Total uncertainty in each bin, replacing the combined systematic uncertainties of
         the backgrounds. Use it for post-fit uncertainties:
@@ -284,7 +282,7 @@ def plot_backgrounds(
     empty_stat_legend : bool, optional
         Add a statistical uncertainty entry to the legend even when no such band is drawn.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
 
     Returns
     -------
@@ -446,11 +444,11 @@ def plot_signal(
         A histogram's values are used. A shaded band shows the statistical and systematic
         uncertainties added in quadrature.
     color : color-like, optional
-        Line and band color (defaults to the next color in the color cycle).
+        Line and band color. Defaults to the next color in the color cycle.
     attach_bands : bool, optional
         Draw the bands behind the signal's line in the legend. Defaults to False.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     **kwargs
         Passed to ``ax.hist``.
     """
@@ -553,15 +551,15 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
 
         If omitted, the points have no error bars.
     color : color-like, optional
-        Point color (defaults to black).
+        Point color. Defaults to black.
     label : str, optional
-        Legend label (defaults to "Data").
+        Legend label. Defaults to "Data".
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
 
     Returns
     -------
-    hist : array_like
+    hist : numpy.ndarray
         The bin contents.
     stat_errs : numpy.ndarray
         The statistical uncertainties. Pass these and ``hist`` to :func:`plot_ratio`.
@@ -654,11 +652,16 @@ def plot_ratio(
         for ``"raw"``, otherwise 0). It is then widened by 10%, so that tick labels at the ends
         of the range do not clash with those of the panel above or below.
     plottype : {"diff", "raw", "significances"}, optional
-        ``"diff"`` plots (data - bkg) / bkg, ``"raw"`` plots data / bkg, and
-        ``"significances"`` plots the significance in each bin, as defined in
-        https://cds.cern.ch/record/2643488 (see :func:`atlas_mpl_style.utils.significance`).
-        Asymmetric uncertainties are taken on the side facing the other value. Defaults to
-        ``"diff"``.
+        What to plot:
+
+        - ``"diff"``: (data - bkg) / bkg.
+        - ``"raw"``: data / bkg.
+        - ``"significances"``: the significance in each bin, as defined in
+          https://cds.cern.ch/record/2643488 (see
+          :func:`atlas_mpl_style.utils.significance`). Asymmetric uncertainties are taken on
+          the side facing the other value.
+
+        Defaults to ``"diff"``.
     offscale_errs : bool, optional
         Also draw the error bars of points outside the y range. Defaults to False.
     """
@@ -766,7 +769,7 @@ def draw_tag(text, ax=None):
     text : str
         Text to draw.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -807,11 +810,11 @@ def plot_1d(
         - ``"poisson"``, ``"poisson2"``: ROOT's Poisson intervals (see
           :func:`atlas_mpl_style.utils.poisson_errors`).
     color : color-like, optional
-        Line color (defaults to the next color in the color cycle).
+        Line color. Defaults to the next color in the color cycle.
     attach_bands : bool, optional
         Draw the band behind the line in the legend. Defaults to False.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     **kwargs
         Passed to ``ax.hist``.
     """
@@ -871,9 +874,8 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
     """
     Plot a 2D histogram as a color map with a colorbar on the right.
 
-    The x and y axes get the same scale, which suits related quantities such as two masses,
-    and their limits are set to the bin edges. For unrelated quantities, call
-    ``ax.set_aspect("auto")`` afterwards to let the axes fill their usual space.
+    The x and y axes get the same scale, and their limits are set to the bin edges. If this
+    is inappropriate, call ``ax.set_aspect("auto")`` afterwards.
 
     .. note:: :func:`atlas_mpl_style.uhi.plot_2d` takes a ``PlottableHistogram`` instead.
 
@@ -884,7 +886,7 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
     hist : numpy.ndarray
         Bin contents, indexed as ``hist[x, y]``.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     pad : float, optional
         Gap between the axes and the colorbar, in inches. Defaults to 0.05.
     **kwargs
@@ -942,7 +944,7 @@ def plot_cutflow(
     text : bool, optional
         Write the yield on each bar. Defaults to True.
     textcolor : color-like, optional
-        Color of the yields (defaults to white).
+        Color of the yields. Defaults to white.
     horizontal : bool, optional
         Draw horizontal bars, with the first cut at the top. Defaults to True.
     **kwargs
@@ -1033,7 +1035,7 @@ def plot_limit(
         Color of the lines and bands, to tell several limits apart. Without it, the lines are
         black and the bands green and yellow.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
+        Axes to draw on. Defaults to the current axes.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -1116,7 +1118,7 @@ def set_xlabel(label, ax=None, *args, **kwargs):
     label : str
         Label text.
     ax : matplotlib.axes.Axes, optional
-        Axes to label (defaults to current axes).
+        Axes to label. Defaults to the current axes.
     *args, **kwargs
         Passed to ``ax.set_xlabel``.
 
@@ -1144,7 +1146,7 @@ def set_ylabel(label, ax=None, *args, **kwargs):
     label : str
         Label text.
     ax : matplotlib.axes.Axes, optional
-        Axes to label (defaults to current axes).
+        Axes to label. Defaults to the current axes.
     *args, **kwargs
         Passed to ``ax.set_ylabel``.
 
@@ -1184,8 +1186,8 @@ def set_zlabel(label, cbar=None, ax=None, **kwargs):
     cbar : matplotlib.colorbar.Colorbar, optional
         Colorbar to label.
     ax : matplotlib.axes.Axes, optional
-        Axes passed to :func:`plot_2d`, whose colorbar is labelled when ``cbar`` is not given
-        (defaults to current axes).
+        Axes passed to :func:`plot_2d`, whose colorbar is labelled when ``cbar`` is not
+        given. Defaults to the current axes.
     **kwargs
         Text properties for the label.
 
@@ -1234,12 +1236,19 @@ def draw_atlas_label(
     x, y : float
         Position of the top-left corner of the label, in axes coordinates.
     ax : matplotlib.axes.Axes, optional
-        Axes to draw on (defaults to current axes).
-    status : {'int', 'wip', 'prelim', 'final', 'opendata', 'opendata-res'} or str, optional
-        ``'int'`` draws "Internal", ``'wip'`` "Work In Progress", ``'prelim'`` "Preliminary",
-        and ``'opendata'`` and ``'opendata-res'`` "Open Data". ``'opendata'`` also adds the line
-        "for education only". ``'final'`` and None draw no status, and any other string is
-        drawn as given. Defaults to ``'int'``.
+        Axes to draw on. Defaults to the current axes.
+    status : str or None, optional
+        Approval status:
+
+        - ``"int"``: "Internal".
+        - ``"wip"``: "Work In Progress".
+        - ``"prelim"``: "Preliminary".
+        - ``"final"`` or None: no status.
+        - ``"opendata"``: "Open Data", and the line "for education only".
+        - ``"opendata-res"``: "Open Data".
+        - any other string: drawn as given.
+
+        Defaults to ``"int"``.
     simulation : bool, optional
         Add "Simulation" to the label. Defaults to False.
     energy : str, optional
@@ -1346,7 +1355,7 @@ def draw_legend(*, ax=None, **kwargs):
     Parameters
     ----------
     ax : matplotlib.axes.Axes, optional
-        Axes to draw the legend on (defaults to current axes).
+        Axes to draw the legend on. Defaults to the current axes.
     **kwargs
         Passed to ``ax.legend``.
     """
