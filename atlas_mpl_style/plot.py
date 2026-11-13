@@ -281,6 +281,7 @@ def plot_backgrounds(
     total_stat_err = _np.sqrt(total_stat_err)
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
+    _u.fit_x_to_bins(ax, bins)
     if show_errs:
         if _np.sum(total_stat_err) != 0:
             ax._ampllegend.has_stat = True
@@ -404,6 +405,7 @@ def plot_signal(
         if len(hist) != len(syst_errs):
             raise BinningMismatchError("Incorrect binning for syst errors")
     bin_centers = (bins[1:] + bins[:-1]) / 2
+    _u.fit_x_to_bins(ax, bins)
     total_err = _np.sqrt(_np.square(stat_errs) + _np.square(syst_errs))
     _, _, p = ax.hist(
         bin_centers,
@@ -496,6 +498,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
         if len(hist) != len(stat_errs):
             raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
+    _u.fit_x_to_bins(ax, bins)
     if _np.sum(stat_errs) == 0:
         a = ax.scatter(
             bin_centers,
@@ -589,6 +592,12 @@ def plot_ratio(
 
     ratio_ax.axhline(centre, color="paper:red", lw=1)
     ratio_ax.set_ylim(min_ratio, max_ratio)
+    if plottype == "raw":
+        # ratio_axes places ticks symmetrically about 0. Centre them on 1 instead.
+        offsets = _mpl.ticker.MaxNLocator(
+            symmetric=True, prune="both", min_n_ticks=5, nbins=4
+        ).tick_values(min_ratio - 1, max_ratio - 1)
+        ratio_ax.yaxis.set_major_locator(_mpl.ticker.FixedLocator(offsets + 1))
     if plottype == "diff":
         plot_band(
             bins, -bkg_errs / bkg, bkg_errs / bkg, color="grey", alpha=0.5, ax=ratio_ax
@@ -604,6 +613,8 @@ def plot_ratio(
         )
 
     bin_centers = (bins[1:] + bins[:-1]) / 2
+    _u.decorate_axes(ratio_ax)
+    _u.fit_x_to_bins(ratio_ax, bins)
     out_of_range_up = _np.where(ratio > max_ratio, max_ratio, _np.nan)
     out_of_range_down = _np.where(ratio < min_ratio, min_ratio, _np.nan)
     ratio_ax.plot(
@@ -698,6 +709,7 @@ def plot_1d(
         if len(hist) != len(stat_errs):
             raise BinningMismatchError("Stat errors may have incorrect binning")
     bin_centers = (bins[1:] + bins[:-1]) / 2
+    _u.fit_x_to_bins(ax, bins)
     _, _, p = ax.hist(
         bin_centers,
         bins=bins,

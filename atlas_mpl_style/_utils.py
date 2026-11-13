@@ -48,6 +48,8 @@ class AMPLAxesInfo:
     main_ax: Axes = None
     low_ax: Axes = None
     cbar: Axes = None
+    # x limits last set by fit_x_to_bins, to tell them apart from limits the caller set.
+    bin_range: Any = None
 
 
 def decorate_axes(ax):
@@ -56,6 +58,18 @@ def decorate_axes(ax):
         ax._ampllegend = AMPLLegend()
     if not hasattr(ax, "_amplaxesinfo"):
         ax._amplaxesinfo = AMPLAxesInfo()
+
+
+def fit_x_to_bins(ax, bins):
+    """Set the x limits of ``ax`` to cover ``bins`` and earlier histograms, unless the caller set them."""
+    info = ax._amplaxesinfo
+    lo, hi = float(bins[0]), float(bins[-1])
+    if not ax.get_autoscalex_on():
+        if info.bin_range is None or tuple(ax.get_xlim()) != info.bin_range:
+            return
+        lo, hi = min(lo, info.bin_range[0]), max(hi, info.bin_range[1])
+    ax.set_xlim(lo, hi)
+    info.bin_range = tuple(ax.get_xlim())
 
 
 def get_main_ax(ax):

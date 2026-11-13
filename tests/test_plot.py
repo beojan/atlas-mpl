@@ -538,5 +538,36 @@ class TestPlotModule(unittest.TestCase):
             draw_legend(["a"], ax=ax)
         plt.close(fig)
 
+    def test_x_limits_fit_the_bins(self):
+        fig, ax, rax = ampl.ratio_axes()
+        bins = np.linspace(0, 1000, 31)
+        plot_backgrounds([Background("b", np.ones(30))], bins, ax=ax)
+        plot_signal("s", np.linspace(-100, 900, 31), np.ones(30), ax=ax)
+        plot_ratio(bins, np.ones(30), np.ones(30), np.ones(30), np.ones(30), rax)
+        fig.canvas.draw()
+        self.assertEqual(ax.get_xlim(), (-100.0, 1000.0))
+        self.assertEqual(rax.get_xlim(), (-100.0, 1000.0))
+        plt.close(fig)
+
+    def test_x_limits_set_by_caller_are_kept(self):
+        fig, ax = plt.subplots()
+        bins = np.linspace(0, 1000, 31)
+        plot_data(bins, np.ones(30), ax=ax)
+        ax.set_xlim(200, 600)
+        plot_1d("h", bins, np.ones(30), ax=ax)
+        self.assertEqual(ax.get_xlim(), (200.0, 600.0))
+        plt.close(fig)
+
+    def test_raw_ratio_ticks_centred_on_one(self):
+        fig, ax, rax = ampl.ratio_axes()
+        bins = np.linspace(0, 1, 5)
+        plot_ratio(bins, np.ones(4), np.ones(4), np.ones(4), np.ones(4), rax, plottype="raw")
+        fig.canvas.draw()
+        lo, hi = rax.get_ylim()
+        ticks = [t for t in rax.get_yticks() if lo <= t <= hi]
+        self.assertIn(1.0, ticks)
+        self.assertGreaterEqual(len(ticks), 3)
+        plt.close(fig)
+
 if __name__ == "__main__":
     unittest.main()
