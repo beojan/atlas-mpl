@@ -240,5 +240,14 @@ class TestStylesAndColors(unittest.TestCase):
             ampl.set_color_cycle("petrof")
 
 
+    def test_use_atlas_style_argument_names(self):
+        ampl.use_atlas_style(atlas_label="CMS", fancy_legend=True)
+        self.assertEqual(ampl.plot._atlas_label, "CMS")
+        self.assertTrue(mpl.rcParams["legend.frameon"])
+        ampl.use_atlas_style(atlasLabel="LHCb", fancyLegend=False)
+        self.assertEqual(ampl.plot._atlas_label, "LHCb")
+        self.assertFalse(mpl.rcParams["legend.frameon"])
+        ampl.use_atlas_style()
+
 if __name__ == "__main__":
     unittest.main()

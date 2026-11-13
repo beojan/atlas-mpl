@@ -91,8 +91,9 @@ class TestUHIModule(unittest.TestCase):
         uhi.plot_data(h, ax=ax, label="DataUHI")
         self.assertIn("DataUHI", ax._ampllegend.data_hists)
 
-        # With ignore_variances
-        uhi.plot_data(h, ignore_variances=True, ax=ax)
+        # Deprecated ignore_variances still works, with a warning.
+        with self.assertWarns(DeprecationWarning):
+            uhi.plot_data(h, ignore_variances=True, ax=ax)
 
         # Profile histogram rejected
         h_prof = bh.Histogram(axis, storage=bh.storage.Mean()).fill([15, 25], sample=[1, 2])
@@ -123,7 +124,8 @@ class TestUHIModule(unittest.TestCase):
 
         # With ignore_variances and syst_errs as histogram
         syst_h = bh.Histogram(axis).fill([10, 20, 30])
-        uhi.plot_signal(h, label="SigUHI2", ignore_variances=True, syst_errs=syst_h, ax=ax)
+        with self.assertWarns(DeprecationWarning):
+            uhi.plot_signal(h, label="SigUHI2", ignore_variances=True, syst_errs=syst_h, ax=ax)
 
         # Syst_errs with dimension error
         h2d = bh.Histogram(axis, axis)
@@ -218,22 +220,18 @@ class TestUHIModule(unittest.TestCase):
         h = bh.Histogram(axis, storage=bh.storage.Weight()).fill([10, 20, 30], weight=[1, 2, 3])
 
         fig, ax = plt.subplots()
-        uhi.plot_1d(h, label="1DUHI", stat_err=True, attach_bands=True, ax=ax)
+        uhi.plot_1d(h, label="1DUHI", attach_bands=True, ax=ax)
         self.assertIn("1DUHI", ax._ampllegend.line_hists)
 
-        # With ignore_variances
-        uhi.plot_1d(h, label="1DUHI_no_var", ignore_variances=True, stat_err=False, ax=ax)
+        # Deprecated ignore_variances and stat_err still work, with a warning.
+        with self.assertWarns(DeprecationWarning):
+            uhi.plot_1d(h, label="1DUHI_no_var", ignore_variances=True, ax=ax)
+        with self.assertWarns(DeprecationWarning):
+            uhi.plot_1d(h, label="1DUHI_no_band", stat_err=False, ax=ax)
+        uhi.plot_1d(h, label="1DUHI_false", stat_errs=False, ax=ax)
 
-        # PlottableHistogram with variances() is None
-        h_no_var = bh.Histogram(axis, storage=bh.storage.Double()).fill([10, 20])
-        uhi.plot_1d(h_no_var, label="1DUHI_double", stat_err=True, ax=ax)
-
-        # Profile histogram rejected
-        h_prof = bh.Histogram(axis, storage=bh.storage.Mean()).fill([10, 20, 30], sample=[1, 2, 3])
-        with self.assertRaises(UnsupportedKindError) as cm:
-            uhi.plot_1d(h_prof, label="1DProf", ax=ax)
-        self.assertIn("Profile histograms", str(cm.exception))
-        self.assertIn("not appropriate", str(cm.exception))
+        h_double = bh.Histogram(axis, storage=bh.storage.Double()).fill([10, 20])
+        uhi.plot_1d(h_double, label="1DUHI_double", ax=ax)
 
         # Protocol error
         with self.assertRaises(ViolatesPlottableHistogramError):
@@ -386,6 +384,132 @@ class TestUHIModule(unittest.TestCase):
     def test_unsupported_kind_error_exported(self):
         self.assertIs(ampl.uhi.UnsupportedKindError, UnsupportedKindError)
         self.assertIs(ampl.plot.UnsupportedKindError, UnsupportedKindError)
+
+    def test_uhi_plot_signal_asymmetric_syst(self):
+        axis = bh.axis.Regular(4, 0, 4)
+        h = bh.Histogram(axis).fill([0.5, 1.5, 1.5, 2.5])
+        down = bh.Histogram(axis).fill([0.5, 1.5])
+        up = bh.Histogram(axis).fill([0.5, 1.5, 2.5, 2.5])
+        fig, ax = plt.subplots()
+        uhi.plot_signal(h, "s", syst_errs=(down, up), ax=ax)
+        plt.close(fig)
+
+    def test_uhi_poisson_stat_errs(self):
+        axis = bh.axis.Regular(3, 0, 3, underflow=True, overflow=True)
+        h = bh.Histogram(axis).fill([0.5, 1.5, 1.5, 1.5, -1])
+        expected = ampl.utils.poisson_errors(h.values())
+        fig, ax = plt.subplots()
+        _, errs = uhi.plot_data(h, stat_errs="poisson", ax=ax)
+        np.testing.assert_allclose(errs, expected)
+        with self.assertWarns(DeprecationWarning):
+            _, errs = uhi.plot_data(h, ignore_variances=True, ax=ax)
+        np.testing.assert_allclose(errs, np.sqrt(h.values()))
+        uhi.plot_1d(h, "h", stat_errs="poisson2", flow=True, ax=ax)
+        plt.close(fig)
+        fig, ax, rax = ampl.ratio_axes()
+        uhi.plot_ratio(h, (h.values() + 1.0, np.ones(3)), rax, plottype="raw", stat_errs="poisson")
+        plt.close(fig)
+
+
+    def test_background_explicit_stat_errs_replace_variances(self):
+        axis = bh.axis.Regular(2, 0, 2)
+        h = bh.Histogram(axis, storage=bh.storage.Weight()).fill([0.5, 1.5], weight=[2, 3])
+        np.testing.assert_allclose(ampl.plot.Background("b", h).stat_errs, [2.0, 3.0])
+        down, up = np.array([0.5, 1.0]), np.array([1.5, 2.0])
+        bkg = ampl.plot.Background("b", h, stat_errs=(down, up))
+        np.testing.assert_allclose(bkg.stat_errs, [down, up])
+
+    def test_uhi_plot_signal_stat_errs(self):
+        axis = bh.axis.Regular(2, 0, 2)
+        h = bh.Histogram(axis).fill([0.5, 1.5, 1.5, 1.5, 1.5])
+        fig, ax = plt.subplots()
+        uhi.plot_signal(h, "s", stat_errs=(np.array([1.0, 1.0]), np.array([2.0, 3.0])), ax=ax)
+        y = ax.collections[0].get_paths()[0].vertices[:, 1]
+        self.assertEqual((y.min(), y.max()), (0.0, 7.0))
+        uhi.plot_signal(h, "s2", stat_errs="sqrt", ax=ax)
+        with self.assertRaises(ValueError):
+            uhi.plot_signal(h, "s3", stat_errs="poisson", ax=ax)
+        plt.close(fig)
+
+    def test_uhi_plot_data_without_variances_uses_sqrt(self):
+        filled = bh.Histogram(bh.axis.Regular(2, 0, 2)).fill([0.5, 1.5, 1.5, 1.5, 1.5])
+
+        class NoVariances:
+            """A PlottableHistogram that reports no variances."""
+
+            axes = filled.axes
+            kind = filled.kind
+
+            def values(self):
+                return filled.values()
+
+            def variances(self):
+                return None
+
+            def counts(self):
+                return filled.counts()
+
+        h = NoVariances()
+        fig, ax = plt.subplots()
+        _, errs = uhi.plot_data(h, ax=ax)
+        np.testing.assert_allclose(errs, [1.0, 2.0])
+        plt.close(fig)
+
+    def test_uhi_stat_errs_histograms(self):
+        axis = bh.axis.Regular(2, 0, 2)
+        h = bh.Histogram(axis).fill([-1, 0.5, 1.5, 1.5, 1.5, 1.5, 5])
+        down = bh.Histogram(axis).fill([-1, 0.5, 1.5])
+        up = bh.Histogram(axis).fill([-1, -1, 0.5, 0.5, 1.5, 5, 5])
+        fig, ax = plt.subplots()
+        _, errs = uhi.plot_data(h, stat_errs=(down, up), ax=ax)
+        np.testing.assert_allclose(errs, [down.values(), up.values()])
+        uhi.plot_signal(h, "s", stat_errs=up, ax=ax)
+        # With flow bins, the uncertainty histograms supply their flow bins too.
+        uhi.plot_1d(h, "f", stat_errs=(down, up), flow=True, ax=ax)
+        flow_errs = uhi._with_flow((down, up))
+        np.testing.assert_allclose(flow_errs, [down.values(flow=True), up.values(flow=True)])
+        self.assertEqual(len(flow_errs[0]), 4)
+        h_prof = bh.Histogram(axis, storage=bh.storage.Mean()).fill([0.5], sample=[1])
+        with self.assertRaises(UnsupportedKindError):
+            uhi.plot_data(h, stat_errs=h_prof, ax=ax)
+        plt.close(fig)
+
+    def test_uhi_optional_arguments_are_keyword_only(self):
+        h = bh.Histogram(bh.axis.Regular(2, 0, 2)).fill([0.5, 1.5])
+        fig, ax = plt.subplots()
+        with self.assertRaises(TypeError):
+            uhi.plot_data(h, True)
+        with self.assertRaises(TypeError):
+            uhi.plot_1d(h, "h", False)
+        plt.close(fig)
+
+    def test_uhi_plot_ratio_list_and_offscale_errs(self):
+        h = bh.Histogram(bh.axis.Regular(2, 0, 2)).fill([0.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5])
+        fig, ax, rax = ampl.ratio_axes()
+        uhi.plot_ratio(h, [np.array([1.0, 1.0]), np.array([0.1, 0.1])], rax, plottype="raw", offscale_errs=True)
+        plt.close(fig)
+
+    def test_uhi_plot_1d_profile(self):
+        axis = bh.axis.Regular(3, 0, 3, underflow=True, overflow=True)
+        prof = bh.Histogram(axis, storage=bh.storage.Mean())
+        prof.fill([0.5, 0.5, 0.5, 1.5, -1, -1], sample=[1.0, 2.0, 3.0, 5.0, 4.0, 6.0])
+        fig, ax = plt.subplots()
+        uhi.plot_1d(prof, "p", ax=ax)
+        points = ax._ampllegend.data_hists["p"]
+        means = points.lines[0].get_ydata()
+        np.testing.assert_allclose(means[:2], [2.0, 5.0])
+        self.assertTrue(np.isnan(means[2]))  # empty bin
+        # The error bar of the first bin is the error on the mean, sqrt(1 / 3) for samples 1, 2, 3.
+        segments = points.lines[2][0].get_segments()
+        low, high = segments[0][:, 1]
+        self.assertAlmostEqual(high - low, 2 * np.sqrt(1.0 / 3))
+        uhi.plot_1d(prof, "pf", flow=True, ax=ax)
+        uhi.plot_1d(prof, "p0", stat_errs=False, ax=ax)
+        with self.assertRaises(ValueError):
+            uhi.plot_1d(prof, "ps", stat_errs="sqrt", ax=ax)
+        with self.assertRaises(TypeError):
+            uhi.plot_1d(prof, "pk", ax=ax, ls="--")
+        plt.close(fig)
 
 if __name__ == "__main__":
     unittest.main()

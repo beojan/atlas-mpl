@@ -11,6 +11,7 @@ import matplotlib.colors as _colors
 import numpy as _np
 import atlas_mpl_style._utils as _u
 from atlas_mpl_style.utils import significance as _significance
+from atlas_mpl_style.utils import poisson_errors as _poisson_errors
 from math import floor, ceil
 from mpl_toolkits.axes_grid1 import make_axes_locatable as _make_axes_locatable
 
@@ -72,6 +73,64 @@ FlowNotSupportedError = _uhi_val.FlowNotSupportedError
 UnsupportedKindError = _uhi_val.UnsupportedKindError
 
 
+def _errors(errs, n, name):
+    """
+    Return ``errs`` as a (2, n) array of down and up uncertainties.
+
+    ``errs`` is an array of ``n`` symmetric uncertainties, a single PlottableHistogram, or a
+    pair ``(down, up)`` whose elements are arrays or PlottableHistograms. Signs are ignored.
+    """
+    if hasattr(errs, "axes"):
+        errs = errs.values()
+    elif isinstance(errs, (tuple, list)) and len(errs) == 2 and all(
+        hasattr(e, "axes") or _np.ndim(e) == 1 for e in errs
+    ):
+        errs = [e.values() if hasattr(e, "axes") else e for e in errs]
+    arr = _np.abs(_np.asarray(errs, dtype=float))
+    if arr.shape == (n,):
+        return _np.stack([arr, arr])
+    if arr.shape == (2, n):
+        return arr
+    if arr.shape == (n, 2):
+        raise BinningMismatchError(
+            f"{name} has one row per bin. Give asymmetric uncertainties as (down, up)."
+        )
+    raise BinningMismatchError(f"{name} does not match the binning")
+
+
+def _stat_errs_from_name(name, hist, allow_ignore=False, allow_poisson=False):
+    """Return the statistical errors named by a ``stat_errs`` string such as ``"sqrt"``."""
+    name = name.lower()
+    if name == "sqrt":
+        return _np.sqrt(hist)
+    if allow_poisson and name in ("poisson", "poisson2"):
+        counts = _np.asarray(hist, dtype=float)
+        if _np.any(counts < 0) or _np.any(counts != _np.round(counts)):
+            raise ValueError(
+                f'stat_errs="{name}" needs unweighted counts, as non-negative integers. '
+                "Bin contents that are not integers indicate a weighted histogram."
+            )
+        return _poisson_errors(counts, name)
+    if allow_ignore and name == "ignore":
+        return _np.zeros_like(hist)
+    raise ValueError(f"Invalid stat_errs {name!r}")
+
+
+def _validate_errs(errs, name, func_name):
+    """Check the PlottableHistograms in ``errs``, which is a histogram, a pair, or neither."""
+    parts = errs if isinstance(errs, (tuple, list)) else [errs]
+    for part in parts:
+        if hasattr(part, "axes"):
+            _uhi_val.validate_plottable_histogram(
+                part, name=name, ndim=1, check_kind=True, func_name=func_name
+            )
+
+
+def _collapse(errs):
+    """Return ``errs`` as a single array when its down and up uncertainties are equal."""
+    return errs[0] if _np.array_equal(errs[0], errs[1]) else errs
+
+
 class Background:
     """A background histogram and its uncertainties, for :func:`plot_backgrounds`."""
 
@@ -86,14 +145,24 @@ class Background:
         label : str
             Legend label.
         hist : array_like or PlottableHistogram
-            Bin contents. A PlottableHistogram also supplies the bin edges, and the square root
-            of its variances as the statistical uncertainties.
-        stat_errs : array_like or {"sqrt", "ignore"}, optional
-            Statistical uncertainty in each bin, zero by default. ``"sqrt"`` uses the square root
-            of the bin contents and ``"ignore"`` uses zero. An array is ignored when ``hist`` is a
-            PlottableHistogram.
+            Bin contents. A PlottableHistogram also supplies the bin edges.
+        stat_errs : array_like or str, optional
+            Statistical uncertainty in each bin:
+
+            - shape (N,): symmetric uncertainties.
+            - shape (2, N): down and up uncertainties, in that order.
+            - ``"sqrt"``: the square root of the bin contents.
+            - ``"ignore"``: zero.
+
+            If omitted, the square root of the variances of a PlottableHistogram, and zero
+            otherwise.
         syst_errs : array_like or PlottableHistogram, optional
-            Systematic uncertainty in each bin. For a PlottableHistogram, its bin values are used.
+            Systematic uncertainty in each bin:
+
+            - shape (N,) or one histogram: symmetric uncertainties.
+            - shape (2, N) or two histograms: down and up uncertainties, in that order.
+
+            A histogram's values are used.
         color : color-like, optional
             Fill color (defaults to the next color in the color cycle).
         """
@@ -104,7 +173,7 @@ class Background:
             hist_obj = hist
             bins = _bins(hist.axes[0])
             hist = hist_obj.values()
-            if not isinstance(stat_errs, str):
+            if stat_errs is None:
                 stat_errs = (
                     None
                     if hist_obj.variances() is None
@@ -112,33 +181,17 @@ class Background:
                 )
         else:
             bins = None
+            hist = _np.asarray(hist, dtype=float)
         if stat_errs is None:
             stat_errs = _np.zeros_like(hist)
         elif isinstance(stat_errs, str):
-            stat_errs = stat_errs.lower()
-            if "pois" in stat_errs or "sqrt" in stat_errs:
-                stat_errs = _np.sqrt(hist)
-            elif "ignore" in stat_errs:
-                stat_errs = _np.zeros_like(hist)
-            else:
-                raise TypeError("Invalid stat_errs")
+            stat_errs = _stat_errs_from_name(stat_errs, hist, allow_ignore=True)
+            stat_errs = _collapse(_errors(stat_errs, len(hist), "stat_errs"))
         else:
-            if len(hist) != len(stat_errs):
-                raise BinningMismatchError("Stat errors may have incorrect binning")
+            stat_errs = _collapse(_errors(stat_errs, len(hist), "stat_errs"))
         if syst_errs is not None:
-            if hasattr(syst_errs, "axes"):
-                _uhi_val.validate_plottable_histogram(
-                    syst_errs,
-                    name="syst_errs",
-                    ndim=1,
-                    check_kind=True,
-                    func_name="Background",
-                )
-                if len(syst_errs.axes[0]) != len(hist):
-                    raise BinningMismatchError("Syst errors have incorrect binning")
-                syst_errs = syst_errs.values()
-            elif len(hist) != len(syst_errs):
-                raise BinningMismatchError("Syst errors have incorrect binning")
+            _validate_errs(syst_errs, "syst_errs", "Background")
+            syst_errs = _collapse(_errors(syst_errs, len(hist), "syst_errs"))
 
         self.bins = bins
         self.hist = hist
@@ -223,8 +276,11 @@ def plot_backgrounds(
         Draw the uncertainty bands of the total background. Defaults to False, following the
         PubCom recommendation.
     total_err : array_like, optional
-        Total uncertainty in each bin, replacing the combined systematic uncertainties of the
-        backgrounds. Use it for post-fit uncertainties.
+        Total uncertainty in each bin, replacing the combined systematic uncertainties of
+        the backgrounds. Use it for post-fit uncertainties:
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
     empty_stat_legend : bool, optional
         Add a statistical uncertainty entry to the legend even when no such band is drawn.
     ax : matplotlib.axes.Axes, optional
@@ -237,37 +293,45 @@ def plot_backgrounds(
     total_err : numpy.ndarray
         Total uncertainty on the sum. Pass ``(total_hist, total_err)`` to
         :func:`atlas_mpl_style.uhi.plot_ratio`, or the two arrays to :func:`plot_ratio`.
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
     """
     if bins is not None and isinstance(bins[0], Background):
         bins, backgrounds = backgrounds, bins
     if ax is None:
         ax = _mpl.pyplot.gca()
     _u.decorate_axes(ax)
-    if len(backgrounds) < 1:
-        return
     if bins is None:
+        if len(backgrounds) == 0:
+            raise ValueError("bins is required when there are no backgrounds")
         if backgrounds[0].bins is None:
             raise TypeError(
                 "bins is required if backgrounds were not constructed from PlottableHists"
             )
         bins = backgrounds[0].bins
-    if len(backgrounds[0].hist) != len(bins) - 1:
+    bins = _np.asarray(bins, dtype=float)
+    n_bins = len(bins) - 1
+    if len(backgrounds) == 0:
+        _u.fit_x_to_bins(ax, bins)
+        return _np.zeros(n_bins), _np.zeros(n_bins)
+    if len(backgrounds[0].hist) != n_bins:
         raise BinningMismatchError("Invalid binning supplied")
     if total_err is not None:
-        if len(total_err) != len(bins) - 1:
-            raise BinningMismatchError("Total error may have incorrect binning")
+        total_err = _errors(total_err, n_bins, "total_err")
     n_bkgs = len(backgrounds)
 
-    total_stat_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float64)
-    total_syst_err = _np.zeros_like(backgrounds[0].hist, dtype=_np.float64)
-    total_hist = _np.zeros_like(backgrounds[0].hist, dtype=_np.float64)
+    # Down and up uncertainties are combined separately, as variances until the end.
+    total_stat_err = _np.zeros((2, n_bins))
+    total_syst_err = _np.zeros((2, n_bins))
+    total_hist = _np.zeros(n_bins)
 
     for i, bkg in enumerate(backgrounds):
-        if len(bkg.hist) != len(total_stat_err):
+        if len(bkg.hist) != n_bins:
             raise BinningMismatchError(f"Invalid binning for background {i}")
-        total_stat_err += _np.square(bkg.stat_errs)
+        total_stat_err += _np.square(_errors(bkg.stat_errs, n_bins, "stat_errs"))
         if total_err is None:
-            total_syst_err += _np.square(bkg.syst_errs)
+            total_syst_err += _np.square(_errors(bkg.syst_errs, n_bins, "syst_errs"))
         total_hist += bkg.hist
     # components still variances at this point
     if total_err is None:
@@ -287,8 +351,8 @@ def plot_backgrounds(
             ax._ampllegend.has_stat = True
             plot_band(
                 bins,
-                total_hist - total_stat_err,
-                total_hist + total_stat_err,
+                total_hist - total_stat_err[0],
+                total_hist + total_stat_err[1],
                 ax=ax,
                 fc="transparent",
                 ec="k",
@@ -302,8 +366,8 @@ def plot_backgrounds(
             ax._ampllegend.has_syst = True
             plot_band(
                 bins,
-                total_hist - total_err,
-                total_hist + total_err,
+                total_hist - total_err[0],
+                total_hist + total_err[1],
                 ax=ax,
                 color="grey",
                 alpha=0.5,
@@ -338,7 +402,7 @@ def plot_backgrounds(
             ax._ampllegend.fill_hists[b.label] = p[0]
         else:
             ax._ampllegend.fill_hists[b.label] = p
-    return total_hist, total_err
+    return total_hist, _collapse(total_err)
 
 
 def plot_signal(
@@ -350,6 +414,7 @@ def plot_signal(
     color=None,
     attach_bands=False,
     ax=None,
+    **kwargs,
 ):
     """
     Plot a signal as an unfilled histogram over the stacked backgrounds.
@@ -366,67 +431,81 @@ def plot_signal(
         Bin edges.
     hist : array_like
         Bin contents.
-    stat_errs : array_like or "sqrt", optional
-        Statistical uncertainty in each bin, drawn as a hatched band. ``"sqrt"`` uses the
-        square root of the bin contents.
-    syst_errs : array_like, optional
-        Systematic uncertainty in each bin. A shaded band shows the statistical and
-        systematic uncertainties added in quadrature.
+    stat_errs : array_like or str, optional
+        Statistical uncertainty in each bin, drawn as a hatched band:
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
+        - ``"sqrt"``: the square root of the bin contents.
+    syst_errs : array_like or PlottableHistogram, optional
+        Systematic uncertainty in each bin:
+
+        - shape (N,) or one histogram: symmetric uncertainties.
+        - shape (2, N) or two histograms: down and up uncertainties, in that order.
+
+        A histogram's values are used. A shaded band shows the statistical and systematic
+        uncertainties added in quadrature.
     color : color-like, optional
         Line and band color (defaults to the next color in the color cycle).
     attach_bands : bool, optional
         Draw the bands behind the signal's line in the legend. Defaults to False.
     ax : matplotlib.axes.Axes, optional
         Axes to draw on (defaults to current axes).
+    **kwargs
+        Passed to ``ax.hist``.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
     _u.decorate_axes(ax)
     have_syst = True
     have_stat = True
+    bins = _np.asarray(bins, dtype=float)
+    hist = _np.asarray(hist, dtype=float)
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
     if stat_errs is None:
         have_stat = False
         stat_errs = _np.zeros_like(hist)
     elif isinstance(stat_errs, str):
-        stat_errs = stat_errs.lower()
-        if "pois" in stat_errs or "sqrt" in stat_errs:
-            stat_errs = _np.sqrt(hist)
-        else:
-            raise TypeError("Invalid stat_errs")
-    else:
-        if len(hist) != len(stat_errs):
-            raise BinningMismatchError("Stat errors may have incorrect binning")
+        stat_errs = _stat_errs_from_name(stat_errs, hist)
+    stat_errs = _errors(stat_errs, len(hist), "stat_errs")
     if syst_errs is None:
         have_syst = False
         syst_errs = _np.zeros_like(hist)
-    else:
-        if len(hist) != len(syst_errs):
-            raise BinningMismatchError("Incorrect binning for syst errors")
+    _validate_errs(syst_errs, "syst_errs", "plot_signal")
+    syst_errs = _errors(syst_errs, len(hist), "syst_errs")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     _u.fit_x_to_bins(ax, bins)
     total_err = _np.sqrt(_np.square(stat_errs) + _np.square(syst_errs))
+    if "lw" not in kwargs:
+        kwargs.setdefault("linewidth", 1)
     _, _, p = ax.hist(
         bin_centers,
         bins=bins,
         weights=hist,
         histtype="step",
         label=label,
-        lw=1,
         color=color,
+        **kwargs,
     )
     if color is None:
         color = p[0].get_ec()
     # Use dummy artist to add to legend as straight line
     # Original patch won't appear due to the shared label
-    ax._ampllegend.line_hists[label] = _mpl.lines.Line2D([0], [0], color=color, lw=1)
+    ax._ampllegend.line_hists[label] = _mpl.lines.Line2D(
+        [0],
+        [0],
+        color=color,
+        linestyle=p[0].get_linestyle(),
+        linewidth=p[0].get_linewidth(),
+        alpha=p[0].get_alpha(),
+    )
     if have_syst:
         ax._ampllegend.has_syst = True
         a_syst = plot_band(
             bins,
-            hist - total_err,
-            hist + total_err,
+            hist - total_err[0],
+            hist + total_err[1],
             color=color,
             ax=ax,
             alpha=0.25,
@@ -436,8 +515,8 @@ def plot_signal(
         ax._ampllegend.has_stat = True
         a_stat = plot_band(
             bins,
-            hist - stat_errs,
-            hist + stat_errs,
+            hist - stat_errs[0],
+            hist + stat_errs[1],
             ax=ax,
             ec=color,
             fc="transparent",
@@ -463,9 +542,16 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
         Bin edges.
     hist : array_like
         Bin contents.
-    stat_errs : array_like or "sqrt", optional
-        Statistical uncertainty in each bin. ``"sqrt"`` uses the square root of the bin
-        contents. If omitted, the points have no error bars.
+    stat_errs : array_like or str, optional
+        Statistical uncertainty in each bin:
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
+        - ``"sqrt"``: the square root of the bin contents.
+        - ``"poisson"``, ``"poisson2"``: ROOT's Poisson intervals (see
+          :func:`atlas_mpl_style.utils.poisson_errors`).
+
+        If omitted, the points have no error bars.
     color : color-like, optional
         Point color (defaults to black).
     label : str, optional
@@ -479,24 +565,23 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
         The bin contents.
     stat_errs : numpy.ndarray
         The statistical uncertainties. Pass these and ``hist`` to :func:`plot_ratio`.
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
     """
     if ax is None:
         ax = _mpl.pyplot.gca()
     _u.decorate_axes(ax)
+    bins = _np.asarray(bins, dtype=float)
+    hist = _np.asarray(hist, dtype=float)
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
 
     if stat_errs is None:
         stat_errs = _np.zeros_like(hist)
     elif isinstance(stat_errs, str):
-        stat_errs = stat_errs.lower()
-        if "pois" in stat_errs or "sqrt" in stat_errs:
-            stat_errs = _np.sqrt(hist)
-        else:
-            raise TypeError("Invalid stat_errs")
-    else:
-        if len(hist) != len(stat_errs):
-            raise BinningMismatchError("Stat errors may have incorrect binning")
+        stat_errs = _stat_errs_from_name(stat_errs, hist, allow_poisson=True)
+    stat_errs = _errors(stat_errs, len(hist), "stat_errs")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     _u.fit_x_to_bins(ax, bins)
     if _np.sum(stat_errs) == 0:
@@ -521,7 +606,7 @@ def plot_data(bins, hist, stat_errs=None, color="k", label="Data", ax=None):
             ms=5,
         )
     ax._ampllegend.data_hists[label] = a
-    return hist, stat_errs
+    return hist, _collapse(stat_errs)
 
 
 def plot_ratio(
@@ -547,10 +632,20 @@ def plot_ratio(
     ----------
     bins : array_like
         Bin edges.
-    data, data_errs : array_like
-        Data bin contents and statistical uncertainties, as returned by :func:`plot_data`.
-    bkg, bkg_errs : array_like
-        Total background and its uncertainty, as returned by :func:`plot_backgrounds`.
+    data : array_like
+        Data bin contents.
+    data_errs : array_like
+        Statistical uncertainties of the data, as returned by :func:`plot_data`:
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
+    bkg : array_like
+        Total background.
+    bkg_errs : array_like
+        Uncertainty on the total background, as returned by :func:`plot_backgrounds`:
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
     ratio_ax : matplotlib.axes.Axes
         Ratio panel from :func:`atlas_mpl_style.ratio_axes`.
     max_ratio : float, optional
@@ -562,12 +657,18 @@ def plot_ratio(
         ``"diff"`` plots (data - bkg) / bkg, ``"raw"`` plots data / bkg, and
         ``"significances"`` plots the significance in each bin, as defined in
         https://cds.cern.ch/record/2643488 (see :func:`atlas_mpl_style.utils.significance`).
-        Defaults to ``"diff"``.
+        Asymmetric uncertainties are taken on the side facing the other value. Defaults to
+        ``"diff"``.
     offscale_errs : bool, optional
         Also draw the error bars of points outside the y range. Defaults to False.
     """
     # divide by zero is common -- ignore errors
     olderr = _np.seterr(all="ignore")
+    bins = _np.asarray(bins, dtype=float)
+    data = _np.asarray(data, dtype=float)
+    bkg = _np.asarray(bkg, dtype=float)
+    data_errs = _errors(data_errs, len(bins) - 1, "data_errs")
+    bkg_errs = _errors(bkg_errs, len(bins) - 1, "bkg_errs")
     if plottype == "diff":
         ratio = (data - bkg) / bkg
         if max_ratio is None:
@@ -579,12 +680,20 @@ def plot_ratio(
             max_ratio = 1.25
         min_ratio = 2 - max_ratio
     elif plottype == "significances":
-        ratio = _significance(data, data_errs, bkg, bkg_errs)
+        # Where the data exceed the background, the data's down and the background's up
+        # uncertainty face each other, and the reverse below it.
+        above = data >= bkg
+        ratio = _significance(
+            data,
+            _np.where(above, data_errs[0], data_errs[1]),
+            bkg,
+            _np.where(above, bkg_errs[1], bkg_errs[0]),
+        )
         if max_ratio is None:
             max_ratio = 3.5
         min_ratio = -max_ratio
     else:
-        raise TypeError("Invalid plottype")
+        raise ValueError(f"Invalid plottype {plottype!r}")
     # Widen limits by 10% about the reference line to avoid tick labels clashing
     centre = 1 if plottype == "raw" else 0
     max_ratio = centre + 1.1 * (max_ratio - centre)
@@ -600,13 +709,13 @@ def plot_ratio(
         ratio_ax.yaxis.set_major_locator(_mpl.ticker.FixedLocator(offsets + 1))
     if plottype == "diff":
         plot_band(
-            bins, -bkg_errs / bkg, bkg_errs / bkg, color="grey", alpha=0.5, ax=ratio_ax
+            bins, -bkg_errs[0] / bkg, bkg_errs[1] / bkg, color="grey", alpha=0.5, ax=ratio_ax
         )
     elif plottype == "raw":
         plot_band(
             bins,
-            1 - (bkg_errs / bkg),
-            1 + (bkg_errs / bkg),
+            1 - (bkg_errs[0] / bkg),
+            1 + (bkg_errs[1] / bkg),
             color="grey",
             alpha=0.5,
             ax=ratio_ax,
@@ -662,7 +771,14 @@ def draw_tag(text, ax=None):
     if ax is None:
         ax = _mpl.pyplot.gca()
     ax.text(
-        1, 1.0005, text, ha="right", va="bottom", fontsize=8, transform=ax.transAxes
+        1,
+        1.0005,
+        text,
+        ha="right",
+        va="bottom",
+        # 8 pt in the ATLAS style, scaled with font.size.
+        fontsize=_mpl.rcParams["font.size"] * 8 / 18,
+        transform=ax.transAxes,
     )
 
 
@@ -682,9 +798,14 @@ def plot_1d(
         Bin edges.
     hist : array_like
         Bin contents.
-    stat_errs : array_like or "sqrt", optional
-        Statistical uncertainty in each bin, drawn as a hatched band. ``"sqrt"`` uses the
-        square root of the bin contents.
+    stat_errs : array_like or str, optional
+        Statistical uncertainty in each bin, drawn as a hatched band:
+
+        - shape (N,): symmetric uncertainties.
+        - shape (2, N): down and up uncertainties, in that order.
+        - ``"sqrt"``: the square root of the bin contents.
+        - ``"poisson"``, ``"poisson2"``: ROOT's Poisson intervals (see
+          :func:`atlas_mpl_style.utils.poisson_errors`).
     color : color-like, optional
         Line color (defaults to the next color in the color cycle).
     attach_bands : bool, optional
@@ -697,17 +818,14 @@ def plot_1d(
     if ax is None:
         ax = _mpl.pyplot.gca()
     _u.decorate_axes(ax)
+    bins = _np.asarray(bins, dtype=float)
+    hist = _np.asarray(hist, dtype=float)
     if len(bins) - 1 != len(hist):
         raise BinningMismatchError("Invalid binning")
     if isinstance(stat_errs, str):
-        stat_errs = stat_errs.lower()
-        if "pois" in stat_errs or "sqrt" in stat_errs:
-            stat_errs = _np.sqrt(hist)
-        else:
-            raise TypeError("Invalid stat_errs")
-    elif stat_errs is not None:
-        if len(hist) != len(stat_errs):
-            raise BinningMismatchError("Stat errors may have incorrect binning")
+        stat_errs = _stat_errs_from_name(stat_errs, hist, allow_poisson=True)
+    if stat_errs is not None:
+        stat_errs = _errors(stat_errs, len(hist), "stat_errs")
     bin_centers = (bins[1:] + bins[:-1]) / 2
     _u.fit_x_to_bins(ax, bins)
     _, _, p = ax.hist(
@@ -737,8 +855,8 @@ def plot_1d(
         norm = 1 / (_np.sum(hist) * _np.diff(bins)) if kwargs.get("density") else 1
         a = plot_band(
             bins,
-            (hist - stat_errs) * norm,
-            (hist + stat_errs) * norm,
+            (hist - stat_errs[0]) * norm,
+            (hist + stat_errs[1]) * norm,
             ax=ax,
             fc="transparent",
             ec=color,
@@ -778,6 +896,9 @@ def plot_2d(xbins, ybins, hist, ax=None, pad=0.05, **kwargs):
     cbar : matplotlib.colorbar.Colorbar
         Use :func:`set_zlabel` to label it.
     """
+    xbins = _np.asarray(xbins, dtype=float)
+    ybins = _np.asarray(ybins, dtype=float)
+    hist = _np.asarray(hist, dtype=float)
     if len(xbins) != hist.shape[0] + 1:
         raise BinningMismatchError("xbins does not match 1st axis of hist")
     if len(ybins) != hist.shape[1] + 1:
@@ -827,6 +948,8 @@ def plot_cutflow(
     **kwargs
         Passed to ``ax.barh`` or ``ax.bar``.
     """
+    # 16 pt in the ATLAS style, scaled with font.size.
+    label_size = _mpl.rcParams["font.size"] * 16 / 18
     resize_ax = False
     if ax is None:
         ax = _mpl.pyplot.gca()
@@ -849,7 +972,7 @@ def plot_cutflow(
                     textcoords="offset points",
                     ha="right",
                     va="center",
-                    fontsize=16,
+                    fontsize=label_size,
                     color=textcolor,
                 )
         if resize_ax:
@@ -867,7 +990,7 @@ def plot_cutflow(
                     textcoords="offset points",
                     ha="center",
                     va="top",
-                    fontsize=16,
+                    fontsize=label_size,
                     color=textcolor,
                 )
         if resize_ax:

@@ -48,7 +48,7 @@ class TestPlotModule(unittest.TestCase):
         np.testing.assert_array_equal(bkg.syst_errs, syst_errs)
 
         # Test errors
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             Background("InvalidStat", hist, stat_errs="invalid_stat")
 
         with self.assertRaises(BinningMismatchError):
@@ -115,7 +115,7 @@ class TestPlotModule(unittest.TestCase):
         self.assertEqual(len(ax2.collections), 0)
 
         # Invalid stat_errs
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             plot_signal("BadSig", bins, hist, stat_errs="invalid", ax=ax1)
 
         with self.assertRaises(BinningMismatchError):
@@ -161,7 +161,7 @@ class TestPlotModule(unittest.TestCase):
         plot_ratio(bins, data, data_errs, bkg, bkg_errs, ratio_ax=rax, max_ratio=2.0, plottype="raw", offscale_errs=True)
 
         # Invalid plottype
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             plot_ratio(bins, data, data_errs, bkg, bkg_errs, ratio_ax=rax, plottype="invalid")
 
         plt.close(fig)
@@ -488,8 +488,11 @@ class TestPlotModule(unittest.TestCase):
 
     def test_background_string_stat_errs(self):
         hist = np.array([10.0, 20.0, 30.0])
-        bkg_pois = Background("BkgPois", hist, stat_errs="pois")
-        np.testing.assert_array_equal(bkg_pois.stat_errs, np.sqrt(hist))
+        bkg_sqrt = Background("BkgSqrt", hist, stat_errs="sqrt")
+        np.testing.assert_array_equal(bkg_sqrt.stat_errs, np.sqrt(hist))
+
+        with self.assertRaises(ValueError):
+            Background("BkgPois", hist, stat_errs="poisson")
 
         bkg_ignore = Background("BkgIgnore", hist, stat_errs="ignore")
         np.testing.assert_array_equal(bkg_ignore.stat_errs, np.zeros_like(hist))
@@ -578,6 +581,162 @@ class TestPlotModule(unittest.TestCase):
         band = ax.collections[0].get_paths()[0].vertices[:, 1]
         self.assertAlmostEqual(band.max(), (density + np.sqrt(hist) / (hist.sum() * np.diff(bins))).max())
         self.assertAlmostEqual(ax.patches[0].get_xy()[:, 1].max(), density.max())
+        plt.close(fig)
+
+    # Asymmetric uncertainties: a pair (down, up), with signs ignored.
+    def _band_edges(self, collection):
+        y = collection.get_paths()[0].vertices[:, 1]
+        return y.min(), y.max()
+
+    def test_asymmetric_errors_accepted_everywhere(self):
+        bins = np.linspace(0, 4, 5)
+        n = np.array([1.0, 4, 9, 16])
+        down, up = 0.5 * np.sqrt(n), 1.5 * np.sqrt(n)
+        for errs in [(down, up), np.vstack([down, up]), (-down, up)]:
+            fig, ax = plt.subplots()
+            _, returned = plot_data(bins, n, errs, ax=ax)
+            np.testing.assert_allclose(returned, [down, up])
+            plot_1d("h", bins, n, errs, ax=ax)
+            plot_signal("s", bins, n, errs, errs, ax=ax)
+            total_hist, total_err = plot_backgrounds(
+                [Background("b", n, errs, errs)], bins, total_err=None, ax=ax, show_errs=True
+            )
+            self.assertEqual(total_err.shape, (2, 4))
+            plt.close(fig)
+
+    def test_asymmetric_band_edges(self):
+        bins = np.linspace(0, 1, 2)
+        fig, ax = plt.subplots()
+        plot_1d("h", bins, np.array([10.0]), (np.array([1.0]), np.array([3.0])), ax=ax)
+        self.assertEqual(self._band_edges(ax.collections[0]), (9.0, 13.0))
+        plt.close(fig)
+
+    def test_backgrounds_combine_each_side_in_quadrature(self):
+        bins = np.linspace(0, 1, 2)
+        fig, ax = plt.subplots()
+        _, total_err = plot_backgrounds(
+            [
+                Background("a", np.array([5.0]), (np.array([3.0]), np.array([0.0]))),
+                Background("b", np.array([5.0]), (np.array([4.0]), np.array([1.0]))),
+            ],
+            bins,
+            ax=ax,
+        )
+        np.testing.assert_allclose(total_err, [[5.0], [1.0]])
+        plt.close(fig)
+
+    def test_symmetric_errors_stay_one_dimensional(self):
+        bins = np.linspace(0, 2, 3)
+        fig, ax = plt.subplots()
+        _, total_err = plot_backgrounds([Background("b", np.ones(2), np.ones(2))], bins, ax=ax)
+        self.assertEqual(total_err.shape, (2,))
+        _, stat = plot_data(bins, np.ones(2), np.ones(2), ax=ax)
+        self.assertEqual(stat.shape, (2,))
+        plt.close(fig)
+
+    def test_one_row_per_bin_is_rejected(self):
+        bins = np.linspace(0, 3, 4)
+        fig, ax = plt.subplots()
+        with self.assertRaisesRegex(BinningMismatchError, r"\(down, up\)"):
+            plot_data(bins, np.ones(3), np.ones((3, 2)), ax=ax)
+        plt.close(fig)
+
+    def test_ratio_with_asymmetric_errors(self):
+        bins = np.linspace(0, 2, 3)
+        data, bkg = np.array([12.0, 8.0]), np.array([10.0, 10.0])
+        data_errs = (np.array([1.0, 2.0]), np.array([3.0, 4.0]))
+        bkg_errs = (np.array([0.5, 1.5]), np.array([2.5, 3.5]))
+        fig, ax, rax = ampl.ratio_axes()
+        plot_ratio(bins, data, data_errs, bkg, bkg_errs, rax, plottype="raw")
+        lo, hi = self._band_edges(rax.collections[0])
+        self.assertAlmostEqual(lo, 1 - 1.5 / 10)
+        self.assertAlmostEqual(hi, 1 + 3.5 / 10)
+        plt.close(fig)
+        fig, ax, rax = ampl.ratio_axes()
+        plot_ratio(bins, data, data_errs, bkg, bkg_errs, rax, plottype="significances")
+        points = [line for line in rax.lines if line.get_marker() == "o"][0].get_ydata()
+        # Data above the background use the data's down and the background's up uncertainty.
+        expected = ampl.utils.significance(data, np.array([1.0, 4.0]), bkg, np.array([2.5, 1.5]))
+        np.testing.assert_allclose(points, expected)
+        plt.close(fig)
+
+    def test_poisson_errors(self):
+        errs = ampl.utils.poisson_errors([0, 4])
+        # Empty bin: no down error, up error to the 68.27% upper limit, -ln(1 - 0.8413).
+        np.testing.assert_allclose(errs[:, 0], [0.0, 1.8410], atol=1e-3)
+        np.testing.assert_allclose(errs[:, 1], [1.9137, 3.1627], atol=1e-3)
+        errs95 = ampl.utils.poisson_errors([0], "poisson2")
+        np.testing.assert_allclose(errs95[:, 0], [0.0, -np.log(0.025)], atol=1e-6)
+        with self.assertRaises(ValueError):
+            ampl.utils.poisson_errors([-1])
+        with self.assertRaises(ValueError):
+            ampl.utils.poisson_errors([1], "poisson3")
+        with self.assertRaisesRegex(ValueError, "weighted"):
+            ampl.utils.poisson_errors([1.5])
+
+    def test_poisson_stat_errs_names(self):
+        bins = np.linspace(0, 2, 3)
+        n = np.array([0.0, 4.0])
+        fig, ax = plt.subplots()
+        _, errs = plot_data(bins, n, "poisson", ax=ax)
+        np.testing.assert_allclose(errs, ampl.utils.poisson_errors(n))
+        _, errs = plot_data(bins, n, "poisson2", ax=ax)
+        np.testing.assert_allclose(errs, ampl.utils.poisson_errors(n, "poisson2"))
+        plot_1d("h", bins, n, "poisson", ax=ax)
+        with self.assertRaises(ValueError):
+            plot_signal("s", bins, n, "poisson2", ax=ax)
+        with self.assertRaises(ValueError):
+            plot_data(bins, n, "pois", ax=ax)
+        with self.assertRaisesRegex(ValueError, 'stat_errs="poisson"'):
+            plot_data(bins, np.array([0.5, 4.0]), "poisson", ax=ax)
+        plt.close(fig)
+
+
+    def test_plot_signal_rejects_profile_syst_errs(self):
+        import boost_histogram as bh
+        from atlas_mpl_style.plot import UnsupportedKindError
+
+        axis = bh.axis.Regular(2, 0, 2)
+        prof = bh.Histogram(axis, storage=bh.storage.Mean()).fill([0.5], sample=[1])
+        fig, ax = plt.subplots()
+        with self.assertRaises(UnsupportedKindError):
+            plot_signal("s", np.array([0.0, 1, 2]), np.array([4.0, 9]), syst_errs=prof, ax=ax)
+        plt.close(fig)
+
+    def test_lists_are_accepted(self):
+        bins, hist = [0.0, 1, 2], [1.0, 4]
+        fig, ax, rax = ampl.ratio_axes()
+        plot_backgrounds([Background("b", hist, "sqrt")], bins, ax=ax, show_errs=True)
+        plot_data(bins, hist, "sqrt", ax=ax)
+        plot_1d("h", bins, hist, [1.0, 2], ax=ax)
+        plot_signal("s", bins, hist, [1.0, 2], ax=ax)
+        plot_ratio(bins, hist, [1.0, 2], hist, [1.0, 1], rax)
+        plt.close(fig)
+        fig, ax = plt.subplots()
+        plot_2d(bins, bins, [[1.0, 2], [3, 4]], ax=ax)
+        plt.close(fig)
+
+    def test_empty_backgrounds_give_zero_totals(self):
+        fig, ax = plt.subplots()
+        total_hist, total_err = plot_backgrounds([], np.linspace(0, 3, 4), ax=ax)
+        np.testing.assert_array_equal(total_hist, np.zeros(3))
+        np.testing.assert_array_equal(total_err, np.zeros(3))
+        with self.assertRaises(ValueError):
+            plot_backgrounds([], ax=ax)
+        plt.close(fig)
+
+    def test_plot_signal_kwargs(self):
+        fig, ax = plt.subplots()
+        plot_signal("s", np.linspace(0, 2, 3), np.ones(2), ax=ax, ls="--", lw=3)
+        line = ax._ampllegend.line_hists["s"]
+        self.assertEqual((line.get_linestyle(), line.get_linewidth()), ("--", 3))
+        plt.close(fig)
+
+    def test_fixed_text_sizes_follow_font_size(self):
+        ampl.set_font(size=9)
+        fig, ax = plt.subplots()
+        draw_tag("tag", ax=ax)
+        self.assertAlmostEqual(ax.texts[-1].get_fontsize(), 4.0)
         plt.close(fig)
 
 if __name__ == "__main__":

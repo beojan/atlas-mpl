@@ -311,7 +311,8 @@ def draw_pull_impact_legend(*, ax=None, **kwargs):
                 "The axes passed to draw_pull_impact_legend do not contain a pull or impact plot."
             )
     kwargs.setdefault("loc", "upper left")
-    kwargs.setdefault("fontsize", 14)
+    # 14 pt in the ATLAS style, scaled with font.size.
+    kwargs.setdefault("fontsize", _mpl.rcParams["font.size"] * 14 / 18)
     kwargs.setdefault("frameon", False)
     kwargs.setdefault("handlelength", 3.0)
     if hasattr(ax, "_impact_axes"):

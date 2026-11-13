@@ -310,21 +310,29 @@ def set_color_cycle(pal=None, n=None):
     plot._hist_colors = _mpl.rcParams["axes.prop_cycle"]()
 
 
-def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
+def use_atlas_style(
+    atlas_label="ATLAS", fancy_legend=False, usetex=False, *, atlasLabel=None, fancyLegend=None
+):
     """
     Activate the ATLAS style.
 
+    The camelCase names ``atlasLabel`` and ``fancyLegend`` are also accepted.
+
     Parameters
     ----------
-    atlasLabel : str, optional
+    atlas_label : str, optional
         Text that :func:`draw_atlas_label` draws in place of "ATLAS".
-    fancyLegend : bool, optional
+    fancy_legend : bool, optional
         Keep Matplotlib's legend frame. By default legends have no frame.
     usetex : bool, optional
         Typeset text with LaTeX, which needs the TeX packages listed in the README. If
         ``pdflatex``, ``dvipng``, or Ghostscript cannot be found, a warning is issued and
         Matplotlib's own math rendering is used instead.
     """
+    if atlasLabel is not None:
+        atlas_label = atlasLabel
+    if fancyLegend is not None:
+        fancy_legend = fancyLegend
     if usetex:
         if (
             _shutil.which("pdflatex") is None
@@ -338,7 +346,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
 
     _style.use("atlas")
     set_color_cycle("ATLAS")
-    plot._atlas_label = atlasLabel
+    plot._atlas_label = atlas_label
     _mpl.rcParams["xtick.minor.visible"] = True
     _mpl.rcParams["ytick.minor.visible"] = True
     if not usetex:
@@ -360,7 +368,7 @@ def use_atlas_style(atlasLabel="ATLAS", fancyLegend=False, usetex=False):
                 r"\def\mathdefault{}",
             ]
         )
-    if not fancyLegend:
+    if not fancy_legend:
         _mpl.rcParams["legend.frameon"] = False
         _mpl.rcParams["legend.fancybox"] = False
         _mpl.rcParams["legend.framealpha"] = 0.75
