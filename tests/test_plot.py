@@ -569,5 +569,16 @@ class TestPlotModule(unittest.TestCase):
         self.assertGreaterEqual(len(ticks), 3)
         plt.close(fig)
 
+    def test_plot_1d_density_band_matches_line(self):
+        fig, ax = plt.subplots()
+        bins = np.array([0.0, 2, 4, 8, 10])
+        hist = np.array([4.0, 8, 16, 4])
+        plot_1d("h", bins, hist, stat_errs="sqrt", ax=ax, density=True)
+        density = hist / (hist.sum() * np.diff(bins))
+        band = ax.collections[0].get_paths()[0].vertices[:, 1]
+        self.assertAlmostEqual(band.max(), (density + np.sqrt(hist) / (hist.sum() * np.diff(bins))).max())
+        self.assertAlmostEqual(ax.patches[0].get_xy()[:, 1].max(), density.max())
+        plt.close(fig)
+
 if __name__ == "__main__":
     unittest.main()

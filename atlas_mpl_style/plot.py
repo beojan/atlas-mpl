@@ -733,10 +733,12 @@ def plot_1d(
     )
     if stat_errs is not None:
         ax._ampllegend.has_stat = True
+        # Normalize the band the same way ax.hist normalizes the line.
+        norm = 1 / (_np.sum(hist) * _np.diff(bins)) if kwargs.get("density") else 1
         a = plot_band(
             bins,
-            hist - stat_errs,
-            hist + stat_errs,
+            (hist - stat_errs) * norm,
+            (hist + stat_errs) * norm,
             ax=ax,
             fc="transparent",
             ec=color,
